@@ -345,7 +345,6 @@ components:
         - lastName
         - birthDate
         - email
-        - password
       properties:
         lastName:
           type: string
@@ -365,12 +364,6 @@ components:
           format: email
           maxLength: 100
           example: faly.randria@email.com
-        password:
-          type: string
-          maxLength: 255
-          writeOnly: true
-          example: "********"
-          description: Raw password (will be hashed server-side)
         phone:
           type: string
           maxLength: 30
@@ -457,7 +450,7 @@ components:
       required:
         - price
         - format
-        - bookId
+        - book
         - pageNumber
       properties:
         price:
@@ -467,10 +460,15 @@ components:
           description: Unit sale price
         format:
           $ref: '#/components/schemas/BookCopyFormat'
-        bookId:
-          type: string
-          format: uuid
-          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        book:
+          type: object
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
         pageNumber:
           type: integer
           example: 120
@@ -481,8 +479,8 @@ components:
         - id
         - price
         - format
-        - libraryId
-        - bookId
+        - library
+        - book
         - status
         - pageNumber
         - updatedAt
@@ -497,14 +495,10 @@ components:
           example: 25.00
         format:
           $ref: '#/components/schemas/BookCopyFormat'
-        libraryId:
-          type: string
-          format: uuid
-          example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-        bookId:
-          type: string
-          format: uuid
-          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        library:
+          $ref: '#/components/schemas/LibraryResponse'
+        book:
+          $ref: '#/components/schemas/BookResponse'
         status:
           $ref: '#/components/schemas/BookCopyStatus'
         pageNumber:
@@ -2036,19 +2030,91 @@ paths:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
-                  -
-                    id: f1a2b3c4-d5e6-7890-abcd-ef1234567890
-                    price: 25.0
+                  - id: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+                    price: 25.00
                     format: PAPERBACK
-                    libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-                    bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                    library:
+                      id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                      name: Librairie Générale
+                      phone: '+261 34 12 345 67'
+                      email: contact@librairie-generale.mg
+                      address: 15 Avenue de l'Indépendance, Antananarivo
+                    book:
+                      id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                      title: Le Petit Prince
+                      abstract: Les aventures...
+                      isbn: 978-2-07-061275-8
+                      publisher: Gallimard
+                      publishedAt: 1943-04-06
+                      createdAt: "2026-06-01T10:30:00Z"
+                      authors:
+                        - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                          firstName: Antoine
+                          lastName: de Saint-Exupéry
+                      genres:
+                        - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                          name: Fiction
                     status: AVAILABLE
                     pageNumber: 120
                     updatedAt: "2026-06-01T10:30:00Z"
+                  - id: g2b3c4d5-e6f7-8901-abcd-ef1234567891
+                    price: 30.00
+                    format: HARDCOVER
+                    library:
+                      id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                      name: Librairie Générale
+                      phone: '+261 34 12 345 67'
+                      email: contact@librairie-generale.mg
+                      address: 15 Avenue de l'Indépendance, Antananarivo
+                    book:
+                      id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                      title: Le Petit Prince
+                      abstract: Les aventures...
+                      isbn: 978-2-07-061275-8
+                      publisher: Gallimard
+                      publishedAt: 1943-04-06
+                      createdAt: "2026-06-01T10:30:00Z"
+                      authors:
+                        - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                          firstName: Antoine
+                          lastName: de Saint-Exupéry
+                      genres:
+                        - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                          name: Fiction
+                    status: AVAILABLE
+                    pageNumber: 96
+                    updatedAt: "2026-06-01T10:30:00Z"
+                  - id: h3c4d5e6-f7a8-9012-abcd-ef1234567892
+                    price: 18.50
+                    format: PAPERBACK
+                    library:
+                      id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                      name: Librairie Générale
+                      phone: '+261 34 12 345 67'
+                      email: contact@librairie-generale.mg
+                      address: 15 Avenue de l'Indépendance, Antananarivo
+                    book:
+                      id: c2d3e4f5-a6b7-8901-abcd-ef1234567891
+                      title: Les Misérables
+                      abstract: null
+                      isbn: 978-2-07-040922-8
+                      publisher: Gallimard
+                      publishedAt: 1862-03-30
+                      createdAt: "2026-06-02T11:00:00Z"
+                      authors:
+                        - id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                          firstName: Victor
+                          lastName: Hugo
+                      genres:
+                        - id: f2a3b4c5-d6e7-8901-abcd-ef1234567890
+                          name: Roman
+                    status: AVAILABLE
+                    pageNumber: 280
+                    updatedAt: "2026-06-01T11:00:00Z"
                 pagination:
                   page: 1
                   size: 20
-                  total: 1
+                  total: 3
 
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -2085,8 +2151,27 @@ paths:
                 id: f1a2b3c4-d5e6-7890-abcd-ef1234567890
                 price: 25.0
                 format: PAPERBACK
-                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-                bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                library:
+                  id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  name: Librairie Générale
+                  phone: '+261 34 12 345 67'
+                  email: contact@librairie-generale.mg
+                  address: 15 Avenue de l'Indépendance, Antananarivo
+                book:
+                  id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                  title: Le Petit Prince
+                  abstract: Les aventures...
+                  isbn: 978-2-07-061275-8
+                  publisher: Gallimard
+                  publishedAt: 1943-04-06
+                  createdAt: "2026-06-01T10:30:00Z"
+                  authors:
+                    - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                      firstName: Antoine
+                      lastName: de Saint-Exupéry
+                  genres:
+                    - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                      name: Fiction
                 status: AVAILABLE
                 pageNumber: 120
                 updatedAt: "2026-06-01T10:30:00Z"
@@ -2130,8 +2215,27 @@ paths:
                 id: f1a2b3c4-d5e6-7890-abcd-ef1234567890
                 price: 25.0
                 format: PAPERBACK
-                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-                bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                library:
+                  id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  name: Librairie Générale
+                  phone: '+261 34 12 345 67'
+                  email: contact@librairie-generale.mg
+                  address: 15 Avenue de l'Indépendance, Antananarivo
+                book:
+                  id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                  title: Le Petit Prince
+                  abstract: Les aventures...
+                  isbn: 978-2-07-061275-8
+                  publisher: Gallimard
+                  publishedAt: 1943-04-06
+                  createdAt: "2026-06-01T10:30:00Z"
+                  authors:
+                    - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                      firstName: Antoine
+                      lastName: de Saint-Exupéry
+                  genres:
+                    - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                      name: Fiction
                 status: AVAILABLE
                 pageNumber: 120
                 updatedAt: "2026-06-01T10:30:00Z"
@@ -2178,8 +2282,27 @@ paths:
                 id: f1a2b3c4-d5e6-7890-abcd-ef1234567890
                 price: 25.0
                 format: PAPERBACK
-                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-                bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                library:
+                  id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  name: Librairie Générale
+                  phone: '+261 34 12 345 67'
+                  email: contact@librairie-generale.mg
+                  address: 15 Avenue de l'Indépendance, Antananarivo
+                book:
+                  id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                  title: Le Petit Prince
+                  abstract: Les aventures...
+                  isbn: 978-2-07-061275-8
+                  publisher: Gallimard
+                  publishedAt: 1943-04-06
+                  createdAt: "2026-06-01T10:30:00Z"
+                  authors:
+                    - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                      firstName: Antoine
+                      lastName: de Saint-Exupéry
+                  genres:
+                    - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                      name: Fiction
                 status: AVAILABLE
                 pageNumber: 120
                 updatedAt: "2026-06-01T10:30:00Z"
