@@ -1,0 +1,2661 @@
+openapi: 3.0.3
+info:
+  title: Library Management API
+  description: |
+    API de gestion de bibliothèque — gère les livres, exemplaires, auteurs, genres,
+    arrivages (réceptions de stock) et ventes au sein d'une ou plusieurs librairies.
+
+    Basée sur le MCD conceptuel du projet.
+  version: 0.1.0
+  contact:
+    name: API Support
+    email: support@library.app
+
+servers:
+  - url: https://api.library.app/v1
+    description: Production
+  - url: http://localhost:8080/api/v1
+    description: Local development
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Authentification par token JWT
+
+  schemas:
+    # ────────────────── Enums ──────────────────
+    BookCopyFormat:
+      type: string
+      enum:
+        - HARDCOVER
+        - PAPERBACK
+        - POCKET
+      description: Format physique d'un exemplaire
+
+    BookCopyStatus:
+      type: string
+      enum:
+        - AVAILABLE
+        - SOLD_OUT
+      description: Disponibilité d'un exemplaire
+
+    SaleStatus:
+      type: string
+      enum:
+        - SOLD
+        - BOOKED
+        - EXPIRED
+      description: État d'une vente
+
+    # ────────────────── Library ──────────────────
+    LibraryRequest:
+      type: object
+      required:
+        - name
+        - phone
+        - email
+        - address
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          example: Librairie Générale
+        phone:
+          type: string
+          maxLength: 30
+          example: +261 34 12 345 67
+        email:
+          type: string
+          format: email
+          maxLength: 100
+          example: contact@librairie-generale.mg
+        address:
+          type: string
+          maxLength: 100
+          example: 15 Avenue de l'Indépendance, Antananarivo
+
+    LibraryResponse:
+      type: object
+      required:
+        - id
+        - name
+        - phone
+        - email
+        - address
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        name:
+          type: string
+          maxLength: 100
+          example: Librairie Générale
+        phone:
+          type: string
+          maxLength: 30
+          example: +261 34 12 345 67
+        email:
+          type: string
+          format: email
+          maxLength: 100
+          example: contact@librairie-generale.mg
+        address:
+          type: string
+          maxLength: 100
+          example: 15 Avenue de l'Indépendance, Antananarivo
+
+    LibraryUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          example: Librairie Générale
+        phone:
+          type: string
+          maxLength: 30
+          example: +261 34 12 345 67
+        email:
+          type: string
+          format: email
+          maxLength: 100
+          example: contact@librairie-generale.mg
+        address:
+          type: string
+          maxLength: 100
+          example: 15 Avenue de l'Indépendance, Antananarivo
+
+    # ────────────────── Book ──────────────────
+    BookRequest:
+      type: object
+      required:
+        - title
+        - isbn
+        - publisher
+        - publishedAt
+      properties:
+        title:
+          type: string
+          maxLength: 100
+          example: Le Petit Prince
+        abstract:
+          type: string
+          nullable: true
+          example: Les aventures d'un petit garçon venu d'ailleurs...
+        isbn:
+          type: string
+          maxLength: 100
+          example: 978-2-07-061275-8
+        publisher:
+          type: string
+          maxLength: 100
+          example: Gallimard
+        publishedAt:
+          type: string
+          format: date
+          example: "1943-04-06"
+
+    BookResponse:
+      type: object
+      required:
+        - id
+        - title
+        - isbn
+        - publisher
+        - publishedAt
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        title:
+          type: string
+          maxLength: 100
+          example: Le Petit Prince
+        abstract:
+          type: string
+          nullable: true
+          example: Les aventures d'un petit garçon venu d'ailleurs...
+        isbn:
+          type: string
+          maxLength: 100
+          example: 978-2-07-061275-8
+        publisher:
+          type: string
+          maxLength: 100
+          example: Gallimard
+        publishedAt:
+          type: string
+          format: date
+          example: "1943-04-06"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-06-01T10:30:00Z"
+
+    BookUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        title:
+          type: string
+          maxLength: 100
+          example: Le Petit Prince
+        abstract:
+          type: string
+          nullable: true
+          example: Les aventures d'un petit garçon venu d'ailleurs...
+        isbn:
+          type: string
+          maxLength: 100
+          example: 978-2-07-061275-8
+        publisher:
+          type: string
+          maxLength: 100
+          example: Gallimard
+        publishedAt:
+          type: string
+          format: date
+          example: "1943-04-06"
+
+    # ────────────────── Author ──────────────────
+    AuthorRequest:
+      type: object
+      required:
+        - lastName
+      properties:
+        firstName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: Antoine
+        lastName:
+          type: string
+          maxLength: 100
+          example: de Saint-Exupéry
+
+    AuthorResponse:
+      type: object
+      required:
+        - id
+        - lastName
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+        firstName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: Antoine
+        lastName:
+          type: string
+          maxLength: 100
+          example: de Saint-Exupéry
+
+    AuthorUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        firstName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: Antoine
+        lastName:
+          type: string
+          maxLength: 100
+          example: de Saint-Exupéry
+
+    # ────────────────── Genre ──────────────────
+    GenreRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          example: Fiction
+
+    GenreResponse:
+      type: object
+      required:
+        - id
+        - name
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+        name:
+          type: string
+          maxLength: 100
+          example: Fiction
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-06-01T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2026-06-01T10:30:00Z"
+
+    GenreUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          example: Fiction
+
+    # ────────────────── Customer ──────────────────
+    CustomerRequest:
+      type: object
+      required:
+        - lastName
+        - birthDate
+        - email
+        - password
+      properties:
+        lastName:
+          type: string
+          maxLength: 100
+          example: Randria
+        firstName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: Faly
+        birthDate:
+          type: string
+          format: date
+          example: "1995-08-12"
+        email:
+          type: string
+          format: email
+          maxLength: 100
+          example: faly.randria@email.com
+        password:
+          type: string
+          maxLength: 255
+          writeOnly: true
+          example: "********"
+          description: Mot de passe en clair (sera hashé côté serveur)
+        phone:
+          type: string
+          maxLength: 30
+          nullable: true
+          example: +261 32 11 234 56
+
+    CustomerResponse:
+      type: object
+      required:
+        - id
+        - lastName
+        - birthDate
+        - email
+        - updatedAt
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+        lastName:
+          type: string
+          maxLength: 100
+          example: Randria
+        firstName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: Faly
+        birthDate:
+          type: string
+          format: date
+          example: "1995-08-12"
+        email:
+          type: string
+          format: email
+          maxLength: 100
+          example: faly.randria@email.com
+        phone:
+          type: string
+          maxLength: 30
+          nullable: true
+          example: +261 32 11 234 56
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2026-06-01T10:30:00Z"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-06-01T10:30:00Z"
+
+    CustomerUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        lastName:
+          type: string
+          maxLength: 100
+          example: Randria
+        firstName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: Faly
+        birthDate:
+          type: string
+          format: date
+          example: "1995-08-12"
+        email:
+          type: string
+          format: email
+          maxLength: 100
+          example: faly.randria@email.com
+        phone:
+          type: string
+          maxLength: 30
+          nullable: true
+          example: +261 32 11 234 56
+
+    # ────────────────── Book Copy ──────────────────
+    BookCopyRequest:
+      type: object
+      required:
+        - price
+        - format
+        - bookId
+        - pageNumber
+      properties:
+        price:
+          type: number
+          format: double
+          example: 25.00
+          description: Prix de vente unitaire
+        format:
+          $ref: '#/components/schemas/BookCopyFormat'
+        bookId:
+          type: string
+          format: uuid
+          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        pageNumber:
+          type: integer
+          example: 120
+
+    BookCopyResponse:
+      type: object
+      required:
+        - id
+        - price
+        - format
+        - libraryId
+        - bookId
+        - status
+        - pageNumber
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+        price:
+          type: number
+          format: double
+          example: 25.00
+        format:
+          $ref: '#/components/schemas/BookCopyFormat'
+        libraryId:
+          type: string
+          format: uuid
+          example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        bookId:
+          type: string
+          format: uuid
+          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        status:
+          $ref: '#/components/schemas/BookCopyStatus'
+        pageNumber:
+          type: integer
+          example: 120
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2026-06-01T10:30:00Z"
+
+    BookCopyUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        price:
+          type: number
+          format: double
+          example: 25.00
+        format:
+          $ref: '#/components/schemas/BookCopyFormat'
+        status:
+          $ref: '#/components/schemas/BookCopyStatus'
+        pageNumber:
+          type: integer
+          example: 120
+
+    # ────────────────── Arrival ──────────────────
+    ArrivalRequest:
+      type: object
+      properties:
+        arrivalDate:
+          type: string
+          format: date-time
+          example: "2026-06-10T08:00:00Z"
+          description: Date de réception. Par défaut, la date courante.
+
+    ArrivalResponse:
+      type: object
+      required:
+        - id
+        - createdAt
+        - arrivalDate
+        - libraryId
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-06-10T08:00:00Z"
+        arrivalDate:
+          type: string
+          format: date-time
+          example: "2026-06-10T08:00:00Z"
+        libraryId:
+          type: string
+          format: uuid
+          example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+
+    # ────────────────── Arrival Item (arrival_book_copy) ──────────────────
+    ArrivalItemRequest:
+      type: object
+      required:
+        - bookCopyId
+        - purchasePrice
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+          example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+        purchasePrice:
+          type: number
+          format: double
+          example: 15.00
+          description: Prix d'achat unitaire (coût fournisseur)
+        quantity:
+          type: integer
+          minimum: 1
+          default: 1
+          example: 3
+
+    ArrivalItemResponse:
+      type: object
+      required:
+        - bookCopyId
+        - arrivalId
+        - createdAt
+        - purchasePrice
+        - quantity
+        - updatedAt
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+          example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+        arrivalId:
+          type: string
+          format: uuid
+          example: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-06-10T08:00:00Z"
+        purchasePrice:
+          type: number
+          format: double
+          example: 15.00
+        quantity:
+          type: integer
+          example: 3
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2026-06-10T08:00:00Z"
+
+    # ────────────────── Sale ──────────────────
+    SaleRequest:
+      type: object
+      required:
+        - customerId
+      properties:
+        saleDate:
+          type: string
+          format: date-time
+          example: "2026-06-15T14:30:00Z"
+          description: Date de la vente. Par défaut, la date courante.
+        customerId:
+          type: string
+          format: uuid
+          example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+        status:
+          $ref: '#/components/schemas/SaleStatus'
+
+    SaleResponse:
+      type: object
+      required:
+        - id
+        - saleDate
+        - customerId
+        - status
+        - libraryId
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+        saleDate:
+          type: string
+          format: date-time
+          example: "2026-06-15T14:30:00Z"
+        customerId:
+          type: string
+          format: uuid
+          example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+        status:
+          $ref: '#/components/schemas/SaleStatus'
+        libraryId:
+          type: string
+          format: uuid
+          example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-06-15T14:30:00Z"
+
+    SaleUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        status:
+          $ref: '#/components/schemas/SaleStatus'
+        saleDate:
+          type: string
+          format: date-time
+          example: "2026-06-15T14:30:00Z"
+
+    # ────────────────── Sale Item (sale_book_copy) ──────────────────
+    SaleItemRequest:
+      type: object
+      required:
+        - bookCopyId
+        - price
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+          example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+        quantity:
+          type: integer
+          minimum: 1
+          default: 1
+          example: 1
+        price:
+          type: number
+          format: double
+          example: 25.00
+          description: Prix unitaire de vente au moment de la transaction
+
+    SaleItemResponse:
+      type: object
+      required:
+        - bookCopyId
+        - saleId
+        - createdAt
+        - quantity
+        - price
+      properties:
+        bookCopyId:
+          type: string
+          format: uuid
+          example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+        saleId:
+          type: string
+          format: uuid
+          example: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-06-15T14:30:00Z"
+        quantity:
+          type: integer
+          example: 1
+        price:
+          type: number
+          format: double
+          example: 25.00
+
+    # ────────────────── Book-Author Association ──────────────────
+    BookAuthorResponse:
+      type: object
+      required:
+        - bookId
+        - authorId
+      properties:
+        bookId:
+          type: string
+          format: uuid
+          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        authorId:
+          type: string
+          format: uuid
+          example: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+
+    BookAuthorReplaceRequest:
+      type: object
+      required:
+        - authorIds
+      properties:
+        authorIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example:
+            - c1d2e3f4-a5b6-7890-abcd-ef1234567890
+            - d1e2f3a4-b5c6-7890-abcd-ef1234567890
+          description: Remplace intégralement la liste des auteurs du livre
+
+    # ────────────────── Book-Genre Association ──────────────────
+    BookGenreResponse:
+      type: object
+      required:
+        - bookId
+        - genreId
+        - createdAt
+        - updatedAt
+      properties:
+        bookId:
+          type: string
+          format: uuid
+          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        genreId:
+          type: string
+          format: uuid
+          example: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-06-01T10:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2026-06-01T10:30:00Z"
+
+    BookGenreReplaceRequest:
+      type: object
+      required:
+        - genreIds
+      properties:
+        genreIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          example:
+            - d1e2f3a4-b5c6-7890-abcd-ef1234567890
+            - e1f2a3b4-c5d6-7890-abcd-ef1234567890
+          description: Remplace intégralement la liste des genres du livre
+
+    # ────────────────── Pagination ──────────────────
+    Pagination:
+      type: object
+      required:
+        - page
+        - size
+        - total
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          example: 1
+        size:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 20
+        total:
+          type: integer
+          example: 42
+
+    # ────────────────── Shared error ──────────────────
+    Error:
+      type: object
+      required:
+        - status
+        - error
+        - message
+      properties:
+        status:
+          type: integer
+          description: Code HTTP
+        error:
+          type: string
+          description: Libellé de l'erreur
+        message:
+          type: string
+          description: Message explicatif
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                description: Champ concerné par l'erreur
+              message:
+                type: string
+                description: Description de l'erreur sur ce champ
+
+  responses:
+    BadRequest:
+      description: Requête malformée ou paramètres invalides
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status: 400
+            error: Bad Request
+            message: The request body contains invalid JSON or a parameter is malformed
+
+    Unauthorized:
+      description: Authentification requise ou token invalide
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status: 401
+            error: Unauthorized
+            message: Missing or invalid authentication token
+
+    Forbidden:
+      description: Accès refusé à la ressource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status: 403
+            error: Forbidden
+            message: You do not have permission to access this resource
+
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status: 404
+            error: Not Found
+            message: The requested resource was not found
+
+    Unprocessable:
+      description: Données sémantiquement invalides
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status: 422
+            error: Unprocessable Entity
+            message: At least one required field is missing or invalid
+
+security:
+  - BearerAuth: []
+
+paths:
+  # ═══════════════════════ Libraries ═══════════════════════
+  /libraries:
+    get:
+      operationId: listLibraries
+      summary: List all libraries
+      tags:
+        - Libraries
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+          description: Free-text search on name, email, or address
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Paginated list of libraries
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LibraryResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      operationId: createLibrary
+      summary: Create a new library
+      tags:
+        - Libraries
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibraryRequest'
+      responses:
+        '201':
+          description: Library created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibraryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /libraries/{libraryId}:
+    get:
+      operationId: getLibrary
+      summary: Get a library by ID
+      tags:
+        - Libraries
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+      responses:
+        '200':
+          description: Library details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibraryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      operationId: updateLibrary
+      summary: Update a library
+      tags:
+        - Libraries
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LibraryUpdateRequest'
+      responses:
+        '200':
+          description: Library updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibraryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+    delete:
+      operationId: deleteLibrary
+      summary: Delete a library
+      tags:
+        - Libraries
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+      responses:
+        '204':
+          description: Library deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ═══════════════════════ Books ═══════════════════════
+  /books:
+    get:
+      operationId: listBooks
+      summary: List all books
+      tags:
+        - Books
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+          description: Free-text search on title or publisher
+        - name: isbn
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+            example: 978-2-07-061275-8
+          description: Exact ISBN match
+        - name: authorId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by author
+        - name: genreId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by genre
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Paginated list of books
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      operationId: createBook
+      summary: Create a new book
+      tags:
+        - Books
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookRequest'
+      responses:
+        '201':
+          description: Book created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /books/{bookId}:
+    get:
+      operationId: getBook
+      summary: Get a book by ID
+      tags:
+        - Books
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+      responses:
+        '200':
+          description: Book details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      operationId: updateBook
+      summary: Update a book
+      tags:
+        - Books
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookUpdateRequest'
+      responses:
+        '200':
+          description: Book updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+    delete:
+      operationId: deleteBook
+      summary: Delete a book
+      tags:
+        - Books
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+      responses:
+        '204':
+          description: Book deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ═══════════════════════ Book Authors ──────────────────
+  /books/{bookId}/authors:
+    get:
+      operationId: listBookAuthors
+      summary: List authors of a book
+      tags:
+        - Books
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+      responses:
+        '200':
+          description: List of author associations for this book
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookAuthorResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      operationId: replaceBookAuthors
+      summary: Replace all authors of a book (bulk)
+      tags:
+        - Books
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookAuthorReplaceRequest'
+      responses:
+        '200':
+          description: Author associations replaced
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookAuthorResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  # ═══════════════════════ Book Genres ──────────────────
+  /books/{bookId}/genres:
+    get:
+      operationId: listBookGenres
+      summary: List genres of a book
+      tags:
+        - Books
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+      responses:
+        '200':
+          description: List of genre associations for this book
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookGenreResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      operationId: replaceBookGenres
+      summary: Replace all genres of a book (bulk)
+      tags:
+        - Books
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookGenreReplaceRequest'
+      responses:
+        '200':
+          description: Genre associations replaced
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookGenreResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  # ═══════════════════════ Authors ═══════════════════════
+  /authors:
+    get:
+      operationId: listAuthors
+      summary: List all authors
+      tags:
+        - Authors
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+          description: Free-text search on first name or last name
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Paginated list of authors
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AuthorResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      operationId: createAuthor
+      summary: Create a new author
+      tags:
+        - Authors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorRequest'
+      responses:
+        '201':
+          description: Author created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /authors/{authorId}:
+    get:
+      operationId: getAuthor
+      summary: Get an author by ID
+      tags:
+        - Authors
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+      responses:
+        '200':
+          description: Author details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      operationId: updateAuthor
+      summary: Update an author
+      tags:
+        - Authors
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorUpdateRequest'
+      responses:
+        '200':
+          description: Author updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthorResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+    delete:
+      operationId: deleteAuthor
+      summary: Delete an author
+      tags:
+        - Authors
+      parameters:
+        - name: authorId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+      responses:
+        '204':
+          description: Author deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ═══════════════════════ Genres ═══════════════════════
+  /genres:
+    get:
+      operationId: listGenres
+      summary: List all genres
+      tags:
+        - Genres
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+          description: Free-text search on name
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Paginated list of genres
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GenreResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      operationId: createGenre
+      summary: Create a new genre
+      tags:
+        - Genres
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenreRequest'
+      responses:
+        '201':
+          description: Genre created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenreResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /genres/{genreId}:
+    get:
+      operationId: getGenre
+      summary: Get a genre by ID
+      tags:
+        - Genres
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+      responses:
+        '200':
+          description: Genre details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenreResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      operationId: updateGenre
+      summary: Update a genre
+      tags:
+        - Genres
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenreUpdateRequest'
+      responses:
+        '200':
+          description: Genre updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenreResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+    delete:
+      operationId: deleteGenre
+      summary: Delete a genre
+      tags:
+        - Genres
+      parameters:
+        - name: genreId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+      responses:
+        '204':
+          description: Genre deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ═══════════════════════ Customers ═══════════════════════
+  /customers:
+    get:
+      operationId: listCustomers
+      summary: List all customers
+      tags:
+        - Customers
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+          description: Free-text search on first name, last name, or email
+        - name: email
+          in: query
+          schema:
+            type: string
+            format: email
+          description: Exact email match
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Paginated list of customers
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomerResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      operationId: createCustomer
+      summary: Create a new customer
+      tags:
+        - Customers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerRequest'
+      responses:
+        '201':
+          description: Customer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /customers/{customerId}:
+    get:
+      operationId: getCustomer
+      summary: Get a customer by ID
+      tags:
+        - Customers
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+      responses:
+        '200':
+          description: Customer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      operationId: updateCustomer
+      summary: Update a customer
+      tags:
+        - Customers
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerUpdateRequest'
+      responses:
+        '200':
+          description: Customer updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+    delete:
+      operationId: deleteCustomer
+      summary: Delete a customer
+      tags:
+        - Customers
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+      responses:
+        '204':
+          description: Customer deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ═══════════════════════ Book Copies ──────────────────
+  /libraries/{libraryId}/copies:
+    get:
+      operationId: listLibraryCopies
+      summary: List book copies in a library
+      tags:
+        - Book Copies
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/BookCopyStatus'
+          description: Filter by availability status
+        - name: format
+          in: query
+          schema:
+            $ref: '#/components/schemas/BookCopyFormat'
+          description: Filter by format
+        - name: bookId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by book
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Paginated list of book copies
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BookCopyResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      operationId: createBookCopy
+      summary: Add a new book copy to a library
+      tags:
+        - Book Copies
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCopyRequest'
+      responses:
+        '201':
+          description: Book copy created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookCopyResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /libraries/{libraryId}/copies/{copyId}:
+    get:
+      operationId: getBookCopy
+      summary: Get a book copy by ID
+      tags:
+        - Book Copies
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: copyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+      responses:
+        '200':
+          description: Book copy details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookCopyResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      operationId: updateBookCopy
+      summary: Update a book copy
+      tags:
+        - Book Copies
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: copyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCopyUpdateRequest'
+      responses:
+        '200':
+          description: Book copy updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookCopyResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+    delete:
+      operationId: deleteBookCopy
+      summary: Remove a book copy from a library
+      tags:
+        - Book Copies
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: copyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+      responses:
+        '204':
+          description: Book copy deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ═══════════════════════ Arrivals ──────────────────
+  /libraries/{libraryId}/arrivals:
+    get:
+      operationId: listLibraryArrivals
+      summary: List arrivals for a library
+      tags:
+        - Arrivals
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Filter by arrival date (inclusive)
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Filter by arrival date (inclusive)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Paginated list of arrivals
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ArrivalResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      operationId: createArrival
+      summary: Create a new arrival for a library
+      tags:
+        - Arrivals
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArrivalRequest'
+      responses:
+        '201':
+          description: Arrival created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrivalResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /libraries/{libraryId}/arrivals/{arrivalId}:
+    get:
+      operationId: getArrival
+      summary: Get an arrival by ID
+      tags:
+        - Arrivals
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: arrivalId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+      responses:
+        '200':
+          description: Arrival details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrivalResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      operationId: deleteArrival
+      summary: Delete an arrival
+      tags:
+        - Arrivals
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: arrivalId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+      responses:
+        '204':
+          description: Arrival deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ═══════════════════════ Arrival Items ──────────────────
+  /arrivals/{arrivalId}/items:
+    get:
+      operationId: listArrivalItems
+      summary: List items in an arrival
+      tags:
+        - Arrivals
+      parameters:
+        - name: arrivalId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+      responses:
+        '200':
+          description: List of arrival items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ArrivalItemResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      operationId: createArrivalItem
+      summary: Add an item to an arrival
+      tags:
+        - Arrivals
+      parameters:
+        - name: arrivalId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArrivalItemRequest'
+      responses:
+        '201':
+          description: Arrival item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrivalItemResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /arrivals/{arrivalId}/items/{bookCopyId}:
+    delete:
+      operationId: deleteArrivalItem
+      summary: Remove an item from an arrival
+      tags:
+        - Arrivals
+      parameters:
+        - name: arrivalId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+        - name: bookCopyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+      responses:
+        '204':
+          description: Arrival item deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ═══════════════════════ Sales ──────────────────
+  /libraries/{libraryId}/sales:
+    get:
+      operationId: listLibrarySales
+      summary: List sales for a library
+      tags:
+        - Sales
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/SaleStatus'
+          description: Filter by sale status
+        - name: customerId
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by customer
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Filter by sale date (inclusive)
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+          description: Filter by sale date (inclusive)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Paginated list of sales
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SaleResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      operationId: createSale
+      summary: Create a new sale in a library
+      tags:
+        - Sales
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleRequest'
+      responses:
+        '201':
+          description: Sale created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaleResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /libraries/{libraryId}/sales/{saleId}:
+    get:
+      operationId: getSale
+      summary: Get a sale by ID
+      tags:
+        - Sales
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: saleId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+      responses:
+        '200':
+          description: Sale details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaleResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      operationId: updateSale
+      summary: Update a sale (e.g. change status)
+      tags:
+        - Sales
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: saleId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleUpdateRequest'
+      responses:
+        '200':
+          description: Sale updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaleResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+    delete:
+      operationId: deleteSale
+      summary: Delete a sale
+      tags:
+        - Sales
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: saleId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+      responses:
+        '204':
+          description: Sale deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ═══════════════════════ Sale Items ──────────────────
+  /sales/{saleId}/items:
+    get:
+      operationId: listSaleItems
+      summary: List items in a sale
+      tags:
+        - Sales
+      parameters:
+        - name: saleId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+      responses:
+        '200':
+          description: List of sale items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SaleItemResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      operationId: createSaleItem
+      summary: Add an item to a sale
+      tags:
+        - Sales
+      parameters:
+        - name: saleId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaleItemRequest'
+      responses:
+        '201':
+          description: Sale item created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaleItemResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /sales/{saleId}/items/{bookCopyId}:
+    delete:
+      operationId: deleteSaleItem
+      summary: Remove an item from a sale
+      tags:
+        - Sales
+      parameters:
+        - name: saleId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+        - name: bookCopyId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+      responses:
+        '204':
+          description: Sale item deleted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
