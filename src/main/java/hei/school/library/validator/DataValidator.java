@@ -13,7 +13,8 @@ public class DataValidator {
     if (value != null && !value.isBlank() && !SAFE_STRING.matcher(value).matches()) {
       throw new UnprocessableEntityException(
           String.format(
-              "Field '%s' contains invalid characters. Only letters (a-z, A-Z), digits (0-9), and @ ' . - _ are allowed.",
+              "Field '%s' contains invalid characters. Only letters (a-z, A-Z), digits (0-9), and @"
+                  + " ' . - _ are allowed.",
               fieldName));
     }
   }

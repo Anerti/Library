@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.entity.Library;
-import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.validator.DataValidator;
@@ -43,8 +42,7 @@ class LibraryServiceTest {
     Library lib = aLibrary("Lib A", "a@mail.com", "123 Street");
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries(null, PageRequest.of(0, 20)))
-        .thenReturn(Optional.of(page));
+    when(repository.searchLibraries(null, PageRequest.of(0, 20))).thenReturn(Optional.of(page));
 
     Map<String, Object> result = service.listLibraries(null, 1, 20);
 
@@ -59,8 +57,7 @@ class LibraryServiceTest {
     Library lib = aLibrary("Lib A", "a@mail.com", "123 Street");
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries("", PageRequest.of(0, 20)))
-        .thenReturn(Optional.of(page));
+    when(repository.searchLibraries("", PageRequest.of(0, 20))).thenReturn(Optional.of(page));
 
     Map<String, Object> result = service.listLibraries("", 1, 20);
 
@@ -72,8 +69,7 @@ class LibraryServiceTest {
     Library lib = aLibrary("Tech Library", "tech@mail.com", "456 Avenue");
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries("tech", PageRequest.of(0, 20)))
-        .thenReturn(Optional.of(page));
+    when(repository.searchLibraries("tech", PageRequest.of(0, 20))).thenReturn(Optional.of(page));
 
     Map<String, Object> result = service.listLibraries("tech", 1, 20);
 
@@ -95,9 +91,9 @@ class LibraryServiceTest {
 
   @Test
   void should_throw_when_search_contains_invalid_characters() {
-    UnprocessableEntityException ex = assertThrows(
-        UnprocessableEntityException.class,
-        () -> service.listLibraries("library!</>", 1, 20));
+    UnprocessableEntityException ex =
+        assertThrows(
+            UnprocessableEntityException.class, () -> service.listLibraries("library!</>", 1, 20));
 
     assertTrue(ex.getMessage().contains("invalid characters"));
     verifyNoInteractions(repository);
@@ -108,8 +104,7 @@ class LibraryServiceTest {
     Library lib = aLibrary("Lib", "l@mail.com", "Addr");
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries(any(), any(PageRequest.class)))
-        .thenReturn(Optional.of(page));
+    when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(Optional.of(page));
 
     service.listLibraries(null, 3, 10);
 
@@ -135,11 +130,11 @@ class LibraryServiceTest {
   @Test
   void should_map_all_fields_correctly() {
     UUID id = UUID.randomUUID();
-    Library lib = new Library(id, "Main Library", "+261341234567", "main@library.org", "Antananarivo");
+    Library lib =
+        new Library(id, "Main Library", "+261341234567", "main@library.org", "Antananarivo");
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries(any(), any(PageRequest.class)))
-        .thenReturn(Optional.of(page));
+    when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(Optional.of(page));
 
     Map<String, Object> result = service.listLibraries(null, 1, 20);
 
@@ -156,8 +151,7 @@ class LibraryServiceTest {
     Library lib = aLibrary("Lib", "l@mail.com", "Addr");
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries(any(), any(PageRequest.class)))
-        .thenReturn(Optional.of(page));
+    when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(Optional.of(page));
 
     Map<String, Object> result = service.listLibraries(null, 2, 5);
 
