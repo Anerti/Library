@@ -641,7 +641,7 @@ components:
         - saleDate
         - customerId
         - status
-        - libraryId
+        - library
         - createdAt
       properties:
         id:
@@ -658,10 +658,8 @@ components:
           example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
         status:
           $ref: '#/components/schemas/SaleStatus'
-        libraryId:
-          type: string
-          format: uuid
-          example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        library:
+          $ref: '#/components/schemas/LibraryResponse'
         createdAt:
           type: string
           format: date-time
@@ -2407,7 +2405,12 @@ paths:
                     id: a2b3c4d5-e6f7-8901-abcd-ef1234567890
                     createdAt: "2026-06-10T08:00:00Z"
                     arrivalDate: "2026-06-10T08:00:00Z"
-                    libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                    library:
+                      id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                      name: Librairie Générale
+                      phone: '+261 34 12 345 67'
+                      email: contact@librairie-generale.mg
+                      address: 15 Avenue de l'Indépendance, Antananarivo
                 pagination:
                   page: 1
                   size: 20
@@ -2448,7 +2451,12 @@ paths:
                 id: a2b3c4d5-e6f7-8901-abcd-ef1234567890
                 createdAt: "2026-06-10T08:00:00Z"
                 arrivalDate: "2026-06-10T08:00:00Z"
-                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                library:
+                  id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  name: Librairie Générale
+                  phone: '+261 34 12 345 67'
+                  email: contact@librairie-generale.mg
+                  address: 15 Avenue de l'Indépendance, Antananarivo
 
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -2489,7 +2497,12 @@ paths:
                 id: a2b3c4d5-e6f7-8901-abcd-ef1234567890
                 createdAt: "2026-06-10T08:00:00Z"
                 arrivalDate: "2026-06-10T08:00:00Z"
-                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                library:
+                  id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  name: Librairie Générale
+                  phone: '+261 34 12 345 67'
+                  email: contact@librairie-generale.mg
+                  address: 15 Avenue de l'Indépendance, Antananarivo
 
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -2710,7 +2723,12 @@ paths:
                     saleDate: "2026-06-15T14:30:00Z"
                     customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
                     status: SOLD
-                    libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                    library:
+                      id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                      name: Librairie Générale
+                      phone: '+261 34 12 345 67'
+                      email: contact@librairie-generale.mg
+                      address: 15 Avenue de l'Indépendance, Antananarivo
                     createdAt: "2026-06-15T14:30:00Z"
                 pagination:
                   page: 1
@@ -2753,7 +2771,12 @@ paths:
                 saleDate: "2026-06-15T14:30:00Z"
                 customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
                 status: SOLD
-                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                library:
+                  id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  name: Librairie Générale
+                  phone: '+261 34 12 345 67'
+                  email: contact@librairie-generale.mg
+                  address: 15 Avenue de l'Indépendance, Antananarivo
                 createdAt: "2026-06-15T14:30:00Z"
 
         '400':
@@ -2796,7 +2819,12 @@ paths:
                 saleDate: "2026-06-15T14:30:00Z"
                 customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
                 status: SOLD
-                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                library:
+                  id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  name: Librairie Générale
+                  phone: '+261 34 12 345 67'
+                  email: contact@librairie-generale.mg
+                  address: 15 Avenue de l'Indépendance, Antananarivo
                 createdAt: "2026-06-15T14:30:00Z"
 
         '400':
@@ -2842,7 +2870,12 @@ paths:
                 saleDate: "2026-06-15T14:30:00Z"
                 customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
                 status: SOLD
-                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                library:
+                  id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  name: Librairie Générale
+                  phone: '+261 34 12 345 67'
+                  email: contact@librairie-generale.mg
+                  address: 15 Avenue de l'Indépendance, Antananarivo
                 createdAt: "2026-06-15T14:30:00Z"
 
         '400':
