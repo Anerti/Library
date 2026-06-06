@@ -450,7 +450,8 @@ components:
       required:
         - price
         - format
-        - book
+        - bookId
+        - libraryId
         - pageNumber
       properties:
         price:
@@ -460,15 +461,14 @@ components:
           description: Unit sale price
         format:
           $ref: '#/components/schemas/BookCopyFormat'
-        book:
-          type: object
-          required:
-            - id
-          properties:
-            id:
-              type: string
-              format: uuid
-              example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        bookId:
+          type: string
+          format: uuid
+          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        libraryId:
+          type: string
+          format: uuid
+          example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
         pageNumber:
           type: integer
           example: 120
