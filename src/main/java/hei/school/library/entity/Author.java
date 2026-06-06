@@ -1,12 +1,11 @@
 package hei.school.library.entity;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Table(name = "author")
@@ -15,13 +14,13 @@ import java.util.UUID;
 @Getter
 @Builder
 public class Author {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-    @Column(nullable = false, length = 100)
-    private String firstName;
+  @Column(nullable = false, length = 100)
+  private String firstName;
 
-    @Column(nullable = false, length = 100)
-    private String lastName;
+  @Column(nullable = false, length = 100)
+  private String lastName;
 }
