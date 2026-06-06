@@ -620,17 +620,15 @@ components:
     SaleRequest:
       type: object
       required:
-        - customerId
+        - customer
       properties:
         saleDate:
           type: string
           format: date-time
           example: "2026-06-15T14:30:00Z"
           description: Sale date. Defaults to the current date.
-        customerId:
-          type: string
-          format: uuid
-          example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+        customer:
+          $ref: '#/components/schemas/CustomerRequest'
         status:
           $ref: '#/components/schemas/SaleStatus'
 
@@ -639,7 +637,7 @@ components:
       required:
         - id
         - saleDate
-        - customerId
+        - customer
         - status
         - library
         - createdAt
@@ -652,10 +650,8 @@ components:
           type: string
           format: date-time
           example: "2026-06-15T14:30:00Z"
-        customerId:
-          type: string
-          format: uuid
-          example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+        customer:
+          $ref: '#/components/schemas/CustomerResponse'
         status:
           $ref: '#/components/schemas/SaleStatus'
         library:
@@ -2509,34 +2505,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-    delete:
-      operationId: deleteArrival
-      summary: Delete an arrival
-      tags:
-        - Arrivals
-      parameters:
-        - name: libraryId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-        - name: arrivalId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: a2b3c4d5-e6f7-8901-abcd-ef1234567890
-      responses:
-        '204':
-          description: Arrival deleted
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
   # ═══════════════════════ Arrival Items ──────────────────
   /arrivals/{arrivalId}/items:
     get:
@@ -2666,12 +2634,12 @@ paths:
           schema:
             $ref: '#/components/schemas/SaleStatus'
           description: Filter by sale status
-        - name: customerId
+        - name: customer.id
           in: query
           schema:
             type: string
             format: uuid
-          description: Filter by customer
+          description: Filter by customer ID
         - name: from
           in: query
           schema:
@@ -2721,7 +2689,15 @@ paths:
                   -
                     id: b2c3d4e5-f6a7-8901-abcd-ef1234567890
                     saleDate: "2026-06-15T14:30:00Z"
-                    customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                    customer:
+                      id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                      lastName: Randria
+                      firstName: Faly
+                      birthDate: "1995-08-12"
+                      email: faly.randria@email.com
+                      phone: "+261 32 11 234 56"
+                      updatedAt: "2026-06-15T14:30:00Z"
+                      createdAt: "2026-06-01T10:00:00Z"
                     status: SOLD
                     library:
                       id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
@@ -2769,7 +2745,15 @@ paths:
               example:
                 id: b2c3d4e5-f6a7-8901-abcd-ef1234567890
                 saleDate: "2026-06-15T14:30:00Z"
-                customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                customer:
+                  id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                  lastName: Randria
+                  firstName: Faly
+                  birthDate: "1995-08-12"
+                  email: faly.randria@email.com
+                  phone: "+261 32 11 234 56"
+                  updatedAt: "2026-06-15T14:30:00Z"
+                  createdAt: "2026-06-01T10:00:00Z"
                 status: SOLD
                 library:
                   id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
@@ -2817,7 +2801,15 @@ paths:
               example:
                 id: b2c3d4e5-f6a7-8901-abcd-ef1234567890
                 saleDate: "2026-06-15T14:30:00Z"
-                customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                customer:
+                  id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                  lastName: Randria
+                  firstName: Faly
+                  birthDate: "1995-08-12"
+                  email: faly.randria@email.com
+                  phone: "+261 32 11 234 56"
+                  updatedAt: "2026-06-15T14:30:00Z"
+                  createdAt: "2026-06-01T10:00:00Z"
                 status: SOLD
                 library:
                   id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
@@ -2868,7 +2860,15 @@ paths:
               example:
                 id: b2c3d4e5-f6a7-8901-abcd-ef1234567890
                 saleDate: "2026-06-15T14:30:00Z"
-                customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                customer:
+                  id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                  lastName: Randria
+                  firstName: Faly
+                  birthDate: "1995-08-12"
+                  email: faly.randria@email.com
+                  phone: "+261 32 11 234 56"
+                  updatedAt: "2026-06-15T14:30:00Z"
+                  createdAt: "2026-06-01T10:00:00Z"
                 status: SOLD
                 library:
                   id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
@@ -2878,36 +2878,6 @@ paths:
                   address: 15 Avenue de l'Indépendance, Antananarivo
                 createdAt: "2026-06-15T14:30:00Z"
 
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '422':
-          $ref: '#/components/responses/Unprocessable'
-
-    delete:
-      operationId: deleteSale
-      summary: Delete a sale
-      tags:
-        - Sales
-      parameters:
-        - name: libraryId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-        - name: saleId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: b2c3d4e5-f6a7-8901-abcd-ef1234567890
-      responses:
-        '204':
-          description: Sale deleted
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
