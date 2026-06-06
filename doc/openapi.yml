@@ -18,12 +18,6 @@ servers:
     description: Local development
 
 components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: Authentification par token JWT
 
   schemas:
     # ────────────────── Enums ──────────────────
@@ -757,6 +751,154 @@ components:
           type: string
           format: date-time
           example: "2026-06-01T10:30:00Z"
+
+    # ────────────────── Analytics ──────────────────
+    DailyRevenueResponse:
+      type: object
+      required:
+        - date
+        - totalRevenue
+      properties:
+        date:
+          type: string
+          format: date
+          example: "2026-06-06"
+        totalRevenue:
+          type: number
+          format: double
+          example: 1250.00
+
+    MonthlyRevenueItem:
+      type: object
+      required:
+        - year
+        - month
+        - totalRevenue
+      properties:
+        year:
+          type: integer
+          example: 2026
+        month:
+          type: string
+          enum:
+            - janvier
+            - février
+            - mars
+            - avril
+            - mai
+            - juin
+            - juillet
+            - août
+            - septembre
+            - octobre
+            - novembre
+            - décembre
+          example: juin
+        totalRevenue:
+          type: number
+          format: double
+          example: 4500.00
+
+    RevenueByGenreItem:
+      type: object
+      required:
+        - genreId
+        - genreName
+        - totalRevenue
+        - totalSold
+      properties:
+        genreId:
+          type: string
+          format: uuid
+          example: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+        genreName:
+          type: string
+          example: Fiction
+        totalRevenue:
+          type: number
+          format: double
+          example: 2300.00
+        totalSold:
+          type: integer
+          example: 45
+
+    TopBookItem:
+      type: object
+      required:
+        - book
+        - totalSold
+        - totalRevenue
+      properties:
+        book:
+          $ref: '#/components/schemas/BookResponse'
+        totalSold:
+          type: integer
+          example: 30
+        totalRevenue:
+          type: number
+          format: double
+          example: 750.00
+
+    RecentSaleItem:
+      type: object
+      required:
+        - id
+        - saleDate
+        - customer
+        - status
+        - totalAmount
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+        saleDate:
+          type: string
+          format: date-time
+          example: "2026-06-06T14:30:00Z"
+        customer:
+          $ref: '#/components/schemas/CustomerResponse'
+        status:
+          $ref: '#/components/schemas/SaleStatus'
+        totalAmount:
+          type: number
+          format: double
+          example: 75.00
+
+    StockResponse:
+      type: object
+      required:
+        - totalCopies
+        - availableCopies
+        - soldOutCopies
+      properties:
+        totalCopies:
+          type: integer
+          example: 200
+        availableCopies:
+          type: integer
+          example: 150
+        soldOutCopies:
+          type: integer
+          example: 50
+        byFormat:
+          type: array
+          items:
+            type: object
+            required:
+              - format
+              - total
+              - available
+            properties:
+              format:
+                $ref: '#/components/schemas/BookCopyFormat'
+              total:
+                type: integer
+                example: 80
+              available:
+                type: integer
+                example: 60
+
     # ────────────────── Pagination ──────────────────
     Pagination:
       type: object
@@ -818,28 +960,6 @@ components:
             status: 400
             error: Bad Request
             message: The request body contains invalid JSON or a parameter is malformed
-
-    Unauthorized:
-      description: Authentification requise ou token invalide
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            status: 401
-            error: Unauthorized
-            message: Missing or invalid authentication token
-
-    Forbidden:
-      description: Accès refusé à la ressource
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            status: 403
-            error: Forbidden
-            message: You do not have permission to access this resource
 
     NotFound:
       description: Ressource introuvable
@@ -926,8 +1046,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
 
     post:
       operationId: createLibrary
@@ -956,8 +1074,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
@@ -991,8 +1107,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1031,8 +1145,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -1056,8 +1168,6 @@ paths:
           description: Library deleted
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1151,8 +1261,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
 
     post:
       operationId: createBook
@@ -1183,8 +1291,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
@@ -1220,8 +1326,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1262,8 +1366,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -1287,8 +1389,6 @@ paths:
           description: Book deleted
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1323,8 +1423,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1362,8 +1460,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1427,8 +1523,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
 
     post:
       operationId: createAuthor
@@ -1455,8 +1549,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
@@ -1488,8 +1580,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1526,8 +1616,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -1551,8 +1639,6 @@ paths:
           description: Author deleted
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1616,8 +1702,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
 
     post:
       operationId: createGenre
@@ -1645,8 +1729,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
@@ -1679,8 +1761,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1718,8 +1798,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -1743,8 +1821,6 @@ paths:
           description: Genre deleted
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1818,8 +1894,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
 
     post:
       operationId: createCustomer
@@ -1851,8 +1925,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
@@ -1889,8 +1961,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1932,8 +2002,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -1957,8 +2025,6 @@ paths:
           description: Customer deleted
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2043,8 +2109,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2086,8 +2150,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2133,8 +2195,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2183,8 +2243,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2215,8 +2273,6 @@ paths:
           description: Book copy deleted
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2293,8 +2349,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2332,8 +2386,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2375,8 +2427,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2405,8 +2455,6 @@ paths:
           description: Arrival deleted
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2445,8 +2493,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2487,8 +2533,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2520,8 +2564,6 @@ paths:
           description: Arrival item deleted
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2611,8 +2653,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2652,8 +2692,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2697,8 +2735,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2745,8 +2781,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2777,8 +2811,6 @@ paths:
           description: Sale deleted
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2816,8 +2848,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2857,8 +2887,6 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2890,7 +2918,439 @@ paths:
           description: Sale item deleted
         '400':
           $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ═══════════════════════ Analytics ═══════════════════════
+
+  /libraries/{libraryId}/analytics/revenue/today:
+    get:
+      operationId: getDailyRevenue
+      summary: Revenue du jour
+      description: Chiffre d'affaires total des ventes soldées aujourd'hui pour une librairie
+      tags:
+        - Analytics
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+      responses:
+        '200':
+          description: Revenue du jour
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyRevenueResponse'
+              example:
+                date: "2026-06-06"
+                totalRevenue: 1250.00
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /libraries/{libraryId}/analytics/revenue/monthly:
+    get:
+      operationId: getMonthlyRevenue
+      summary: Revenue mensuel
+      description: Chiffre d'affaires total pour un mois donné dans une librairie
+      tags:
+        - Analytics
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: year
+          in: query
+          schema:
+            type: integer
+            example: 2026
+          description: Année (par défaut l'année courante)
+        - name: month
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 6
+          description: Mois (1-12, par défaut le mois courant)
+      responses:
+        '200':
+          description: Revenue du mois
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonthlyRevenueItem'
+              example:
+                year: 2026
+                month: juin
+                totalRevenue: 4500.00
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /libraries/{libraryId}/analytics/revenue/by-genre:
+    get:
+      operationId: getRevenueByGenre
+      summary: Revenue par genre
+      description: Chiffre d'affaires total groupé par genre pour une librairie, avec pagination et tri
+      tags:
+        - Analytics
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Date de début (inclusive)
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Date de fin (inclusive)
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+          description: Tri par totalRevenue (ascendant ou descendant)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Revenue groupé par genre (pagíné)
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RevenueByGenreItem'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  - genreId: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                    genreName: Fiction
+                    totalRevenue: 2300.00
+                    totalSold: 45
+                  - genreId: e2f3a4b5-c6d7-8901-abcd-ef1234567891
+                    genreName: Science-Fiction
+                    totalRevenue: 1500.00
+                    totalSold: 28
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /libraries/{libraryId}/analytics/books:
+    get:
+      operationId: getPopularBooks
+      summary: Top livres vendus
+      description: Classement des livres les plus vendus pour une librairie
+      tags:
+        - Analytics
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: sortOrder
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+          description: Tri par totalSold (ascendant ou descendant)
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+            minimum: 1
+          description: Numéro de la page
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+            minimum: 1
+          description: Nombre d'éléments par page
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Date de début (inclusive)
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Date de fin (inclusive)
+      responses:
+        '200':
+          description: Classement des livres les plus vendus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TopBookItem'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  - book:
+                      id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                      title: Le Petit Prince
+                      isbn: 978-2-07-061275-8
+                      publisher: Gallimard
+                      publishedAt: "1943-04-06"
+                      createdAt: "2026-06-01T10:30:00Z"
+                    totalSold: 30
+                    totalRevenue: 750.00
+                  - book:
+                      id: c2d3e4f5-a6b7-8901-abcd-ef1234567891
+                      title: Les Misérables
+                      isbn: 978-2-07-040922-8
+                      publisher: Gallimard
+                      publishedAt: "1862-03-30"
+                      createdAt: "2026-06-02T11:00:00Z"
+                    totalSold: 22
+                    totalRevenue: 660.00
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 2
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /libraries/{libraryId}/analytics/sales/recent:
+    get:
+      operationId: getRecentSales
+      summary: Ventes récentes
+      description: Dernières ventes effectuées dans une librairie
+      tags:
+        - Analytics
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+            example: 20
+          description: Nombre de ventes à retourner
+      responses:
+        '200':
+          description: Liste des ventes récentes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecentSaleItem'
+              example:
+                - id: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+                  saleDate: "2026-06-06T14:30:00Z"
+                  customer:
+                    id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                    lastName: Randria
+                    firstName: Faly
+                    birthDate: "1995-08-12"
+                    email: faly.randria@email.com
+                    phone: "+261 32 11 234 56"
+                    updatedAt: "2026-06-06T14:30:00Z"
+                    createdAt: "2026-06-01T10:00:00Z"
+                  status: SOLD
+                  totalAmount: 75.00
+                - id: c3d4e5f6-a7b8-9012-abcd-ef1234567891
+                  saleDate: "2026-06-06T11:15:00Z"
+                  customer:
+                    id: f2a3b4c5-d6e7-8901-abcd-ef1234567890
+                    lastName: Rakoto
+                    firstName: Nantenaina
+                    birthDate: "1998-03-20"
+                    email: nantenaina.rakoto@email.com
+                    phone: "+261 32 98 765 43"
+                    updatedAt: "2026-06-06T11:15:00Z"
+                    createdAt: "2026-06-02T08:00:00Z"
+                  status: BOOKED
+                  totalAmount: 45.00
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /libraries/{libraryId}/analytics/stock:
+    get:
+      operationId: getStockOverview
+      summary: Livres en stock
+      description: Aperçu du stock d'une librairie (exemplaires disponibles, vendus, répartition par format)
+      tags:
+        - Analytics
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+      responses:
+        '200':
+          description: Aperçu du stock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockResponse'
+              example:
+                totalCopies: 200
+                availableCopies: 150
+                soldOutCopies: 50
+                byFormat:
+                  - format: HARDCOVER
+                    total: 30
+                    available: 20
+                  - format: PAPERBACK
+                    total: 120
+                    available: 90
+                  - format: POCKET
+                    total: 50
+                    available: 40
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /libraries/{libraryId}/analytics/sale/booked:
+    get:
+      operationId: getBookedSales
+      summary: Ventes réservées
+      description: Ventes réservées (BOOKED) non encore soldées dans une librairie
+      tags:
+        - Analytics
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Liste paginée des ventes en attente
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RecentSaleItem'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  - id: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+                    saleDate: "2026-06-06T10:00:00Z"
+                    customer:
+                      id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                      lastName: Randria
+                      firstName: Faly
+                      birthDate: "1995-08-12"
+                      email: faly.randria@email.com
+                      phone: "+261 32 11 234 56"
+                      updatedAt: "2026-06-06T10:00:00Z"
+                      createdAt: "2026-06-01T10:00:00Z"
+                    status: BOOKED
+                    totalAmount: 75.00
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 1
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
