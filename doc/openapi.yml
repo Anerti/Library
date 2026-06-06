@@ -2,10 +2,10 @@ openapi: 3.0.3
 info:
   title: Library Management API
   description: |
-    API de gestion de bibliothèque — gère les livres, exemplaires, auteurs, genres,
-    arrivages (réceptions de stock) et ventes au sein d'une ou plusieurs librairies.
+    Library management API — manages books, copies, authors, genres,
+    arrivals (stock receipts) and sales within one or more libraries.
 
-    Basée sur le MCD conceptuel du projet.
+    Based on the project's conceptual data model (MCD).
   version: 0.1.0
   contact:
     name: API Support
@@ -27,14 +27,14 @@ components:
         - HARDCOVER
         - PAPERBACK
         - POCKET
-      description: Format physique d'un exemplaire
+      description: Physical format of a book copy
 
     BookCopyStatus:
       type: string
       enum:
         - AVAILABLE
         - SOLD_OUT
-      description: Disponibilité d'un exemplaire
+      description: Availability status of a book copy
 
     SaleStatus:
       type: string
@@ -42,7 +42,7 @@ components:
         - SOLD
         - BOOKED
         - EXPIRED
-      description: État d'une vente
+      description: Status of a sale
 
     # ────────────────── Library ──────────────────
     LibraryRequest:
@@ -163,6 +163,8 @@ components:
         - publisher
         - publishedAt
         - createdAt
+        - authors
+        - genres
       properties:
         id:
           type: string
@@ -192,6 +194,14 @@ components:
           type: string
           format: date-time
           example: "2026-06-01T10:30:00Z"
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthorResponse'
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/GenreSummary'
 
     BookUpdateRequest:
       type: object
@@ -304,6 +314,21 @@ components:
           format: date-time
           example: "2026-06-01T10:30:00Z"
 
+    GenreSummary:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+        name:
+          type: string
+          maxLength: 100
+          example: Fiction
+
     GenreUpdateRequest:
       type: object
       minProperties: 1
@@ -345,7 +370,7 @@ components:
           maxLength: 255
           writeOnly: true
           example: "********"
-          description: Mot de passe en clair (sera hashé côté serveur)
+          description: Raw password (will be hashed server-side)
         phone:
           type: string
           maxLength: 30
@@ -439,7 +464,7 @@ components:
           type: number
           format: double
           example: 25.00
-          description: Prix de vente unitaire
+          description: Unit sale price
         format:
           $ref: '#/components/schemas/BookCopyFormat'
         bookId:
@@ -514,7 +539,7 @@ components:
           type: string
           format: date-time
           example: "2026-06-10T08:00:00Z"
-          description: Date de réception. Par défaut, la date courante.
+          description: Reception date. Defaults to the current date.
 
     ArrivalResponse:
       type: object
@@ -556,7 +581,7 @@ components:
           type: number
           format: double
           example: 15.00
-          description: Prix d'achat unitaire (coût fournisseur)
+          description: Unit purchase price (supplier cost)
         quantity:
           type: integer
           minimum: 1
@@ -607,7 +632,7 @@ components:
           type: string
           format: date-time
           example: "2026-06-15T14:30:00Z"
-          description: Date de la vente. Par défaut, la date courante.
+          description: Sale date. Defaults to the current date.
         customerId:
           type: string
           format: uuid
@@ -679,7 +704,7 @@ components:
           type: number
           format: double
           example: 25.00
-          description: Prix unitaire de vente au moment de la transaction
+          description: Unit sale price at the time of transaction
 
     SaleItemResponse:
       type: object
@@ -710,47 +735,6 @@ components:
           format: double
           example: 25.00
 
-    # ────────────────── Book-Author Association ──────────────────
-    BookAuthorResponse:
-      type: object
-      required:
-        - bookId
-        - authorId
-      properties:
-        bookId:
-          type: string
-          format: uuid
-          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-        authorId:
-          type: string
-          format: uuid
-          example: c1d2e3f4-a5b6-7890-abcd-ef1234567890
-
-    # ────────────────── Book-Genre Association ──────────────────
-    BookGenreResponse:
-      type: object
-      required:
-        - bookId
-        - genreId
-        - createdAt
-        - updatedAt
-      properties:
-        bookId:
-          type: string
-          format: uuid
-          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-        genreId:
-          type: string
-          format: uuid
-          example: d1e2f3a4-b5c6-7890-abcd-ef1234567890
-        createdAt:
-          type: string
-          format: date-time
-          example: "2026-06-01T10:30:00Z"
-        updatedAt:
-          type: string
-          format: date-time
-          example: "2026-06-01T10:30:00Z"
 
     # ────────────────── Analytics ──────────────────
     DailyRevenueResponse:
@@ -781,19 +765,19 @@ components:
         month:
           type: string
           enum:
-            - janvier
-            - février
-            - mars
-            - avril
-            - mai
-            - juin
-            - juillet
-            - août
-            - septembre
-            - octobre
-            - novembre
-            - décembre
-          example: juin
+            - january
+            - february
+            - march
+            - april
+            - may
+            - june
+            - july
+            - august
+            - september
+            - october
+            - november
+            - december
+          example: june
         totalRevenue:
           type: number
           format: double
@@ -930,13 +914,13 @@ components:
       properties:
         status:
           type: integer
-          description: Code HTTP
+          description: HTTP status code
         error:
           type: string
-          description: Libellé de l'erreur
+          description: Error code
         message:
           type: string
-          description: Message explicatif
+          description: Human-readable error message
         details:
           type: array
           items:
@@ -944,14 +928,14 @@ components:
             properties:
               field:
                 type: string
-                description: Champ concerné par l'erreur
+                description: Field affected by the error
               message:
                 type: string
-                description: Description de l'erreur sur ce champ
+                description: Error description for this field
 
   responses:
     BadRequest:
-      description: Requête malformée ou paramètres invalides
+      description: Malformed request or invalid parameters
       content:
         application/json:
           schema:
@@ -962,7 +946,7 @@ components:
             message: The request body contains invalid JSON or a parameter is malformed
 
     NotFound:
-      description: Ressource introuvable
+      description: Resource not found
       content:
         application/json:
           schema:
@@ -973,7 +957,7 @@ components:
             message: The requested resource was not found
 
     Unprocessable:
-      description: Données sémantiquement invalides
+      description: Semantically invalid data
       content:
         application/json:
           schema:
@@ -1246,6 +1230,13 @@ paths:
                     publisher: Gallimard
                     publishedAt: 1943-04-06
                     createdAt: "2026-06-01T10:30:00Z"
+                    authors:
+                      - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                        firstName: Antoine
+                        lastName: de Saint-Exupéry
+                    genres:
+                      - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                        name: Fiction
                   -
                     id: c2d3e4f5-a6b7-8901-abcd-ef1234567891
                     title: Les Misérables
@@ -1254,6 +1245,13 @@ paths:
                     publisher: Gallimard
                     publishedAt: 1862-03-30
                     createdAt: "2026-06-02T11:00:00Z"
+                    authors:
+                      - id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                        firstName: Victor
+                        lastName: Hugo
+                    genres:
+                      - id: f2a3b4c5-d6e7-8901-abcd-ef1234567890
+                        name: Roman
                 pagination:
                   page: 1
                   size: 20
@@ -1288,6 +1286,13 @@ paths:
                 publisher: Gallimard
                 publishedAt: 1943-04-06
                 createdAt: "2026-06-01T10:30:00Z"
+                authors:
+                  - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                    firstName: Antoine
+                    lastName: de Saint-Exupéry
+                genres:
+                  - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                    name: Fiction
 
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -1323,6 +1328,13 @@ paths:
                 publisher: Gallimard
                 publishedAt: 1943-04-06
                 createdAt: "2026-06-01T10:30:00Z"
+                authors:
+                  - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                    firstName: Antoine
+                    lastName: de Saint-Exupéry
+                genres:
+                  - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                    name: Fiction
 
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -1363,6 +1375,13 @@ paths:
                 publisher: Gallimard
                 publishedAt: 1943-04-06
                 createdAt: "2026-06-01T10:30:00Z"
+                authors:
+                  - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                    firstName: Antoine
+                    lastName: de Saint-Exupéry
+                genres:
+                  - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                    name: Fiction
 
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -1392,76 +1411,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  # ═══════════════════════ Book Authors ──────────────────
-  /books/{bookId}/authors:
-    get:
-      operationId: listBookAuthors
-      summary: List authors of a book
-      tags:
-        - Books
-      parameters:
-        - name: bookId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-      responses:
-        '200':
-          description: List of author associations for this book
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BookAuthorResponse'
-              example:
-                -
-                  bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-                  authorId: c1d2e3f4-a5b6-7890-abcd-ef1234567890
-
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-
-
-  # ═══════════════════════ Book Genres ──────────────────
-  /books/{bookId}/genres:
-    get:
-      operationId: listBookGenres
-      summary: List genres of a book
-      tags:
-        - Books
-      parameters:
-        - name: bookId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-      responses:
-        '200':
-          description: List of genre associations for this book
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BookGenreResponse'
-              example:
-                -
-                  bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-                  genreId: d1e2f3a4-b5c6-7890-abcd-ef1234567890
-                  createdAt: "2026-06-01T10:30:00Z"
-                  updatedAt: "2026-06-01T10:30:00Z"
-
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
 
 
   # ═══════════════════════ Authors ═══════════════════════
@@ -1837,13 +1786,7 @@ paths:
           schema:
             type: string
             maxLength: 100
-          description: Free-text search on first name, last name, or email
-        - name: email
-          in: query
-          schema:
-            type: string
-            format: email
-          description: Exact email match
+          description: Search by first name, last name, email, or phone number
         - name: page
           in: query
           schema:
@@ -2926,8 +2869,8 @@ paths:
   /libraries/{libraryId}/analytics/revenue/today:
     get:
       operationId: getDailyRevenue
-      summary: Revenue du jour
-      description: Chiffre d'affaires total des ventes soldées aujourd'hui pour une librairie
+      summary: Daily revenue
+      description: Total revenue from completed sales today for a library
       tags:
         - Analytics
       parameters:
@@ -2940,7 +2883,7 @@ paths:
             example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
       responses:
         '200':
-          description: Revenue du jour
+          description: Daily revenue
           content:
             application/json:
               schema:
@@ -2956,8 +2899,8 @@ paths:
   /libraries/{libraryId}/analytics/revenue/monthly:
     get:
       operationId: getMonthlyRevenue
-      summary: Revenue mensuel
-      description: Chiffre d'affaires total pour un mois donné dans une librairie
+      summary: Monthly revenue
+      description: Total revenue for a given month in a library
       tags:
         - Analytics
       parameters:
@@ -2973,7 +2916,7 @@ paths:
           schema:
             type: integer
             example: 2026
-          description: Année (par défaut l'année courante)
+          description: Year (defaults to current year)
         - name: month
           in: query
           schema:
@@ -2981,17 +2924,17 @@ paths:
             minimum: 1
             maximum: 12
             example: 6
-          description: Mois (1-12, par défaut le mois courant)
+          description: Month (1-12, defaults to current month)
       responses:
         '200':
-          description: Revenue du mois
+          description: Monthly revenue
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MonthlyRevenueItem'
               example:
                 year: 2026
-                month: juin
+                month: june
                 totalRevenue: 4500.00
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -3001,8 +2944,8 @@ paths:
   /libraries/{libraryId}/analytics/revenue/by-genre:
     get:
       operationId: getRevenueByGenre
-      summary: Revenue par genre
-      description: Chiffre d'affaires total groupé par genre pour une librairie, avec pagination et tri
+      summary: Revenue by genre
+      description: Total revenue grouped by genre for a library, with pagination and sorting
       tags:
         - Analytics
       parameters:
@@ -3018,13 +2961,13 @@ paths:
           schema:
             type: string
             format: date
-          description: Date de début (inclusive)
+          description: Start date (inclusive)
         - name: to
           in: query
           schema:
             type: string
             format: date
-          description: Date de fin (inclusive)
+          description: End date (inclusive)
         - name: sortOrder
           in: query
           schema:
@@ -3033,7 +2976,7 @@ paths:
               - asc
               - desc
             default: desc
-          description: Tri par totalRevenue (ascendant ou descendant)
+          description: Sort by totalRevenue (ascending or descending)
         - name: page
           in: query
           schema:
@@ -3051,7 +2994,7 @@ paths:
             example: 20
       responses:
         '200':
-          description: Revenue groupé par genre (pagíné)
+          description: Revenue grouped by genre (paginated)
           content:
             application/json:
               schema:
@@ -3088,8 +3031,8 @@ paths:
   /libraries/{libraryId}/analytics/books:
     get:
       operationId: getPopularBooks
-      summary: Top livres vendus
-      description: Classement des livres les plus vendus pour une librairie
+      summary: Top selling books
+      description: Ranking of the best-selling books for a library
       tags:
         - Analytics
       parameters:
@@ -3108,14 +3051,14 @@ paths:
               - asc
               - desc
             default: desc
-          description: Tri par totalSold (ascendant ou descendant)
+          description: Sort by totalSold (ascending or descending)
         - name: page
           in: query
           schema:
             type: integer
             default: 1
             minimum: 1
-          description: Numéro de la page
+          description: Page number
         - name: size
           in: query
           schema:
@@ -3123,22 +3066,22 @@ paths:
             default: 20
             maximum: 100
             minimum: 1
-          description: Nombre d'éléments par page
+          description: Number of items per page
         - name: from
           in: query
           schema:
             type: string
             format: date
-          description: Date de début (inclusive)
+          description: Start date (inclusive)
         - name: to
           in: query
           schema:
             type: string
             format: date
-          description: Date de fin (inclusive)
+          description: End date (inclusive)
       responses:
         '200':
-          description: Classement des livres les plus vendus
+          description: Best-selling books ranking
           content:
             application/json:
               schema:
@@ -3159,6 +3102,13 @@ paths:
                       publisher: Gallimard
                       publishedAt: "1943-04-06"
                       createdAt: "2026-06-01T10:30:00Z"
+                      authors:
+                        - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                          firstName: Antoine
+                          lastName: de Saint-Exupéry
+                      genres:
+                        - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                          name: Fiction
                     totalSold: 30
                     totalRevenue: 750.00
                   - book:
@@ -3168,6 +3118,13 @@ paths:
                       publisher: Gallimard
                       publishedAt: "1862-03-30"
                       createdAt: "2026-06-02T11:00:00Z"
+                      authors:
+                        - id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                          firstName: Victor
+                          lastName: Hugo
+                      genres:
+                        - id: f2a3b4c5-d6e7-8901-abcd-ef1234567890
+                          name: Roman
                     totalSold: 22
                     totalRevenue: 660.00
                 pagination:
@@ -3182,8 +3139,8 @@ paths:
   /libraries/{libraryId}/analytics/sales/recent:
     get:
       operationId: getRecentSales
-      summary: Ventes récentes
-      description: Dernières ventes effectuées dans une librairie
+      summary: Recent sales
+      description: Most recent sales in a library
       tags:
         - Analytics
       parameters:
@@ -3201,10 +3158,10 @@ paths:
             default: 20
             maximum: 100
             example: 20
-          description: Nombre de ventes à retourner
+          description: Number of sales to return
       responses:
         '200':
-          description: Liste des ventes récentes
+          description: List of recent sales
           content:
             application/json:
               schema:
@@ -3246,8 +3203,8 @@ paths:
   /libraries/{libraryId}/analytics/stock:
     get:
       operationId: getStockOverview
-      summary: Livres en stock
-      description: Aperçu du stock d'une librairie (exemplaires disponibles, vendus, répartition par format)
+      summary: Books in stock
+      description: Stock overview for a library (available copies, sold, breakdown by format)
       tags:
         - Analytics
       parameters:
@@ -3260,7 +3217,7 @@ paths:
             example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
       responses:
         '200':
-          description: Aperçu du stock
+          description: Stock overview
           content:
             application/json:
               schema:
@@ -3287,8 +3244,8 @@ paths:
   /libraries/{libraryId}/analytics/sale/booked:
     get:
       operationId: getBookedSales
-      summary: Ventes réservées
-      description: Ventes réservées (BOOKED) non encore soldées dans une librairie
+      summary: Booked sales
+      description: Booked sales not yet completed in a library
       tags:
         - Analytics
       parameters:
@@ -3316,7 +3273,7 @@ paths:
             example: 20
       responses:
         '200':
-          description: Liste paginée des ventes en attente
+          description: Paginated list of booked sales
           content:
             application/json:
               schema:
