@@ -18,7 +18,8 @@ Library/
 ├── settings.gradle            # rootProject.name = 'library-962dc383'
 ├── .env                       # DB creds (PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGSSLMODE)
 ├── doc/
-│   └── api.yml                # OpenAPI spec
+│   ├── library-mcd.canvas     # MCD conceptuel (Obsidian Canvas)
+│   ├── openapi.yml            # OpenAPI 3.0.3 spec (22 paths, 47 ops)
 └── src/
     ├── main/java/hei/school/library/
     │   ├── PojaApplication.java          # @SpringBootApplication entry
@@ -64,7 +65,7 @@ Library/
 - **Generated code exclusion:** `**/gen/**` is excluded from JaCoCo coverage.
 - **Parallel tests:** `maxParallelForks = CPU/2` (set in `build.gradle`).
 - **DB schema:** Hibernate `ddl-auto=validate` — schema is managed externally (Flyway-like via POJA pipeline), not by JPA auto-DDL.
-- **OpenAPI:** API spec lives at `doc/api.yml`. Generated types land under `build/generated/` (ignored by VCS).
+- **OpenAPI:** Spec at `doc/openapi.yml` (3.0.3, 22 paths, 47 ops). No auth required yet.
 - **Lombok:** Used everywhere (avoid writing getters/setters/constructors manually).
 - **AWS Lambda:** The app is deployed as a Lambda container (`springboot3` container type). `LambdaHandler` is the entry point.
 - **Mail:** Uses AWS SES via Jakarta Mail under the hood. Configured in `EmailConf`.

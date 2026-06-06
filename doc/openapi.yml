@@ -732,21 +732,6 @@ components:
           format: uuid
           example: c1d2e3f4-a5b6-7890-abcd-ef1234567890
 
-    BookAuthorReplaceRequest:
-      type: object
-      required:
-        - authorIds
-      properties:
-        authorIds:
-          type: array
-          items:
-            type: string
-            format: uuid
-          example:
-            - c1d2e3f4-a5b6-7890-abcd-ef1234567890
-            - d1e2f3a4-b5c6-7890-abcd-ef1234567890
-          description: Remplace intégralement la liste des auteurs du livre
-
     # ────────────────── Book-Genre Association ──────────────────
     BookGenreResponse:
       type: object
@@ -772,22 +757,6 @@ components:
           type: string
           format: date-time
           example: "2026-06-01T10:30:00Z"
-
-    BookGenreReplaceRequest:
-      type: object
-      required:
-        - genreIds
-      properties:
-        genreIds:
-          type: array
-          items:
-            type: string
-            format: uuid
-          example:
-            - d1e2f3a4-b5c6-7890-abcd-ef1234567890
-            - e1f2a3b4-c5d6-7890-abcd-ef1234567890
-          description: Remplace intégralement la liste des genres du livre
-
     # ────────────────── Pagination ──────────────────
     Pagination:
       type: object
@@ -894,8 +863,6 @@ components:
             error: Unprocessable Entity
             message: At least one required field is missing or invalid
 
-security:
-  - BearerAuth: []
 
 paths:
   # ═══════════════════════ Libraries ═══════════════════════
@@ -944,6 +911,19 @@ paths:
                       $ref: '#/components/schemas/LibraryResponse'
                   pagination:
                     $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  -
+                    id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                    name: Librairie Générale
+                    phone: +261 34 12 345 67
+                    email: contact@librairie-generale.mg
+                    address: "15 Avenue de l'Indépendance, Antananarivo"
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 1
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -967,6 +947,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LibraryResponse'
+              example:
+                id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                name: Librairie Générale
+                phone: +261 34 12 345 67
+                email: contact@librairie-generale.mg
+                address: "15 Avenue de l'Indépendance, Antananarivo"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -995,6 +982,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LibraryResponse'
+              example:
+                id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                name: Librairie Générale
+                phone: +261 34 12 345 67
+                email: contact@librairie-generale.mg
+                address: "15 Avenue de l'Indépendance, Antananarivo"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1028,6 +1022,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LibraryResponse'
+              example:
+                id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                name: Librairie Générale
+                phone: +261 34 12 345 67
+                email: contact@librairie-generale.mg
+                address: "15 Avenue de l'Indépendance, Antananarivo"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1125,6 +1126,29 @@ paths:
                       $ref: '#/components/schemas/BookResponse'
                   pagination:
                     $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  -
+                    id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                    title: Le Petit Prince
+                    abstract: Les aventures...
+                    isbn: 978-2-07-061275-8
+                    publisher: Gallimard
+                    publishedAt: 1943-04-06
+                    createdAt: "2026-06-01T10:30:00Z"
+                  -
+                    id: c2d3e4f5-a6b7-8901-abcd-ef1234567891
+                    title: Les Misérables
+                    abstract: null
+                    isbn: 978-2-07-040922-8
+                    publisher: Gallimard
+                    publishedAt: 1862-03-30
+                    createdAt: "2026-06-02T11:00:00Z"
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 2
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1148,6 +1172,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookResponse'
+              example:
+                id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                title: Le Petit Prince
+                abstract: Les aventures...
+                isbn: 978-2-07-061275-8
+                publisher: Gallimard
+                publishedAt: 1943-04-06
+                createdAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1176,6 +1209,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookResponse'
+              example:
+                id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                title: Le Petit Prince
+                abstract: Les aventures...
+                isbn: 978-2-07-061275-8
+                publisher: Gallimard
+                publishedAt: 1943-04-06
+                createdAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1209,6 +1251,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookResponse'
+              example:
+                id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                title: Le Petit Prince
+                abstract: Les aventures...
+                isbn: 978-2-07-061275-8
+                publisher: Gallimard
+                publishedAt: 1943-04-06
+                createdAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1265,6 +1316,11 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BookAuthorResponse'
+              example:
+                -
+                  bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                  authorId: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1272,42 +1328,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-    put:
-      operationId: replaceBookAuthors
-      summary: Replace all authors of a book (bulk)
-      tags:
-        - Books
-      parameters:
-        - name: bookId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BookAuthorReplaceRequest'
-      responses:
-        '200':
-          description: Author associations replaced
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BookAuthorResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '422':
-          $ref: '#/components/responses/Unprocessable'
 
   # ═══════════════════════ Book Genres ──────────────────
   /books/{bookId}/genres:
@@ -1333,6 +1353,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/BookGenreResponse'
+              example:
+                -
+                  bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                  genreId: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                  createdAt: "2026-06-01T10:30:00Z"
+                  updatedAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1340,42 +1367,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-    put:
-      operationId: replaceBookGenres
-      summary: Replace all genres of a book (bulk)
-      tags:
-        - Books
-      parameters:
-        - name: bookId
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
-            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/BookGenreReplaceRequest'
-      responses:
-        '200':
-          description: Genre associations replaced
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/BookGenreResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '422':
-          $ref: '#/components/responses/Unprocessable'
 
   # ═══════════════════════ Authors ═══════════════════════
   /authors:
@@ -1423,6 +1414,17 @@ paths:
                       $ref: '#/components/schemas/AuthorResponse'
                   pagination:
                     $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  -
+                    id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                    firstName: Antoine
+                    lastName: de Saint-Exupéry
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 1
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1446,6 +1448,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthorResponse'
+              example:
+                id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                firstName: Antoine
+                lastName: de Saint-Exupéry
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1474,6 +1481,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthorResponse'
+              example:
+                id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                firstName: Antoine
+                lastName: de Saint-Exupéry
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1507,6 +1519,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthorResponse'
+              example:
+                id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                firstName: Antoine
+                lastName: de Saint-Exupéry
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1585,6 +1602,18 @@ paths:
                       $ref: '#/components/schemas/GenreResponse'
                   pagination:
                     $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  -
+                    id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                    name: Fiction
+                    createdAt: "2026-06-01T10:30:00Z"
+                    updatedAt: "2026-06-01T10:30:00Z"
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 1
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1608,6 +1637,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenreResponse'
+              example:
+                id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                name: Fiction
+                createdAt: "2026-06-01T10:30:00Z"
+                updatedAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1636,6 +1671,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenreResponse'
+              example:
+                id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                name: Fiction
+                createdAt: "2026-06-01T10:30:00Z"
+                updatedAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1669,6 +1710,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GenreResponse'
+              example:
+                id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                name: Fiction
+                createdAt: "2026-06-01T10:30:00Z"
+                updatedAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1753,6 +1800,22 @@ paths:
                       $ref: '#/components/schemas/CustomerResponse'
                   pagination:
                     $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  -
+                    id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                    lastName: Randria
+                    firstName: Faly
+                    birthDate: 1995-08-12
+                    email: faly.randria@email.com
+                    phone: +261 32 11 234 56
+                    updatedAt: "2026-06-01T10:30:00Z"
+                    createdAt: "2026-06-01T10:30:00Z"
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 1
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1776,6 +1839,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerResponse'
+              example:
+                id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                lastName: Randria
+                firstName: Faly
+                birthDate: 1995-08-12
+                email: faly.randria@email.com
+                phone: +261 32 11 234 56
+                updatedAt: "2026-06-01T10:30:00Z"
+                createdAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1804,6 +1877,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerResponse'
+              example:
+                id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                lastName: Randria
+                firstName: Faly
+                birthDate: 1995-08-12
+                email: faly.randria@email.com
+                phone: +261 32 11 234 56
+                updatedAt: "2026-06-01T10:30:00Z"
+                createdAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1837,6 +1920,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomerResponse'
+              example:
+                id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                lastName: Randria
+                firstName: Faly
+                birthDate: 1995-08-12
+                email: faly.randria@email.com
+                phone: +261 32 11 234 56
+                updatedAt: "2026-06-01T10:30:00Z"
+                createdAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1932,6 +2025,22 @@ paths:
                       $ref: '#/components/schemas/BookCopyResponse'
                   pagination:
                     $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  -
+                    id: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+                    price: 25.0
+                    format: PAPERBACK
+                    libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                    bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                    status: AVAILABLE
+                    pageNumber: 120
+                    updatedAt: "2026-06-01T10:30:00Z"
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 1
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1965,6 +2074,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookCopyResponse'
+              example:
+                id: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+                price: 25.0
+                format: PAPERBACK
+                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                status: AVAILABLE
+                pageNumber: 120
+                updatedAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2002,6 +2121,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookCopyResponse'
+              example:
+                id: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+                price: 25.0
+                format: PAPERBACK
+                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                status: AVAILABLE
+                pageNumber: 120
+                updatedAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2042,6 +2171,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookCopyResponse'
+              example:
+                id: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+                price: 25.0
+                format: PAPERBACK
+                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                status: AVAILABLE
+                pageNumber: 120
+                updatedAt: "2026-06-01T10:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2140,6 +2279,18 @@ paths:
                       $ref: '#/components/schemas/ArrivalResponse'
                   pagination:
                     $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  -
+                    id: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+                    createdAt: "2026-06-10T08:00:00Z"
+                    arrivalDate: "2026-06-10T08:00:00Z"
+                    libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 1
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2173,6 +2324,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArrivalResponse'
+              example:
+                id: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+                createdAt: "2026-06-10T08:00:00Z"
+                arrivalDate: "2026-06-10T08:00:00Z"
+                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2210,6 +2367,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArrivalResponse'
+              example:
+                id: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+                createdAt: "2026-06-10T08:00:00Z"
+                arrivalDate: "2026-06-10T08:00:00Z"
+                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2271,6 +2434,15 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ArrivalItemResponse'
+              example:
+                -
+                  bookCopyId: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+                  arrivalId: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+                  createdAt: "2026-06-10T08:00:00Z"
+                  purchasePrice: 15.0
+                  quantity: 3
+                  updatedAt: "2026-06-10T08:00:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2304,6 +2476,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArrivalItemResponse'
+              example:
+                -
+                  bookCopyId: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+                  arrivalId: a2b3c4d5-e6f7-8901-abcd-ef1234567890
+                  createdAt: "2026-06-10T08:00:00Z"
+                  purchasePrice: 15.0
+                  quantity: 3
+                  updatedAt: "2026-06-10T08:00:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2414,6 +2595,20 @@ paths:
                       $ref: '#/components/schemas/SaleResponse'
                   pagination:
                     $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  -
+                    id: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+                    saleDate: "2026-06-15T14:30:00Z"
+                    customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                    status: SOLD
+                    libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                    createdAt: "2026-06-15T14:30:00Z"
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 1
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2447,6 +2642,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SaleResponse'
+              example:
+                id: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+                saleDate: "2026-06-15T14:30:00Z"
+                customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                status: SOLD
+                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                createdAt: "2026-06-15T14:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2484,6 +2687,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SaleResponse'
+              example:
+                id: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+                saleDate: "2026-06-15T14:30:00Z"
+                customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                status: SOLD
+                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                createdAt: "2026-06-15T14:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2524,6 +2735,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SaleResponse'
+              example:
+                id: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+                saleDate: "2026-06-15T14:30:00Z"
+                customerId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                status: SOLD
+                libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                createdAt: "2026-06-15T14:30:00Z"
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2587,6 +2806,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SaleItemResponse'
+              example:
+                -
+                  bookCopyId: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+                  saleId: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+                  createdAt: "2026-06-15T14:30:00Z"
+                  quantity: 1
+                  price: 25.0
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2620,6 +2847,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SaleItemResponse'
+              example:
+                -
+                  bookCopyId: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+                  saleId: b2c3d4e5-f6a7-8901-abcd-ef1234567890
+                  createdAt: "2026-06-15T14:30:00Z"
+                  quantity: 1
+                  price: 25.0
+
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':

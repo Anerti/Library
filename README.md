@@ -32,8 +32,20 @@ PGSSLMODE=disable
 
 ## Endpoints
 
-- `GET /ping` — health check
-- `GET /health/email` — SES email status
+47 endpoints — spec complète au format OpenAPI 3.0.3 dans `doc/openapi.yml`.
+
+Principaux groupes :
+- **Libraries** — CRUD succursales
+- **Books** — catalogue, auteurs, genres
+- **Customers** — clients
+- **Book Copies** — exemplaires par librairie
+- **Arrivals** — réceptions de stock
+- **Sales** — ventes et articles vendus
+
+Tous les endpoints retournent des réponses paginées (listes) avec des exemples inline.
+
+> `GET /ping` — health check
+> `GET /health/email` — SES email status
 
 ## Stack
 

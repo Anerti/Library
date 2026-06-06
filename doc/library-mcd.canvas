@@ -1,0 +1,41 @@
+{
+	"nodes":[
+		{"id":"42be7b2a078e4fb7","type":"text","text":"# library\n\n- `id uuid pk`\n- `name varchar(100) not null`\n- `phone varchar(30) not null`\n- `email varchar(100) not null`\n- `address varchar(100) not null`","x":-291,"y":-1000,"width":520,"height":297},
+		{"id":"3bbc9933dc59b1d4","type":"text","text":"# book_copy\n\n- `id uuid pk`\n- `price numeric not null`\n- `format enum(HARDCOVER, PAPERBACK, POCKET) not null`\n- `library_id uuid fk references library(id) not null`\n- `book_id uuid fk references book(id) not null`\n- `status enum(available, sold_out) default available`\n- `page_number int not null`\n- `updated_at timestamp default now()`","x":-326,"y":116,"width":591,"height":429},
+		{"id":"96a93a215fa9859d","type":"text","text":"# arrival\n\n- `id uuid pk`\n- `created_at timestamp now()`\n- `arrival_date timestamp default now()`\n- `library_id uuid references library(id) not null`","x":1440,"y":116,"width":620,"height":429},
+		{"id":"d5b05aa0ef758fb9","type":"text","text":"# library_arrival","x":1625,"y":-881,"width":250,"height":60,"color":"6"},
+		{"id":"d54cbf1a60f5d63c","type":"text","text":"# sale_book_copy (sale_item)\n\n- `(book_copy_id, sale_id) unique`\n- `book_copy_id uuid references book_copy(id) not null`\n- `sale_id uuid references sale(id) not null`\n- `created_at timestamp default now()`\n- `quantity int default 1`\n- `price numeric not null`","x":-1260,"y":211,"width":591,"height":240,"color":"6"},
+		{"id":"96fe8288917f91ac","type":"text","text":"# customer_sale","x":-2089,"y":880,"width":250,"height":60,"color":"6"},
+		{"id":"cb68a0335f447150","type":"text","text":"# customer\n\n- `id uuid pk`\n- `last_name varchar(100) not null`\n- `first_name varchar(100)`\n- `birth_date date not null`\n- `email varchar(100) not null`\n- `password varchar(255) not null`\n- `phone varchar(30)`\n- `updated_at timestamp now()`\n- `created_at timestamp now()`","x":-2260,"y":1340,"width":591,"height":320},
+		{"id":"ec136f60c48d35d0","type":"text","text":"# library_sale","x":-2089,"y":-881,"width":250,"height":60,"color":"6"},
+		{"id":"9e05d223e92d1d70","type":"text","text":"# sale\n\n- `id uuid pk`\n- `sale_date timestamp now()`\n- `customer_id uuid fk references customer(id) not null`\n- `status enum(sold, booked, expired) default booked`\n- `library_id uuid fk references library(id) not null`\n- `created_at timestamp now()`","x":-2264,"y":171,"width":600,"height":320},
+		{"id":"3878e5964e81f16f","type":"text","text":"# author_book\n\n- `(book_id, author_id) unique`\n- `book_id uuid fk references book(id) not null`\n- `author_id uuid fk references author(id) not null`","x":-326,"y":1858,"width":591,"height":244,"color":"6"},
+		{"id":"18bb7359f6986faa","type":"text","text":"# book_book_copy","x":-173,"y":820,"width":285,"height":59,"color":"6"},
+		{"id":"74c1acf0a9c1f1ca","type":"text","text":"# book\n\n- `id uuid pk`\n- `title varchar(100) not null`\n- `abstract text`  \n- `isbn varchar(100) unique not null`\n- `publisher varchar(100) not null`\n- `published_at date not null`\n- `created_at timestamp default now()`","x":-326,"y":1140,"width":591,"height":429},
+		{"id":"ee939a0a96632f7b","type":"text","text":"# library_book_copy","x":-169,"y":-331,"width":276,"height":60,"color":"6"},
+		{"id":"bb2197b77433ed69","type":"text","text":"# book_genre\n\n- `(book_id, genre_id) unique`\n- `genre_id uuid fk references genre(id) not null`\n- `book_id uuid fk references book(id) not null`\n- `created_at timestamp now()`\n- `updated_at timestamp default now()`","x":980,"y":1210,"width":564,"height":289,"color":"6"},
+		{"id":"434dac67a86e979b","type":"text","text":"# genre\n\n- `id uuid pk`\n- `name varchar(100) unique not null`\n- `created_at timestamp now()`\n- `updated_at timestamp now()`","x":967,"y":1844,"width":591,"height":258},
+		{"id":"7c97939a2fe11d9a","type":"text","text":"# author\n\n- `id uuid pk`\n- `first_name varchar(100)`\n- `last_name varchar(100) not null`","x":-326,"y":2340,"width":591,"height":320},
+		{"id":"f758336a4cd0a3cc","type":"text","text":"# arrival_book_copy  (arrival_item)\n\n- `(book_copy_id, arrival_id) unique`\n- `book_copy_id uuid fk references book_copy(id) not null`\n- `arrival_id uuid fk references arrival(id) not null`\n- `created_at timestamp default now()`\n- `purchase_price numeric not null`\n- `quantity int default 1`\n- `updated_at timestamp default now()`","x":540,"y":195,"width":640,"height":271,"color":"6"}
+	],
+	"edges":[
+		{"id":"2e20d950e29be090","fromNode":"42be7b2a078e4fb7","fromSide":"bottom","toNode":"ee939a0a96632f7b","toSide":"top","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"b7e23584cc644404","fromNode":"ee939a0a96632f7b","fromSide":"bottom","toNode":"3bbc9933dc59b1d4","toSide":"top","toEnd":"none","color":"6","label":"1,1"},
+		{"id":"2c4b823aae6f546c","fromNode":"96a93a215fa9859d","fromSide":"left","toNode":"f758336a4cd0a3cc","toSide":"right","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"c5d1f189e27a20fd","fromNode":"f758336a4cd0a3cc","fromSide":"left","toNode":"3bbc9933dc59b1d4","toSide":"right","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"480da5a7cbfef999","fromNode":"3bbc9933dc59b1d4","fromSide":"left","toNode":"d54cbf1a60f5d63c","toSide":"right","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"8c6b4221d731cf37","fromNode":"d54cbf1a60f5d63c","fromSide":"left","toNode":"9e05d223e92d1d70","toSide":"right","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"dc57da13d872c405","fromNode":"96fe8288917f91ac","fromSide":"top","toNode":"9e05d223e92d1d70","toSide":"bottom","toEnd":"none","color":"6","label":"1,1"},
+		{"id":"ea6ed786fa242397","fromNode":"96fe8288917f91ac","fromSide":"bottom","toNode":"cb68a0335f447150","toSide":"top","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"4dafad807b79e71b","fromNode":"434dac67a86e979b","fromSide":"top","toNode":"bb2197b77433ed69","toSide":"bottom","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"b63c54a82bb03c51","fromNode":"bb2197b77433ed69","fromSide":"left","toNode":"74c1acf0a9c1f1ca","toSide":"right","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"5587911fca491a03","fromNode":"42be7b2a078e4fb7","fromSide":"right","toNode":"d5b05aa0ef758fb9","toSide":"left","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"dce7f201c7b28d42","fromNode":"d5b05aa0ef758fb9","fromSide":"bottom","toNode":"96a93a215fa9859d","toSide":"top","toEnd":"none","color":"6","label":"1,1"},
+		{"id":"d853f9b04c44c2fe","fromNode":"42be7b2a078e4fb7","fromSide":"left","toNode":"ec136f60c48d35d0","toSide":"right","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"d64674e90428c549","fromNode":"9e05d223e92d1d70","fromSide":"top","toNode":"ec136f60c48d35d0","toSide":"bottom","toEnd":"none","color":"6","label":"1,1"},
+		{"id":"5843aa58ce9bbbc3","fromNode":"74c1acf0a9c1f1ca","fromSide":"bottom","toNode":"3878e5964e81f16f","toSide":"top","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"b20298ac89863dd8","fromNode":"3878e5964e81f16f","fromSide":"bottom","toNode":"7c97939a2fe11d9a","toSide":"top","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"b19fbfecbecf4873","fromNode":"74c1acf0a9c1f1ca","fromSide":"top","toNode":"18bb7359f6986faa","toSide":"bottom","toEnd":"none","color":"6","label":"1,N"},
+		{"id":"af84874cf855548c","fromNode":"18bb7359f6986faa","fromSide":"top","toNode":"3bbc9933dc59b1d4","toSide":"bottom","toEnd":"none","color":"6","label":"1,1"}
+	]
+}
