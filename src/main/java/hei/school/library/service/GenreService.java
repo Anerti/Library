@@ -3,10 +3,14 @@ package hei.school.library.service;
 import hei.school.library.dto.genre.GenreRequest;
 import hei.school.library.dto.genre.GenreResponse;
 import hei.school.library.entity.GenreEntity;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.repository.GenreRepository;
 import hei.school.library.validator.GenreValidator;
 import org.springframework.stereotype.Service;
 import hei.school.library.converter.GenreConverter;
+
+import java.util.UUID;
+
 @Service
 public class GenreService {
     private final GenreRepository genreRepository;
@@ -19,6 +23,7 @@ public class GenreService {
         this.genreValidator = genreValidator;
     }
     public GenreResponse createGenreByName(GenreRequest request) {
+        genreValidator.isRequestValid(request);
         genreValidator.isExistByName(request.getName());
         GenreEntity genre = new GenreEntity();
         genre.setName(request.getName());
@@ -26,5 +31,11 @@ public class GenreService {
         return genreConverter.toResponse(
                 genreRepository.save(genre)
         );
+    }
+    public GenreResponse getGenreById(UUID id) {
+        genreValidator.isIdValid(id);
+        GenreEntity genre = genreRepository.findById(id)
+                .orElseThrow(() ->new NotFoundException("The requested resource was not found"));
+        return genreConverter.toResponse(genre);
     }
 }
