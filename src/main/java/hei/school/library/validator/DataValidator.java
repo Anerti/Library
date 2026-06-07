@@ -37,6 +37,5 @@ public class DataValidator {
                   + "Only letters (a-z, A-Z) and space are allowed.",
               fieldName));
     }
-
   }
 }
