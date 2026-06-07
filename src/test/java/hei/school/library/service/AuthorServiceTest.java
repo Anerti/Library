@@ -9,6 +9,7 @@ import hei.school.library.dto.AuthorUpdateRequest;
 import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
+import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.validator.AuthorValidator;
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -27,7 +27,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class AuthorServiceTest {
   @Mock private AuthorRepository authorRepository;
   @Mock private AuthorValidator authorValidator;
-  @InjectMocks private AuthorService authorService;
+  private AuthorMapper authorMapper;
+  private AuthorService authorService;
 
   private UUID existingId;
   private UUID unknownId;
@@ -36,6 +37,9 @@ public class AuthorServiceTest {
 
   @BeforeEach
   public void setUp() {
+    authorMapper = new AuthorMapper();
+    authorService = new AuthorService(authorRepository, authorValidator, authorMapper);
+
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
     author = Author.builder().id(existingId).firstName("Jean").lastName("Paul").build();

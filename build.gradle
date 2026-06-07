@@ -15,7 +15,7 @@ plugins {
 }
 
 jacoco {
-    toolVersion = "0.8.11"
+    toolVersion = "0.8.15"
 }
 
 
@@ -147,6 +147,9 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.2'
     testImplementation 'org.testcontainers:testcontainers-junit-jupiter:2.0.2'
     testImplementation 'org.junit-pioneer:junit-pioneer:2.2.0'
+
+    testRuntimeOnly 'net.bytebuddy:byte-buddy:1.18.10'
+    testRuntimeOnly 'net.bytebuddy:byte-buddy-agent:1.18.10'
 
 
 
