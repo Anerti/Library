@@ -7,6 +7,8 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.validator.AuthorValidator;
+import hei.school.library.validator.DataValidator;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +22,7 @@ public class AuthorService {
   private final AuthorRepository authorRepository;
   private final AuthorValidator authorValidator;
   private final AuthorMapper authorMapper;
+  private final DataValidator dataValidator;
 
   @Transactional(readOnly = true)
   public PageResponse<AuthorResponse> findAll(String search, int page, int size) {
@@ -39,25 +42,17 @@ public class AuthorService {
   }
 
   public AuthorResponse create(AuthorRequest authorRequest) {
-    authorValidator.validateCreate(authorRequest);
+    dataValidator.validateName("firstName", authorRequest.getFirstName());
+    dataValidator.validateName("lastName", authorRequest.getLastName());
 
-    if (authorRepository.existsByFirstNameAndLastName(
-        authorRequest.getFirstName(), authorRequest.getLastName())) {
-      throw new ConflictException(
-          "Author with name "
-              + authorRequest.getFirstName()
-              + " "
-              + authorRequest.getLastName()
-              + " already exists");
-    }
-
-    Author author =
-        Author.builder()
-            .firstName(authorRequest.getFirstName())
-            .lastName(authorRequest.getLastName())
-            .build();
-
-    return authorMapper.toResponse(authorRepository.save(author));
+    return authorMapper.toResponse(
+            authorRepository.create(authorRequest.getFirstName(), authorRequest.getLastName())
+            .orElseThrow(() -> new ConflictException(
+                    "Author "
+                    + authorRequest.getFirstName()
+                    + " " + authorRequest.getLastName()
+                    + " already exists"))
+    );
   }
 
   public AuthorResponse update(UUID id, AuthorUpdateRequest authorUpdateRequest) {
