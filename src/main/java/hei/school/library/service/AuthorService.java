@@ -76,9 +76,8 @@ public class AuthorService {
 
   @Transactional
   public void delete(UUID id) {
-    if (!authorRepository.existsById(id)) {
-      throw new NotFoundException("Author with id " + id + " not found");
-    }
-    authorRepository.deleteById(id);
+    authorRepository
+        .delete(id)
+        .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
   }
 }
