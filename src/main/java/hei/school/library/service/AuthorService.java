@@ -35,7 +35,7 @@ public class AuthorService {
     return authorRepository
         .findById(id)
         .map(authorMapper::toResponse)
-        .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
+        .orElseThrow(() -> new NotFoundException("Author " + id + " not found"));
   }
 
   public AuthorResponse create(AuthorRequest authorRequest) {
