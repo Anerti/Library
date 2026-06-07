@@ -58,4 +58,22 @@ public class AuthorService {
 
     return toDto(authorRepository.save(author));
   }
+
+  public AuthorDto update(UUID id, AuthorRequest authorRequest) {
+    authorValidator.validate(authorRequest);
+    Author author =
+        authorRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
+    author.setFirstName(authorRequest.getFirstName());
+    author.setLastName(authorRequest.getLastName());
+    return toDto(authorRepository.save(author));
+  }
+
+  public void delete(UUID id) {
+    if (!authorRepository.existsById(id)) {
+      throw new NotFoundException("Author with id " + id + " not found");
+    }
+    authorRepository.deleteById(id);
+  }
 }
