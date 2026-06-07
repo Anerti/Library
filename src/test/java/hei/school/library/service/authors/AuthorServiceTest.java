@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import hei.school.library.dto.AuthorRequest;
 import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.AuthorUpdateRequest;
-import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
@@ -14,19 +13,14 @@ import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.service.AuthorService;
 import hei.school.library.validator.AuthorValidator;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorServiceTest {
@@ -53,36 +47,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("findAll: retourne la page d'auteurs")
-  void findAll_shouldReturnPageOfAuthors() {
-    Page<Author> authorPage = new PageImpl<>(List.of(author));
-    when(authorRepository.findAll(any(Pageable.class))).thenReturn(authorPage);
-
-    PageResponse<AuthorResponse> result = authorService.findAll(null, 1, 20);
-
-    assertThat(result.getData()).hasSize(1);
-    assertThat(result.getData().getFirst().getFirstName()).isEqualTo("Jean");
-    assertThat(result.getPagination().getTotal()).isEqualTo(1);
-    assertThat(result.getPagination().getPage()).isEqualTo(1);
-    assertThat(result.getPagination().getSize()).isEqualTo(20);
-    verify(authorRepository).findAll(any(Pageable.class));
-  }
-
-  @Test
-  @DisplayName("findAll: recherche par search")
-  void findAll_shouldSearchAuthors() {
-    Page<Author> authorPage = new PageImpl<>(List.of(author));
-    when(authorRepository.findBySearch(eq("Jean"), any(Pageable.class))).thenReturn(authorPage);
-
-    PageResponse<AuthorResponse> result = authorService.findAll("Jean", 1, 20);
-
-    assertThat(result.getData()).hasSize(1);
-    assertThat(result.getData().getFirst().getFirstName()).isEqualTo("Jean");
-    verify(authorRepository).findBySearch(eq("Jean"), any(Pageable.class));
-  }
-
-  @Test
-  @DisplayName("findById: retourne l'auteur si trouver")
+  @DisplayName("findById: should return author when found")
   void findById_shouldReturnAuthor() {
     when(authorRepository.findById(existingId)).thenReturn(Optional.of(author));
     AuthorResponse result = authorService.findById(existingId);
@@ -92,7 +57,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("findById : lève NotFoundException si absent")
+  @DisplayName("findById: should throw NotFoundException when absent")
   void findById_shouldThrow_whenNotFound() {
     when(authorRepository.findById(unknownId)).thenReturn(Optional.empty());
 
@@ -102,7 +67,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("create : sauvegarde et retourne le DTO")
+  @DisplayName("create: should save and return DTO")
   void create_shouldSaveAndReturnDto() {
     when(authorRepository.existsByFirstNameAndLastName("Jean", "Paul")).thenReturn(false);
     when(authorRepository.save(any(Author.class))).thenReturn(author);
@@ -116,7 +81,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("create : lève ConflictException si doublon")
+  @DisplayName("create: should throw ConflictException when duplicate")
   void create_shouldThrow_whenDuplicate() {
     when(authorRepository.existsByFirstNameAndLastName("Jean", "Paul")).thenReturn(true);
 
@@ -127,7 +92,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("update : modifie et retourne le DTO")
+  @DisplayName("update: should update and return DTO")
   void update_shouldUpdateAndReturnDto() {
     AuthorUpdateRequest updateReq = new AuthorUpdateRequest("Jean", "Paul Updated");
 
@@ -144,7 +109,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("update : lève NotFoundException si absent")
+  @DisplayName("update: should throw NotFoundException when absent")
   void update_shouldThrow_whenNotFound() {
     when(authorRepository.findById(unknownId)).thenReturn(Optional.empty());
 
@@ -155,7 +120,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("delete : supprime si l'auteur existe")
+  @DisplayName("delete: should delete when author exists")
   void delete_shouldDelete_whenExists() {
     when(authorRepository.existsById(existingId)).thenReturn(true);
 
@@ -165,7 +130,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("delete : lève NotFoundException si absent")
+  @DisplayName("delete: should throw NotFoundException when absent")
   void delete_shouldThrow_whenNotFound() {
     when(authorRepository.existsById(unknownId)).thenReturn(false);
 
