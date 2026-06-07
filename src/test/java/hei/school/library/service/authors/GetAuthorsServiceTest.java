@@ -35,11 +35,11 @@ class GetAuthorsServiceTest {
 
   @BeforeEach
   void setUp() {
-      AuthorMapper authorMapper = new AuthorMapper();
-      authorService = new AuthorService(authorRepository, authorValidator, authorMapper);
+    AuthorMapper authorMapper = new AuthorMapper();
+    authorService = new AuthorService(authorRepository, authorValidator, authorMapper);
 
-      UUID existingId = UUID.randomUUID();
-      author = Author.builder().id(existingId).firstName("Jean").lastName("Paul").build();
+    UUID existingId = UUID.randomUUID();
+    author = Author.builder().id(existingId).firstName("Jean").lastName("Paul").build();
   }
 
   @Test

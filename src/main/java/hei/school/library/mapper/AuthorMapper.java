@@ -21,11 +21,12 @@ public class AuthorMapper {
   public PageResponse<AuthorResponse> toPageResponse(Page<Author> page, int pageNum, int pageSize) {
     return PageResponse.<AuthorResponse>builder()
         .data(page.getContent().stream().map(this::toResponse).toList())
-        .pagination(PaginationDto.builder()
-            .page(pageNum)
-            .size(pageSize)
-            .total(page.getTotalElements())
-            .build())
+        .pagination(
+            PaginationDto.builder()
+                .page(pageNum)
+                .size(pageSize)
+                .total(page.getTotalElements())
+                .build())
         .build();
   }
 }

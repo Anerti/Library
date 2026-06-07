@@ -25,9 +25,9 @@ public class AuthorService {
   public PageResponse<AuthorResponse> findAll(String search, int page, int size) {
     PageRequest pageable = PageRequest.of(page - 1, size);
 
-    return (search == null || search.isBlank()) ?
-            authorMapper.toPageResponse(authorRepository.findAll(pageable), page, size)
-            : authorMapper.toPageResponse(authorRepository.findBySearch(search, pageable), page, size);
+    return (search == null || search.isBlank())
+        ? authorMapper.toPageResponse(authorRepository.findAll(pageable), page, size)
+        : authorMapper.toPageResponse(authorRepository.findBySearch(search, pageable), page, size);
   }
 
   @Transactional(readOnly = true)
