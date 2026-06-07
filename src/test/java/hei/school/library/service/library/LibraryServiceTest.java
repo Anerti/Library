@@ -1,4 +1,4 @@
-package hei.school.library.service;
+package hei.school.library.service.library;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,6 +8,7 @@ import hei.school.library.dto.LibraryResponse;
 import hei.school.library.entity.Library;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.repository.dao.LibraryRepository;
+import hei.school.library.service.LibraryService;
 import hei.school.library.validator.DataValidator;
 import java.util.List;
 import java.util.Map;

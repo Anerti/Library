@@ -1,4 +1,4 @@
-package hei.school.library.service;
+package hei.school.library.service.authors;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -6,13 +6,14 @@ import static org.mockito.Mockito.*;
 import hei.school.library.dto.AuthorRequest;
 import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.AuthorUpdateRequest;
+import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
+import hei.school.library.service.AuthorService;
 import hei.school.library.validator.AuthorValidator;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,8 +21,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthorServiceTest {
@@ -48,16 +53,32 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("findAll: retourne la liste des auteurs")
-  void findAll_shouldReturnAllAuthors() {
-    List<Author> authors = new ArrayList<>();
-    authors.add(author);
-    when(authorRepository.findAll()).thenReturn(authors);
+  @DisplayName("findAll: retourne la page d'auteurs")
+  void findAll_shouldReturnPageOfAuthors() {
+    Page<Author> authorPage = new PageImpl<>(List.of(author));
+    when(authorRepository.findAll(any(Pageable.class))).thenReturn(authorPage);
 
-    List<AuthorResponse> result = authorService.findAll();
-    assertThat(result).hasSize(1);
-    assertThat(result.getFirst().getFirstName()).isEqualTo("Jean");
-    verify(authorRepository, times(1)).findAll();
+    PageResponse<AuthorResponse> result = authorService.findAll(null, 1, 20);
+
+    assertThat(result.getData()).hasSize(1);
+    assertThat(result.getData().getFirst().getFirstName()).isEqualTo("Jean");
+    assertThat(result.getPagination().getTotal()).isEqualTo(1);
+    assertThat(result.getPagination().getPage()).isEqualTo(1);
+    assertThat(result.getPagination().getSize()).isEqualTo(20);
+    verify(authorRepository).findAll(any(Pageable.class));
+  }
+
+  @Test
+  @DisplayName("findAll: recherche par search")
+  void findAll_shouldSearchAuthors() {
+    Page<Author> authorPage = new PageImpl<>(List.of(author));
+    when(authorRepository.findBySearch(eq("Jean"), any(Pageable.class))).thenReturn(authorPage);
+
+    PageResponse<AuthorResponse> result = authorService.findAll("Jean", 1, 20);
+
+    assertThat(result.getData()).hasSize(1);
+    assertThat(result.getData().getFirst().getFirstName()).isEqualTo("Jean");
+    verify(authorRepository).findBySearch(eq("Jean"), any(Pageable.class));
   }
 
   @Test
