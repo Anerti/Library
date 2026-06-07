@@ -41,4 +41,13 @@ public interface AuthorRepository extends JpaRepository<Author, UUID> {
           """,
       nativeQuery = true)
   Optional<Author> create(@Param("firstName") String firstName, @Param("lastName") String lastName);
+
+  @Query(
+      value =
+          """
+          DELETE FROM author WHERE id = :id
+          RETURNING id
+          """,
+      nativeQuery = true)
+  Optional<UUID> delete(@Param("id") UUID id);
 }
