@@ -40,8 +40,7 @@ public class AuthorController {
 
   @PostMapping
   public ResponseEntity<AuthorResponse> create(@RequestBody AuthorRequest authorRequest) {
-    var author = authorService.create(authorRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(author);
+    return ResponseEntity.status(HttpStatus.CREATED).body(authorService.create(authorRequest));
   }
 
   @PatchMapping("/{id}")

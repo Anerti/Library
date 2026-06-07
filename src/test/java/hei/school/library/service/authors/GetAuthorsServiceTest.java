@@ -12,6 +12,7 @@ import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.service.AuthorService;
 import hei.school.library.validator.AuthorValidator;
+import hei.school.library.validator.DataValidator;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,13 +31,15 @@ class GetAuthorsServiceTest {
 
   @Mock private AuthorRepository authorRepository;
   @Mock private AuthorValidator authorValidator;
+  @Mock private DataValidator dataValidator;
   private AuthorService authorService;
   private Author author;
 
   @BeforeEach
   void setUp() {
     AuthorMapper authorMapper = new AuthorMapper();
-    authorService = new AuthorService(authorRepository, authorValidator, authorMapper);
+    authorService =
+        new AuthorService(authorRepository, authorValidator, authorMapper, dataValidator);
 
     UUID existingId = UUID.randomUUID();
     author = Author.builder().id(existingId).firstName("Jean").lastName("Paul").build();

@@ -7,6 +7,7 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.validator.AuthorValidator;
+import hei.school.library.validator.DataValidator;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -15,11 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-@Transactional
 public class AuthorService {
   private final AuthorRepository authorRepository;
   private final AuthorValidator authorValidator;
   private final AuthorMapper authorMapper;
+  private final DataValidator dataValidator;
 
   @Transactional(readOnly = true)
   public PageResponse<AuthorResponse> findAll(String search, int page, int size) {
@@ -38,28 +39,25 @@ public class AuthorService {
         .orElseThrow(() -> new NotFoundException("Author " + id + " not found"));
   }
 
+  @Transactional
   public AuthorResponse create(AuthorRequest authorRequest) {
-    authorValidator.validateCreate(authorRequest);
+    dataValidator.validateName("firstName", authorRequest.getFirstName());
+    dataValidator.validateName("lastName", authorRequest.getLastName());
 
-    if (authorRepository.existsByFirstNameAndLastName(
-        authorRequest.getFirstName(), authorRequest.getLastName())) {
-      throw new ConflictException(
-          "Author with name "
-              + authorRequest.getFirstName()
-              + " "
-              + authorRequest.getLastName()
-              + " already exists");
-    }
-
-    Author author =
-        Author.builder()
-            .firstName(authorRequest.getFirstName())
-            .lastName(authorRequest.getLastName())
-            .build();
-
-    return authorMapper.toResponse(authorRepository.save(author));
+    return authorMapper.toResponse(
+        authorRepository
+            .create(authorRequest.getFirstName(), authorRequest.getLastName())
+            .orElseThrow(
+                () ->
+                    new ConflictException(
+                        "Author "
+                            + authorRequest.getFirstName()
+                            + " "
+                            + authorRequest.getLastName()
+                            + " already exists")));
   }
 
+  @Transactional
   public AuthorResponse update(UUID id, AuthorUpdateRequest authorUpdateRequest) {
     authorValidator.validateUpdate(authorUpdateRequest);
     Author author =
@@ -76,6 +74,7 @@ public class AuthorService {
     return authorMapper.toResponse(authorRepository.save(author));
   }
 
+  @Transactional
   public void delete(UUID id) {
     if (!authorRepository.existsById(id)) {
       throw new NotFoundException("Author with id " + id + " not found");

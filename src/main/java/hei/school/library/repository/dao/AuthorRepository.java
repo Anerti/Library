@@ -1,6 +1,7 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.Author;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,8 +12,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AuthorRepository extends JpaRepository<Author, UUID> {
-
-  Boolean existsByFirstNameAndLastName(String firstName, String lastName);
 
   @Query(
       value =
@@ -31,4 +30,15 @@ public interface AuthorRepository extends JpaRepository<Author, UUID> {
           """,
       nativeQuery = true)
   Page<Author> findBySearch(@Param("search") String search, Pageable pageable);
+
+  @Query(
+      value =
+          """
+          INSERT INTO author (first_name, last_name)
+          VALUES (:firstName, :lastName)
+          ON CONFLICT (first_name, last_name) DO NOTHING
+          RETURNING id, first_name, last_name
+          """,
+      nativeQuery = true)
+  Optional<Author> create(@Param("firstName") String firstName, @Param("lastName") String lastName);
 }
