@@ -46,6 +46,11 @@ public class GlobalExceptionHandler {
         .body(errorBody("INTERNAL_ERROR", "Something went wrong"));
   }
 
+  @ExceptionHandler(ConflictException.class)
+  public ResponseEntity<Map<String, Object>> handleConflict(ConflictException ex) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody("CONFLICT", ex.getMessage()));
+  }
+
   private static Map<String, Object> errorBody(String code, String message) {
     return Map.of("error", code, "message", message, "timestamp", Instant.now().toString());
   }
