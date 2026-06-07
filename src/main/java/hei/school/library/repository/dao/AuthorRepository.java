@@ -17,14 +17,14 @@ public interface AuthorRepository extends JpaRepository<Author, UUID> {
   @Query(
       value =
           """
-          SELECT * FROM author
+          SELECT id, first_name, last_name FROM author
           WHERE (:search IS NULL OR :search = ''
              OR first_name ILIKE '%' || :search || '%'
              OR last_name  ILIKE '%' || :search || '%')
           """,
       countQuery =
           """
-          SELECT COUNT(*) FROM author
+          SELECT COUNT(id) FROM author
           WHERE (:search IS NULL OR :search = ''
              OR first_name ILIKE '%' || :search || '%'
              OR last_name  ILIKE '%' || :search || '%')
