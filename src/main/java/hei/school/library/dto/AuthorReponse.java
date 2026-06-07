@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Setter
-public class AuthorDto {
+public class AuthorReponse {
   private UUID id;
   private String firstName;
   private String lastName;

@@ -1,6 +1,6 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.AuthorDto;
+import hei.school.library.dto.AuthorReponse;
 import hei.school.library.dto.AuthorRequest;
 import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
@@ -11,33 +11,37 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class AuthorService {
   private final AuthorRepository authorRepository;
   private final AuthorValidator authorValidator;
 
-  public AuthorDto toDto(Author author) {
-    return AuthorDto.builder()
+  public AuthorReponse toDto(Author author) {
+    return AuthorReponse.builder()
         .id(author.getId())
         .firstName(author.getFirstName())
         .lastName(author.getLastName())
         .build();
   }
 
-  public List<AuthorDto> findAll() {
+  @Transactional(readOnly = true)
+  public List<AuthorReponse> findAll() {
     return authorRepository.findAll().stream().map(this::toDto).toList();
   }
 
-  public AuthorDto findById(UUID id) {
+  @Transactional(readOnly = true)
+  public AuthorReponse findById(UUID id) {
     return authorRepository
         .findById(id)
         .map(this::toDto)
         .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
   }
 
-  public AuthorDto create(AuthorRequest authorRequest) {
+  public AuthorReponse create(AuthorRequest authorRequest) {
     authorValidator.validate(authorRequest);
 
     if (authorRepository.existsByFirstNameAndLastName(
@@ -59,7 +63,7 @@ public class AuthorService {
     return toDto(authorRepository.save(author));
   }
 
-  public AuthorDto update(UUID id, AuthorRequest authorRequest) {
+  public AuthorReponse update(UUID id, AuthorRequest authorRequest) {
     authorValidator.validate(authorRequest);
     Author author =
         authorRepository
