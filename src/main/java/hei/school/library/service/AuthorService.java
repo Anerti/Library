@@ -6,6 +6,7 @@ import hei.school.library.dto.AuthorUpdateRequest;
 import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
+import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.validator.AuthorValidator;
 import java.util.List;
@@ -20,25 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthorService {
   private final AuthorRepository authorRepository;
   private final AuthorValidator authorValidator;
-
-  public AuthorResponse toDto(Author author) {
-    return AuthorResponse.builder()
-        .id(author.getId())
-        .firstName(author.getFirstName())
-        .lastName(author.getLastName())
-        .build();
-  }
+  private final AuthorMapper authorMapper;
 
   @Transactional(readOnly = true)
   public List<AuthorResponse> findAll() {
-    return authorRepository.findAll().stream().map(this::toDto).toList();
+    return authorRepository.findAll().stream().map(authorMapper::toResponse).toList();
   }
 
   @Transactional(readOnly = true)
   public AuthorResponse findById(UUID id) {
     return authorRepository
         .findById(id)
-        .map(this::toDto)
+        .map(authorMapper::toResponse)
         .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
   }
 
@@ -61,7 +55,7 @@ public class AuthorService {
             .lastName(authorRequest.getLastName())
             .build();
 
-    return toDto(authorRepository.save(author));
+    return authorMapper.toResponse(authorRepository.save(author));
   }
 
   public AuthorResponse update(UUID id, AuthorUpdateRequest authorUpdateRequest) {
@@ -77,7 +71,7 @@ public class AuthorService {
     if (authorUpdateRequest.getLastName() != null) {
       author.setLastName(authorUpdateRequest.getLastName());
     }
-    return toDto(authorRepository.save(author));
+    return authorMapper.toResponse(authorRepository.save(author));
   }
 
   public void delete(UUID id) {
