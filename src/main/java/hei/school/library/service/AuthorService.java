@@ -8,7 +8,6 @@ import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.validator.AuthorValidator;
 import hei.school.library.validator.DataValidator;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-@Transactional
 public class AuthorService {
   private final AuthorRepository authorRepository;
   private final AuthorValidator authorValidator;
@@ -41,6 +39,7 @@ public class AuthorService {
         .orElseThrow(() -> new NotFoundException("Author " + id + " not found"));
   }
 
+  @Transactional
   public AuthorResponse create(AuthorRequest authorRequest) {
     dataValidator.validateName("firstName", authorRequest.getFirstName());
     dataValidator.validateName("lastName", authorRequest.getLastName());
@@ -55,6 +54,7 @@ public class AuthorService {
     );
   }
 
+  @Transactional
   public AuthorResponse update(UUID id, AuthorUpdateRequest authorUpdateRequest) {
     authorValidator.validateUpdate(authorUpdateRequest);
     Author author =
@@ -71,6 +71,7 @@ public class AuthorService {
     return authorMapper.toResponse(authorRepository.save(author));
   }
 
+  @Transactional
   public void delete(UUID id) {
     if (!authorRepository.existsById(id)) {
       throw new NotFoundException("Author with id " + id + " not found");
