@@ -10,6 +10,7 @@ import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.service.AuthorService;
 import hei.school.library.validator.AuthorValidator;
+import hei.school.library.validator.DataValidator;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ class GetAuthorsByIdServiceTest {
 
   @Mock private AuthorRepository authorRepository;
   @Mock private AuthorValidator authorValidator;
+  @Mock private DataValidator dataValidator;
   private AuthorService authorService;
 
   private UUID existingId;
@@ -33,7 +35,7 @@ class GetAuthorsByIdServiceTest {
   @BeforeEach
   void setUp() {
     AuthorMapper authorMapper = new AuthorMapper();
-    authorService = new AuthorService(authorRepository, authorValidator, authorMapper);
+    authorService = new AuthorService(authorRepository, authorValidator, authorMapper, dataValidator);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
