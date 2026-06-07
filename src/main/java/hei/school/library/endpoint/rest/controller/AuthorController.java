@@ -53,6 +53,6 @@ public class AuthorController {
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> delete(@PathVariable UUID id) {
     authorService.delete(id);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
