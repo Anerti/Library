@@ -1,10 +1,6 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.AuthorRequest;
-import hei.school.library.dto.AuthorResponse;
-import hei.school.library.dto.AuthorUpdateRequest;
-import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.PaginationDto;
+import hei.school.library.dto.*;
 import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
@@ -13,7 +9,6 @@ import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.validator.AuthorValidator;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,21 +25,9 @@ public class AuthorService {
   public PageResponse<AuthorResponse> findAll(String search, int page, int size) {
     PageRequest pageable = PageRequest.of(page - 1, size);
 
-    Page<Author> authorPage;
-    if (search == null || search.isBlank()) {
-      authorPage = authorRepository.findAll(pageable);
-    } else {
-      authorPage = authorRepository.findBySearch(search, pageable);
-    }
-
-    return PageResponse.<AuthorResponse>builder()
-        .data(authorPage.getContent().stream().map(authorMapper::toResponse).toList())
-        .pagination(PaginationDto.builder()
-            .page(page)
-            .size(size)
-            .total(authorPage.getTotalElements())
-            .build())
-        .build();
+    return (search == null || search.isBlank()) ?
+            authorMapper.toPageResponse(authorRepository.findAll(pageable), page, size)
+            : authorMapper.toPageResponse(authorRepository.findBySearch(search, pageable), page, size);
   }
 
   @Transactional(readOnly = true)
