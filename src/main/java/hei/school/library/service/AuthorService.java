@@ -1,7 +1,8 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.AuthorReponse;
 import hei.school.library.dto.AuthorRequest;
+import hei.school.library.dto.AuthorResponse;
+import hei.school.library.dto.AuthorUpdateRequest;
 import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
@@ -20,8 +21,8 @@ public class AuthorService {
   private final AuthorRepository authorRepository;
   private final AuthorValidator authorValidator;
 
-  public AuthorReponse toDto(Author author) {
-    return AuthorReponse.builder()
+  public AuthorResponse toDto(Author author) {
+    return AuthorResponse.builder()
         .id(author.getId())
         .firstName(author.getFirstName())
         .lastName(author.getLastName())
@@ -29,20 +30,20 @@ public class AuthorService {
   }
 
   @Transactional(readOnly = true)
-  public List<AuthorReponse> findAll() {
+  public List<AuthorResponse> findAll() {
     return authorRepository.findAll().stream().map(this::toDto).toList();
   }
 
   @Transactional(readOnly = true)
-  public AuthorReponse findById(UUID id) {
+  public AuthorResponse findById(UUID id) {
     return authorRepository
         .findById(id)
         .map(this::toDto)
         .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
   }
 
-  public AuthorReponse create(AuthorRequest authorRequest) {
-    authorValidator.validate(authorRequest);
+  public AuthorResponse create(AuthorRequest authorRequest) {
+    authorValidator.validateCreate(authorRequest);
 
     if (authorRepository.existsByFirstNameAndLastName(
         authorRequest.getFirstName(), authorRequest.getLastName())) {
@@ -63,14 +64,19 @@ public class AuthorService {
     return toDto(authorRepository.save(author));
   }
 
-  public AuthorReponse update(UUID id, AuthorRequest authorRequest) {
-    authorValidator.validate(authorRequest);
+  public AuthorResponse update(UUID id, AuthorUpdateRequest authorUpdateRequest) {
+    authorValidator.validateUpdate(authorUpdateRequest);
     Author author =
         authorRepository
             .findById(id)
             .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
-    author.setFirstName(authorRequest.getFirstName());
-    author.setLastName(authorRequest.getLastName());
+
+    if (authorUpdateRequest.getFirstName() != null) {
+      author.setFirstName(authorUpdateRequest.getFirstName());
+    }
+    if (authorUpdateRequest.getLastName() != null) {
+      author.setLastName(authorUpdateRequest.getLastName());
+    }
     return toDto(authorRepository.save(author));
   }
 
