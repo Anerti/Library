@@ -1,17 +1,15 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.AuthorRequest;
-import hei.school.library.dto.AuthorResponse;
-import hei.school.library.dto.AuthorUpdateRequest;
+import hei.school.library.dto.*;
 import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.validator.AuthorValidator;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,8 +22,12 @@ public class AuthorService {
   private final AuthorMapper authorMapper;
 
   @Transactional(readOnly = true)
-  public List<AuthorResponse> findAll() {
-    return authorRepository.findAll().stream().map(authorMapper::toResponse).toList();
+  public PageResponse<AuthorResponse> findAll(String search, int page, int size) {
+    PageRequest pageable = PageRequest.of(page - 1, size);
+
+    return (search == null || search.isBlank())
+        ? authorMapper.toPageResponse(authorRepository.findAll(pageable), page, size)
+        : authorMapper.toPageResponse(authorRepository.findBySearch(search, pageable), page, size);
   }
 
   @Transactional(readOnly = true)

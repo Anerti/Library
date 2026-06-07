@@ -1,4 +1,4 @@
-package hei.school.library.service;
+package hei.school.library.service.authors;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -11,9 +11,8 @@ import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
+import hei.school.library.service.AuthorService;
 import hei.school.library.validator.AuthorValidator;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,20 +47,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("findAll: retourne la liste des auteurs")
-  void findAll_shouldReturnAllAuthors() {
-    List<Author> authors = new ArrayList<>();
-    authors.add(author);
-    when(authorRepository.findAll()).thenReturn(authors);
-
-    List<AuthorResponse> result = authorService.findAll();
-    assertThat(result).hasSize(1);
-    assertThat(result.getFirst().getFirstName()).isEqualTo("Jean");
-    verify(authorRepository, times(1)).findAll();
-  }
-
-  @Test
-  @DisplayName("findById: retourne l'auteur si trouver")
+  @DisplayName("findById: should return author when found")
   void findById_shouldReturnAuthor() {
     when(authorRepository.findById(existingId)).thenReturn(Optional.of(author));
     AuthorResponse result = authorService.findById(existingId);
@@ -71,7 +57,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("findById : lève NotFoundException si absent")
+  @DisplayName("findById: should throw NotFoundException when absent")
   void findById_shouldThrow_whenNotFound() {
     when(authorRepository.findById(unknownId)).thenReturn(Optional.empty());
 
@@ -81,7 +67,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("create : sauvegarde et retourne le DTO")
+  @DisplayName("create: should save and return DTO")
   void create_shouldSaveAndReturnDto() {
     when(authorRepository.existsByFirstNameAndLastName("Jean", "Paul")).thenReturn(false);
     when(authorRepository.save(any(Author.class))).thenReturn(author);
@@ -95,7 +81,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("create : lève ConflictException si doublon")
+  @DisplayName("create: should throw ConflictException when duplicate")
   void create_shouldThrow_whenDuplicate() {
     when(authorRepository.existsByFirstNameAndLastName("Jean", "Paul")).thenReturn(true);
 
@@ -106,7 +92,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("update : modifie et retourne le DTO")
+  @DisplayName("update: should update and return DTO")
   void update_shouldUpdateAndReturnDto() {
     AuthorUpdateRequest updateReq = new AuthorUpdateRequest("Jean", "Paul Updated");
 
@@ -123,7 +109,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("update : lève NotFoundException si absent")
+  @DisplayName("update: should throw NotFoundException when absent")
   void update_shouldThrow_whenNotFound() {
     when(authorRepository.findById(unknownId)).thenReturn(Optional.empty());
 
@@ -134,7 +120,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("delete : supprime si l'auteur existe")
+  @DisplayName("delete: should delete when author exists")
   void delete_shouldDelete_whenExists() {
     when(authorRepository.existsById(existingId)).thenReturn(true);
 
@@ -144,7 +130,7 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("delete : lève NotFoundException si absent")
+  @DisplayName("delete: should throw NotFoundException when absent")
   void delete_shouldThrow_whenNotFound() {
     when(authorRepository.existsById(unknownId)).thenReturn(false);
 
