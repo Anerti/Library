@@ -15,7 +15,7 @@
 		{"id":"ee939a0a96632f7b","type":"text","text":"# library_book_copy","x":-169,"y":-331,"width":276,"height":60,"color":"6"},
 		{"id":"bb2197b77433ed69","type":"text","text":"# book_genre\n\n- `(book_id, genre_id) unique`\n- `genre_id uuid fk references genre(id) not null`\n- `book_id uuid fk references book(id) not null`\n- `created_at timestamp now()`\n- `updated_at timestamp default now()`","x":980,"y":1210,"width":564,"height":289,"color":"6"},
 		{"id":"434dac67a86e979b","type":"text","text":"# genre\n\n- `id uuid pk`\n- `name varchar(100) unique not null`\n- `created_at timestamp now()`\n- `updated_at timestamp now()`","x":967,"y":1844,"width":591,"height":258},
-		{"id":"7c97939a2fe11d9a","type":"text","text":"# author\n\n- `id uuid pk`\n- `first_name varchar(100)`\n- `last_name varchar(100) not null`","x":-326,"y":2340,"width":591,"height":320},
+		{"id":"7c97939a2fe11d9a","type":"text","text":"# author\n\n- `id uuid pk`\n- `first_name varchar(100) unique not null`\n- `last_name varchar(100) unique not null`","x":-326,"y":2340,"width":591,"height":320},
 		{"id":"f758336a4cd0a3cc","type":"text","text":"# arrival_book_copy  (arrival_item)\n\n- `(book_copy_id, arrival_id) unique`\n- `book_copy_id uuid fk references book_copy(id) not null`\n- `arrival_id uuid fk references arrival(id) not null`\n- `created_at timestamp default now()`\n- `purchase_price numeric not null`\n- `quantity int default 1`\n- `updated_at timestamp default now()`","x":540,"y":195,"width":640,"height":271,"color":"6"}
 	],
 	"edges":[

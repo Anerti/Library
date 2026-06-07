@@ -21,20 +21,21 @@ public class DataValidator {
   }
 
   public void validateName(String fieldName, String value) {
-    if (value != null && value.length() > 100) {
+    if (value == null || value.isBlank()) {
+      throw new UnprocessableEntityException(String.format("%s is required.", fieldName));
+    }
+
+    if (value.length() > 100) {
       throw new UnprocessableEntityException(String.format(
               "%s cannot be longer than 100 characters.", fieldName
       ));
     }
 
-    if (value != null && !SAFE_NAME_STRING.matcher(value).matches()) {
+    if (!SAFE_NAME_STRING.matcher(value).matches()) {
       throw new UnprocessableEntityException(String.format(
               "%s field contain forbidden characters. " +
                       "Only letters (a-z, A-Z) and space are allowed.", fieldName
       ));
-    }
-    if (value == null || value.isBlank()) {
-      throw new UnprocessableEntityException(String.format("%s is required.", fieldName));
     }
 
   }
