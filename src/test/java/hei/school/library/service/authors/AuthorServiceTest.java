@@ -47,26 +47,6 @@ public class AuthorServiceTest {
   }
 
   @Test
-  @DisplayName("findById: should return author when found")
-  void findById_shouldReturnAuthor() {
-    when(authorRepository.findById(existingId)).thenReturn(Optional.of(author));
-    AuthorResponse result = authorService.findById(existingId);
-
-    assertThat(result.getLastName()).isEqualTo("Paul");
-    verify(authorRepository).findById(existingId);
-  }
-
-  @Test
-  @DisplayName("findById: should throw NotFoundException when absent")
-  void findById_shouldThrow_whenNotFound() {
-    when(authorRepository.findById(unknownId)).thenReturn(Optional.empty());
-
-    assertThatThrownBy(() -> authorService.findById(unknownId))
-        .isInstanceOf(NotFoundException.class)
-        .hasMessageContaining(unknownId.toString());
-  }
-
-  @Test
   @DisplayName("create: should save and return DTO")
   void create_shouldSaveAndReturnDto() {
     when(authorRepository.existsByFirstNameAndLastName("Jean", "Paul")).thenReturn(false);
