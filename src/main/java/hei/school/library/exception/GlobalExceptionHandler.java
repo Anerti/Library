@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -37,6 +38,12 @@ public class GlobalExceptionHandler {
   public ResponseEntity<Map<String, Object>> handleBadArgument(IllegalArgumentException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
         .body(errorBody("BAD_REQUEST", ex.getMessage()));
+  }
+
+  @ExceptionHandler(TypeMismatchException.class)
+  public ResponseEntity<Map<String, Object>> handleTypeMismatch(TypeMismatchException ex) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(errorBody("BAD_REQUEST", "Invalid parameter: " + ex.getPropertyName()));
   }
 
   @ExceptionHandler(Exception.class)
