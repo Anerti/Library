@@ -29,7 +29,7 @@ class PostAuthorsServiceTest {
   @Mock private AuthorRepository authorRepository;
   @Mock private AuthorValidator authorValidator;
   @Mock private DataValidator dataValidator;
-    private AuthorService authorService;
+  private AuthorService authorService;
 
   private UUID existingId;
   private Author author;
@@ -37,13 +37,9 @@ class PostAuthorsServiceTest {
 
   @BeforeEach
   void setUp() {
-      AuthorMapper authorMapper = new AuthorMapper();
-      authorService = new AuthorService(
-              authorRepository,
-              authorValidator,
-              authorMapper,
-              dataValidator
-    );
+    AuthorMapper authorMapper = new AuthorMapper();
+    authorService =
+        new AuthorService(authorRepository, authorValidator, authorMapper, dataValidator);
 
     existingId = UUID.randomUUID();
     author = Author.builder().id(existingId).firstName("Jean").lastName("Paul").build();
@@ -53,8 +49,7 @@ class PostAuthorsServiceTest {
   @Test
   @DisplayName("create: should save and return DTO")
   void create_shouldSaveAndReturnDto() {
-    when(authorRepository.create(anyString(), anyString()))
-        .thenReturn(Optional.of(author));
+    when(authorRepository.create(anyString(), anyString())).thenReturn(Optional.of(author));
 
     AuthorResponse result = authorService.create(authorRequest);
 
@@ -67,8 +62,7 @@ class PostAuthorsServiceTest {
   @Test
   @DisplayName("create: should throw ConflictException when duplicate")
   void create_shouldThrow_whenDuplicate() {
-    when(authorRepository.create(anyString(), anyString()))
-        .thenReturn(Optional.empty());
+    when(authorRepository.create(anyString(), anyString())).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> authorService.create(authorRequest))
         .isInstanceOf(ConflictException.class);
@@ -79,8 +73,12 @@ class PostAuthorsServiceTest {
   void create_shouldThrow_whenNameInvalid() {
     AuthorRequest invalidRequest = new AuthorRequest("Jean123", "Paul");
 
-    doThrow(new UnprocessableEntityException("firstName field contain forbidden characters. Only letters (a-z, A-Z) and space are allowed."))
-        .when(dataValidator).validateName("firstName", "Jean123");
+    doThrow(
+            new UnprocessableEntityException(
+                "firstName field contain forbidden characters. Only letters (a-z, A-Z) and space"
+                    + " are allowed."))
+        .when(dataValidator)
+        .validateName("firstName", "Jean123");
 
     assertThatThrownBy(() -> authorService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class);

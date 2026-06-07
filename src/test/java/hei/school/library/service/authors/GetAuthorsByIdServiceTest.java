@@ -35,7 +35,8 @@ class GetAuthorsByIdServiceTest {
   @BeforeEach
   void setUp() {
     AuthorMapper authorMapper = new AuthorMapper();
-    authorService = new AuthorService(authorRepository, authorValidator, authorMapper, dataValidator);
+    authorService =
+        new AuthorService(authorRepository, authorValidator, authorMapper, dataValidator);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();

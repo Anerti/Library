@@ -26,16 +26,16 @@ public class DataValidator {
     }
 
     if (value.length() > 100) {
-      throw new UnprocessableEntityException(String.format(
-              "%s cannot be longer than 100 characters.", fieldName
-      ));
+      throw new UnprocessableEntityException(
+          String.format("%s cannot be longer than 100 characters.", fieldName));
     }
 
     if (!SAFE_NAME_STRING.matcher(value).matches()) {
-      throw new UnprocessableEntityException(String.format(
-              "%s field contain forbidden characters. " +
-                      "Only letters (a-z, A-Z) and space are allowed.", fieldName
-      ));
+      throw new UnprocessableEntityException(
+          String.format(
+              "%s field contain forbidden characters. "
+                  + "Only letters (a-z, A-Z) and space are allowed.",
+              fieldName));
     }
 
   }

@@ -45,13 +45,16 @@ public class AuthorService {
     dataValidator.validateName("lastName", authorRequest.getLastName());
 
     return authorMapper.toResponse(
-            authorRepository.create(authorRequest.getFirstName(), authorRequest.getLastName())
-            .orElseThrow(() -> new ConflictException(
-                    "Author "
-                    + authorRequest.getFirstName()
-                    + " " + authorRequest.getLastName()
-                    + " already exists"))
-    );
+        authorRepository
+            .create(authorRequest.getFirstName(), authorRequest.getLastName())
+            .orElseThrow(
+                () ->
+                    new ConflictException(
+                        "Author "
+                            + authorRequest.getFirstName()
+                            + " "
+                            + authorRequest.getLastName()
+                            + " already exists")));
   }
 
   @Transactional

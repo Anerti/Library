@@ -40,6 +40,5 @@ public interface AuthorRepository extends JpaRepository<Author, UUID> {
           RETURNING id, first_name, last_name
           """,
       nativeQuery = true)
-  Optional<Author> create(
-      @Param("firstName") String firstName, @Param("lastName") String lastName);
+  Optional<Author> create(@Param("firstName") String firstName, @Param("lastName") String lastName);
 }

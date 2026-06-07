@@ -37,9 +37,8 @@ public class AuthorServiceTest {
   @BeforeEach
   public void setUp() {
     authorMapper = new AuthorMapper();
-    authorService = new AuthorService(
-        authorRepository, authorValidator, authorMapper, dataValidator
-    );
+    authorService =
+        new AuthorService(authorRepository, authorValidator, authorMapper, dataValidator);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
