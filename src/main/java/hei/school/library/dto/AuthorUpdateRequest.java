@@ -1,17 +1,15 @@
 package hei.school.library.dto;
 
-import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Getter
 @Setter
-public class AuthorReponse {
-  private UUID id;
+public class AuthorUpdateRequest {
   private String firstName;
   private String lastName;
 }
