@@ -5,7 +5,13 @@ import java.util.UUID;
 import lombok.*;
 
 @Entity
-@Table(name = "author")
+@Table(
+    name = "author",
+    uniqueConstraints = @UniqueConstraint(
+        columnNames = {"first_name", "last_name"},
+        name = "uq_author_name"
+    )
+)
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
