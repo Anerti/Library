@@ -1,5 +1,6 @@
 package hei.school.library.mapper;
 
+import hei.school.library.dto.AuthorRequest;
 import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.PaginationDto;
@@ -15,6 +16,13 @@ public class AuthorMapper {
         .id(author.getId())
         .firstName(author.getFirstName())
         .lastName(author.getLastName())
+        .build();
+  }
+
+  public Author toEntity(AuthorRequest request) {
+    return Author.builder()
+        .firstName(request.getFirstName())
+        .lastName(request.getLastName())
         .build();
   }
 
