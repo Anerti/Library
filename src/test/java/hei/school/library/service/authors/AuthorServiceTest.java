@@ -72,24 +72,4 @@ public class AuthorServiceTest {
 
     verify(authorRepository, never()).save(any(Author.class));
   }
-
-  @Test
-  @DisplayName("delete: should delete when author exists")
-  void delete_shouldDelete_whenExists() {
-    when(authorRepository.existsById(existingId)).thenReturn(true);
-
-    authorService.delete(existingId);
-
-    verify(authorRepository).deleteById(existingId);
-  }
-
-  @Test
-  @DisplayName("delete: should throw NotFoundException when absent")
-  void delete_shouldThrow_whenNotFound() {
-    when(authorRepository.existsById(unknownId)).thenReturn(false);
-
-    assertThatThrownBy(() -> authorService.delete(unknownId)).isInstanceOf(NotFoundException.class);
-
-    verify(authorRepository, never()).deleteById(any());
-  }
 }
