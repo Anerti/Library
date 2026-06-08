@@ -1,6 +1,7 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.Arrival;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,21 +12,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ArrivalRepository extends JpaRepository<Arrival, UUID> {
+
   @Query(
-      value =
-          """
-          SELECT id, first_name, last_name FROM author
-          WHERE (:search IS NULL OR :search = ''
-             OR first_name ILIKE '%' || :search || '%'
-             OR last_name  ILIKE '%' || :search || '%')
-          """,
-      countQuery =
-          """
-          SELECT COUNT(id) FROM author
-          WHERE (:search IS NULL OR :search = ''
-             OR first_name ILIKE '%' || :search || '%'
-             OR last_name  ILIKE '%' || :search || '%')
-          """,
-      nativeQuery = true)
-  Page<Arrival> findBySearch(@Param("search") String search, Pageable pageable);
+      "SELECT a FROM Arrival a WHERE a.library.id = :libraryId "
+          + "AND (:from IS NULL OR a.arrivalDate >= :from) "
+          + "AND (:to IS NULL OR a.arrivalDate <= :to)")
+  Page<Arrival> findByLibraryIdAndDateRange(
+      @Param("libraryId") UUID libraryId,
+      @Param("from") LocalDateTime from,
+      @Param("to") LocalDateTime to,
+      Pageable pageable);
 }
