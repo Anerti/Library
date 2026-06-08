@@ -6,7 +6,6 @@ import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.service.GenreService;
 import hei.school.library.validator.DataValidator;
-import hei.school.library.validator.GenreValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,8 +29,6 @@ public class GenreServiceTest {
     private DataValidator dataValidator;
     @Mock
     private GenreMapper genreMapper;
-    @Mock
-    private GenreValidator genreValidator;
 
     private GenreService genreService;
 
