@@ -89,17 +89,19 @@ class GetCustomersServiceTest {
   }
 
   @Test
-  @DisplayName("findAll: should throw UnprocessableEntityException when search contains invalid characters")
+  @DisplayName(
+      "findAll: should throw UnprocessableEntityException when search contains invalid characters")
   void findAll_shouldThrow_whenSearchInvalid() {
     String invalidSearch = "customer!</>";
 
-    doThrow(new UnprocessableEntityException(
-            "Field 'search' contains invalid characters. Only letters (a-z, A-Z), digits (0-9),"
+    doThrow(
+            new UnprocessableEntityException(
+                "Field 'search' contains invalid characters. Only letters (a-z, A-Z), digits (0-9),"
                     + " and @ ' . - _ are allowed."))
-            .when(dataValidator)
-            .validateString("search", invalidSearch);
+        .when(dataValidator)
+        .validateString("search", invalidSearch);
 
     assertThatThrownBy(() -> customerService.findAll(invalidSearch, 1, 20))
-            .isInstanceOf(UnprocessableEntityException.class);
+        .isInstanceOf(UnprocessableEntityException.class);
   }
 }
