@@ -87,7 +87,7 @@ jobs:
 
       - name: Build project
         run: |
-          ./gradlew clean build -x test --refresh-dependencies
+          ./gradlew build -x test
           sam build
 
       - name: Prepare Poja deployment
