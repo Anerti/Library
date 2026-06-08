@@ -1,33 +1,30 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.entity.Genre;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.validator.DataValidator;
-import hei.school.library.validator.GenreValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import hei.school.library.mapper.GenreMapper;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 public class GenreService {
     private final GenreRepository genreRepository;
     private final GenreMapper genreMapper;
-    private final GenreValidator genreValidator;
     private final DataValidator dataValidator;
 
-    @Transactional
-    public GenreResponse createGenreByName(GenreRequest request) {
-        dataValidator.validateString("name", request.getName());
-        dataValidator.validateName("name", request.getName());
-        genreValidator.isExistByName(genreRepository.existsByNameIgnoreCase(request.getName()));
-        Genre genre = Genre.builder().name(request.getName()).build();
-
-        return genreMapper.toResponse(
-                genreRepository.save(genre)
-        );
+    @Transactional(readOnly = true)
+    public GenreResponse getGenreById(UUID id) {
+        dataValidator.validateString("id", id == null ? null : id.toString());
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() ->new NotFoundException("The requested resource was not found"));
+        return genreMapper.toResponse(genre);
     }
 
 }
