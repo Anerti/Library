@@ -1,15 +1,16 @@
-package hei.school.library.genre;
-import hei.school.library.dto.genre.GenreRequest;
-import hei.school.library.dto.genre.GenreResponse;
-import hei.school.library.endpoint.rest.controller.library.GenreController;
+package hei.school.library.controller.genre;
+import hei.school.library.dto.GenreRequest;
+import hei.school.library.dto.GenreResponse;
+import hei.school.library.endpoint.rest.controller.GenreController;
 import hei.school.library.exception.BadRequestException;
+import hei.school.library.exception.ConflictException;
 import hei.school.library.service.GenreService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -20,13 +21,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(GenreController.class)
 public class GenreControllerTest {
-    @MockBean
-    private GenreService genreService;
-
-    @Autowired
     private MockMvc mockMvc;
+    private GenreService genreService;
+    private GenreController genreController;
+
+    @BeforeEach
+    void setup() {
+        this.genreService = Mockito.mock(GenreService.class);
+        this.genreController = new GenreController(this.genreService);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(this.genreController).build();
+    }
 
     @Test
     void shouldCreateGenre() throws Exception {
@@ -56,15 +61,31 @@ public class GenreControllerTest {
                         .value("Fantasy"));
     }
     @Test
-    void shouldReturnBadRequestWhenGenreAlreadyExists() throws Exception {
+    void shouldReturnConflictWhenGenreAlreadyExists() throws Exception {
+        shouldCreateGenre();
         when(genreService.createGenreByName(any(GenreRequest.class)))
-                .thenThrow(new BadRequestException("Genre already exists"));
+                .thenThrow(new ConflictException("The requested resource already exists"));
 
         mockMvc.perform(post("/genres")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
                             "name":"Fantasy"
+                        }
+                    """)
+                )
+                .andExpect(status().isConflict());
+    }
+    @Test
+    void shouldReturnBadRequestWhenRequestIsNotValid() throws Exception {
+        when(genreService.createGenreByName(any(GenreRequest.class)))
+                .thenThrow(new BadRequestException("The request body contains invalid JSON or a parameter is malformed"));
+
+        mockMvc.perform(post("/genres")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+
                         }
                     """)
                 )
