@@ -1,4 +1,4 @@
-package hei.school.library.repository;
+package hei.school.library.repository.dao;
 
 import hei.school.library.entity.Genre;
 import org.springframework.data.jpa.repository.JpaRepository;

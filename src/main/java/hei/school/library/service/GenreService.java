@@ -3,7 +3,7 @@ package hei.school.library.service;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.entity.Genre;
-import hei.school.library.repository.GenreRepository;
+import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.validator.DataValidator;
 import hei.school.library.validator.GenreValidator;
 import lombok.RequiredArgsConstructor;

@@ -5,7 +5,7 @@ import hei.school.library.entity.Genre;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.GenreMapper;
-import hei.school.library.repository.GenreRepository;
+import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.service.GenreService;
 import hei.school.library.validator.DataValidator;
 import hei.school.library.validator.GenreValidator;
