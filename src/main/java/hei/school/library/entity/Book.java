@@ -43,6 +43,7 @@ public class Book {
       name = "book_authors",
       joinColumns = @JoinColumn(name = "book_id"),
       inverseJoinColumns = @JoinColumn(name = "author_id"))
+  @Builder.Default
   private Set<Author> authors = new HashSet<>();
 
   //    @ManyToMany

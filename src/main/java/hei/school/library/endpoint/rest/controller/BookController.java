@@ -4,6 +4,7 @@ import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookResponse;
 import hei.school.library.service.BookService;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,9 +24,22 @@ public class BookController {
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
-  @GetMapping
+  // GET simple - tous les livres sans pagination
+  @GetMapping("/all")
   public ResponseEntity<List<BookResponse>> getAllBooks() {
     return ResponseEntity.ok(bookService.getAllBooks());
+  }
+
+  // GET avec pagination et filtres (sans genreId)
+  @GetMapping
+  public ResponseEntity<Map<String, Object>> searchBooks(
+      @RequestParam(required = false) String search,
+      @RequestParam(required = false) String isbn,
+      @RequestParam(required = false) UUID authorId,
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int size) {
+
+    return ResponseEntity.ok(bookService.listBooks(search, isbn, authorId, page, size));
   }
 
   @GetMapping("/{id}")

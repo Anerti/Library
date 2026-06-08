@@ -4,9 +4,14 @@ import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookResponse;
 import hei.school.library.entity.Book;
 import hei.school.library.repository.dao.BookRepository;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +64,30 @@ public class BookService {
       throw new RuntimeException("Book not found");
     }
     bookRepository.deleteById(id);
+  }
+
+  @Transactional(readOnly = true)
+  public Map<String, Object> listBooks(
+      String search, String isbn, UUID authorId, int page, int size) {
+    Pageable pageable = PageRequest.of(page - 1, size);
+
+    Page<Book> bookPage = bookRepository.searchBooks(search, isbn, authorId, pageable);
+
+    List<BookResponse> dtos = bookPage.getContent().stream().map(this::mapToResponse).toList();
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("data", dtos);
+    response.put("pagination", buildPagination(bookPage, page, size));
+
+    return response;
+  }
+
+  private Map<String, Object> buildPagination(Page<Book> page, int currentPage, int size) {
+    Map<String, Object> pagination = new HashMap<>();
+    pagination.put("page", currentPage);
+    pagination.put("size", size);
+    pagination.put("total", page.getTotalElements());
+    return pagination;
   }
 
   private BookResponse mapToResponse(Book book) {
