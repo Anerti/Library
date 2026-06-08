@@ -2,9 +2,10 @@ package hei.school.library.controller.genre;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.endpoint.rest.controller.GenreController;
-import hei.school.library.exception.BadRequestException;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.service.GenreService;
+import lombok.Builder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -34,16 +35,16 @@ public class GenreControllerTest {
     }
 
     @Test
-    void shouldCreateGenre() throws Exception {
+    void should_create_genre() throws Exception {
 
         UUID id = UUID.randomUUID();
 
-        GenreResponse response =
-                new GenreResponse();
-        response.setId(id);
-        response.setName("Fantasy");
-        response.setCreatedAt(Instant.now());
-        response.setUpdatedAt(Instant.now());
+        GenreResponse response = GenreResponse.builder()
+                .id(id)
+                .name("Fantasy")
+                .createdAt(Instant.now())
+                .updatedAt(Instant.now())
+                .build();
 
         when(genreService.createGenreByName(any(GenreRequest.class)))
                 .thenReturn(response);
@@ -61,8 +62,7 @@ public class GenreControllerTest {
                         .value("Fantasy"));
     }
     @Test
-    void shouldReturnConflictWhenGenreAlreadyExists() throws Exception {
-        shouldCreateGenre();
+    void should_return_conflict_when_genre_already_exists() throws Exception {
         when(genreService.createGenreByName(any(GenreRequest.class)))
                 .thenThrow(new ConflictException("The requested resource already exists"));
 
@@ -77,9 +77,9 @@ public class GenreControllerTest {
                 .andExpect(status().isConflict());
     }
     @Test
-    void shouldReturnBadRequestWhenRequestIsNotValid() throws Exception {
+    void should_return_unprocessable_entity_exception_when_request_is_not_valid() throws Exception {
         when(genreService.createGenreByName(any(GenreRequest.class)))
-                .thenThrow(new BadRequestException("The request body contains invalid JSON or a parameter is malformed"));
+                .thenThrow(new UnprocessableEntityException("The request body contains invalid JSON or a parameter is malformed"));
 
         mockMvc.perform(post("/genres")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -89,6 +89,6 @@ public class GenreControllerTest {
                         }
                     """)
                 )
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isUnprocessableEntity());
     }
 }
