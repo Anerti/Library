@@ -4,7 +4,7 @@ import hei.school.library.dto.GenreRequest;
 import hei.school.library.entity.Genre;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.UnprocessableEntityException;
-import hei.school.library.mapper.GenreConverter;
+import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.GenreRepository;
 import hei.school.library.service.GenreService;
 import hei.school.library.validator.DataValidator;
@@ -29,7 +29,7 @@ public class GenreServiceTest {
     @Mock
     private DataValidator dataValidator;
     @Mock
-    private GenreConverter genreConverter;
+    private GenreMapper genreMapper;
     @Mock
     private GenreValidator genreValidator;
 
@@ -37,7 +37,7 @@ public class GenreServiceTest {
 
     @BeforeEach
     void setUp() {
-        genreService = new GenreService(genreRepository, genreConverter, genreValidator, dataValidator);
+        genreService = new GenreService(genreRepository, genreMapper, genreValidator, dataValidator);
     }
 
     @Test
@@ -53,7 +53,7 @@ public class GenreServiceTest {
 
         when(genreRepository.save(any(Genre.class))).thenReturn(genre);
 
-        assertEquals(genreConverter.toResponse(genre), genreService.createGenreByName(
+        assertEquals(genreMapper.toResponse(genre), genreService.createGenreByName(
                 GenreRequest.builder()
                 .name("Fantasy")
                 .build()));

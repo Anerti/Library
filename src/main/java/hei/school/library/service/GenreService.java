@@ -8,13 +8,13 @@ import hei.school.library.validator.DataValidator;
 import hei.school.library.validator.GenreValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import hei.school.library.mapper.GenreConverter;
+import hei.school.library.mapper.GenreMapper;
 import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class GenreService {
     private final GenreRepository genreRepository;
-    private final GenreConverter genreConverter;
+    private final GenreMapper genreMapper;
     private final GenreValidator genreValidator;
     private final DataValidator dataValidator;
 
@@ -25,7 +25,7 @@ public class GenreService {
         genreValidator.isExistByName(genreRepository.existsByNameIgnoreCase(request.getName()));
         Genre genre = Genre.builder().name(request.getName()).build();
 
-        return genreConverter.toResponse(
+        return genreMapper.toResponse(
                 genreRepository.save(genre)
         );
     }

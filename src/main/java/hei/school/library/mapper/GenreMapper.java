@@ -6,7 +6,7 @@ import lombok.Builder;
 import org.springframework.stereotype.Component;
 @Builder
 @Component
-public class GenreConverter {
+public class GenreMapper {
     public GenreResponse toResponse(Genre genre) {
         if (genre == null) {
             return null;
