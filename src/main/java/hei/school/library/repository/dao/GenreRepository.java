@@ -14,7 +14,7 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
           INSERT INTO genre (id, name, created_at, updated_at)
           VALUES (gen_random_uuid(), :name, NOW(), NOW())
           ON CONFLICT (name) DO NOTHING
-          returning id, name, created_at, updated _at
+          returning id, name, created_at, updated_at
           """,
             nativeQuery = true)
     Optional<Genre> insertGenreIgnoreConflict(
