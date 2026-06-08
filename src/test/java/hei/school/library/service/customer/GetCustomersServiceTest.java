@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import hei.school.library.dto.CustomerResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Customer;
+import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.service.CustomerService;
@@ -85,5 +86,20 @@ class GetCustomersServiceTest {
     PageResponse<CustomerResponse> result = customerService.findAll(null, 1, 20);
 
     assertThat(result.getData().getFirst()).isInstanceOf(CustomerResponse.class);
+  }
+
+  @Test
+  @DisplayName("findAll: should throw UnprocessableEntityException when search contains invalid characters")
+  void findAll_shouldThrow_whenSearchInvalid() {
+    String invalidSearch = "customer!</>";
+
+    doThrow(new UnprocessableEntityException(
+            "Field 'search' contains invalid characters. Only letters (a-z, A-Z), digits (0-9),"
+                    + " and @ ' . - _ are allowed."))
+            .when(dataValidator)
+            .validateString("search", invalidSearch);
+
+    assertThatThrownBy(() -> customerService.findAll(invalidSearch, 1, 20))
+            .isInstanceOf(UnprocessableEntityException.class);
   }
 }
