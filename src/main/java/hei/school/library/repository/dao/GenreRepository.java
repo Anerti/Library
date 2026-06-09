@@ -3,6 +3,9 @@ package hei.school.library.repository.dao;
 import hei.school.library.entity.Genre;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,4 +21,20 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
           """,
       nativeQuery = true)
   Optional<Genre> insertGenreIgnoreConflict(@Param("name") String name);
+
+    @Query(
+            value =
+                    """
+                    SELECT id, name, created_at, updated_at FROM genre
+                    WHERE (:search IS NULL OR :search = ''
+                       OR name ILIKE '%' || :search || '%')
+                    """,
+            countQuery =
+                    """
+                    SELECT COUNT(id) FROM genre
+                    WHERE (:search IS NULL OR :search = ''
+                       OR name ILIKE '%' || :search || '%')
+                    """,
+            nativeQuery = true)
+    Page<Genre> findBySearch(@Param("search") String search, Pageable pageable);
 }
