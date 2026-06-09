@@ -1,4 +1,5 @@
 package hei.school.library.entity;
+
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
@@ -16,18 +17,18 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "genre")
 public class Genre {
-@Id
-@GeneratedValue(strategy = GenerationType.UUID)
-private UUID id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private UUID id;
 
-@Column(nullable = false, unique = true, length = 100)
-private String name;
+  @Column(nullable = false, unique = true, length = 100)
+  private String name;
 
-@CreatedDate
-@Column(name = "created_at", nullable = false, updatable = false)
-private Instant createdAt;
+  @CreatedDate
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
 
-@LastModifiedDate
-@Column(name = "updated_at", nullable = false)
-private Instant updatedAt;
+  @LastModifiedDate
+  @Column(name = "updated_at", nullable = false)
+  private Instant updatedAt;
 }
