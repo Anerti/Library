@@ -2,6 +2,7 @@ package hei.school.library.repository.dao;
 
 import hei.school.library.entity.Arrival;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,4 +23,15 @@ public interface ArrivalRepository extends JpaRepository<Arrival, UUID> {
       @Param("from") LocalDateTime from,
       @Param("to") LocalDateTime to,
       Pageable pageable);
+
+  @Query(
+      value =
+          """
+          INSERT INTO arrival (id, library_id, arrival_date, created_at)
+          VALUES (gen_random_uuid(), :libraryId, :arrivalDate, now())
+          RETURNING id, library_id, arrival_date, created_at
+          """,
+      nativeQuery = true)
+  Optional<Arrival> create(
+      @Param("libraryId") UUID libraryId, @Param("arrivalDate") LocalDateTime arrivalDate);
 }

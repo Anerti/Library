@@ -1,5 +1,6 @@
 package hei.school.library.service;
 
+import hei.school.library.dto.ArrivalRequest;
 import hei.school.library.dto.ArrivalResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.PaginationDto;
@@ -51,5 +52,17 @@ public class ArrivalService {
         .findById(arrivalId)
         .map(arrivalMapper::toResponse)
         .orElseThrow(() -> new NotFoundException("Arrival with id " + arrivalId + " not found"));
+  }
+
+  public ArrivalResponse create(UUID libraryId, ArrivalRequest arrivalRequest) {
+
+    LocalDateTime arrivalDate =
+        arrivalRequest.getArrivalDate() != null
+            ? arrivalRequest.getArrivalDate()
+            : LocalDateTime.now();
+    return arrivalRepository
+        .create(libraryId, arrivalDate)
+        .map(arrivalMapper::toResponse)
+        .orElseThrow(() -> new NotFoundException("Library with id " + libraryId + " not found"));
   }
 }

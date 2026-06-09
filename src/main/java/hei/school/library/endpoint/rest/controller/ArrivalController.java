@@ -1,5 +1,6 @@
 package hei.school.library.endpoint.rest.controller;
 
+import hei.school.library.dto.ArrivalRequest;
 import hei.school.library.dto.ArrivalResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.service.ArrivalService;
@@ -33,5 +34,12 @@ public class ArrivalController {
       @PathVariable UUID libraryId, @PathVariable UUID arrivalId) {
 
     return ResponseEntity.status(HttpStatus.OK).body(arrivalService.findById(libraryId, arrivalId));
+  }
+
+  @PostMapping
+  public ResponseEntity<ArrivalResponse> create(
+      @PathVariable UUID libraryId, @RequestBody ArrivalRequest arrivalRequest) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(arrivalService.create(libraryId, arrivalRequest));
   }
 }
