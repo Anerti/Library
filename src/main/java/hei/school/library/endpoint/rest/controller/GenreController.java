@@ -1,19 +1,20 @@
 package hei.school.library.endpoint.rest.controller;
+
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.service.GenreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/genres")
 public class GenreController {
-    private final GenreService genreService;
+  private final GenreService genreService;
 
-    @PostMapping
-    public ResponseEntity<?> create(@RequestBody GenreRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(genreService.createGenreByName(request));
-    }
-
+  @PostMapping
+  public ResponseEntity<?> create(@RequestBody GenreRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(genreService.createGenreByName(request));
+  }
 }

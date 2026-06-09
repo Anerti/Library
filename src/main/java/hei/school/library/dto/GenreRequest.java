@@ -8,5 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GenreRequest {
-    private String name;
+  private String name;
 }
