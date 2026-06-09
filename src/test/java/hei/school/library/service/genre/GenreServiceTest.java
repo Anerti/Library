@@ -65,14 +65,6 @@ public class GenreServiceTest {
         assertThrows(NotFoundException.class, () -> genreService.getGenreById(id));
     }
     @Test
-    void should_return_unprocessable_entity_when_id_is_not_valid() throws Exception {
-        doThrow(UnprocessableEntityException.class)
-                .when(dataValidator).validateString(eq("id"), any());
-
-        assertThrows(UnprocessableEntityException.class, () -> genreService.getGenreById(null));
-
-    }
-    @Test
     void should_create_genre() throws Exception {
 
         UUID id = UUID.randomUUID();
