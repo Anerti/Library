@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/genres")
@@ -17,4 +19,9 @@ public class GenreController {
   public ResponseEntity<?> create(@RequestBody GenreRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(genreService.createGenreByName(request));
   }
+    @DeleteMapping("/{genreId}")
+    public ResponseEntity<Void> delete(@PathVariable UUID genreId) {
+        genreService.deleteGenreById(genreId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

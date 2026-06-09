@@ -1,14 +1,15 @@
 package hei.school.library.service.genre;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.entity.Genre;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
@@ -77,4 +78,24 @@ public class GenreServiceTest {
         UnprocessableEntityException.class,
         () -> genreService.createGenreByName(GenreRequest.builder().name(null).build()));
   }
+
+    @Test
+    void should_delete_genre_by_id() throws Exception {
+
+        UUID id = UUID.randomUUID();
+        when(genreRepository.deleteByUUId(id))
+                .thenReturn(Optional.of(id));
+        genreService.deleteGenreById(id);
+
+        verify(genreRepository, times(1)).deleteByUUId(id);
+    }
+    @Test
+    void should_return_not_found_when_genre_id_does_not_exist_on_deleting() throws Exception {
+        UUID id = UUID.randomUUID();
+        when(genreRepository.deleteByUUId(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> genreService.deleteGenreById(id)).isInstanceOf(NotFoundException.class);
+
+        verify(genreRepository).deleteByUUId(id);
+    }
 }
