@@ -2,6 +2,7 @@ package hei.school.library.controller.genre;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,6 +11,7 @@ import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.endpoint.rest.controller.GenreController;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.service.GenreService;
 import java.time.Instant;
@@ -99,4 +101,47 @@ public class GenreControllerTest {
                     """))
         .andExpect(status().isUnprocessableEntity());
   }
+    @Test
+    void should_update_genre_by_name() throws Exception {
+
+        UUID id = UUID.randomUUID();
+
+        GenreResponse response =
+                new GenreResponse();
+        response.setId(id);
+        response.setName("Fantasy");
+        response.setCreatedAt(Instant.now());
+        response.setUpdatedAt(Instant.now());
+
+        when(genreService.updateGenreByName(any(UUID.class),any(GenreRequest.class))).thenReturn(response);
+
+        mockMvc
+                .perform(
+                        patch("/genres/{id}",id)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
+                                            {
+                                                "name":"Fantasy"
+                                            }
+                                        """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id.toString()))
+                .andExpect(jsonPath("$.name").value("Fantasy"));
+    }
+    @Test
+    void should_return_not_found_when_genre_id_does_not_exist_on_updating() throws Exception {
+        UUID id = UUID.randomUUID();
+        when(genreService.updateGenreByName(any(UUID.class), any(GenreRequest.class)))
+                .thenThrow(new NotFoundException("Genre with id " + id + " not found"));
+
+        mockMvc.perform(patch("/genres/{id}", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                {
+                    "name": "Action"
+                }
+            """))
+                .andExpect(status().isNotFound());
+    }
 }

@@ -18,4 +18,16 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
           """,
       nativeQuery = true)
   Optional<Genre> insertGenreIgnoreConflict(@Param("name") String name);
+
+    @Query(
+            value =
+                    """
+                    UPDATE genre 
+                    SET name = :name, updated_at = NOW() 
+                    WHERE id = :id
+                    RETURNING id, name, created_at, updated_at
+                    """,
+            nativeQuery = true)
+    Optional<Genre> updateGenreName(@Param("id") UUID id, @Param("name") String name);
+
 }

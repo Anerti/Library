@@ -1,14 +1,14 @@
 package hei.school.library.service.genre;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.entity.Genre;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
@@ -77,4 +77,43 @@ public class GenreServiceTest {
         UnprocessableEntityException.class,
         () -> genreService.createGenreByName(GenreRequest.builder().name(null).build()));
   }
+    @Test
+    void should_delete_genre_by_id() throws Exception {
+        UUID id = UUID.randomUUID();
+        String newName = "Action";
+
+        GenreRequest request = new GenreRequest();
+        request.setName(newName);
+
+        Genre updatedGenreFromDb = new Genre();
+        updatedGenreFromDb.setId(id);
+        updatedGenreFromDb.setName(newName);
+
+        GenreResponse expectedResponse = new GenreResponse();
+        expectedResponse.setId(id);
+        expectedResponse.setName(newName);
+        doNothing().when(dataValidator).validateName("name", newName);
+        when(genreRepository.updateGenreName(id, newName)).thenReturn(Optional.of(updatedGenreFromDb));
+        when(genreMapper.toResponse(updatedGenreFromDb)).thenReturn(expectedResponse);
+        GenreResponse actualResponse = genreService.updateGenreByName(id, request);
+        assertNotNull(actualResponse);
+        assertEquals(newName, actualResponse.getName());
+        assertEquals(id, actualResponse.getId());
+        verify(dataValidator, times(1)).validateName("name", newName);
+        verify(genreRepository, times(1)).updateGenreName(id, newName);
+        verify(genreMapper, times(1)).toResponse(updatedGenreFromDb);
+    }
+    @Test
+    void should_return_not_found_when_genre_id_does_not_exist_on_deleting() throws Exception {
+        UUID id = UUID.randomUUID();
+        GenreRequest request =
+                GenreRequest.builder()
+                        .name("Fantasy")
+                        .build();
+        when(genreRepository.updateGenreName(id,request.getName())).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> genreService.updateGenreByName(id,request)).isInstanceOf(NotFoundException.class);
+
+        verify(genreRepository).updateGenreName(id,request.getName());
+    }
 }
