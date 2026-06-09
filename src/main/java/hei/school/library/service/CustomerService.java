@@ -2,7 +2,9 @@ package hei.school.library.service;
 
 import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerResponse;
+import hei.school.library.dto.CustomerUpdateRequest;
 import hei.school.library.dto.PageResponse;
+import hei.school.library.entity.Customer;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.CustomerMapper;
@@ -59,5 +61,23 @@ public class CustomerService {
                 () ->
                     new ConflictException(
                         "Customer with email " + request.getEmail() + " already exists")));
+  }
+
+  @Transactional
+  public CustomerResponse update(UUID id, CustomerUpdateRequest request) {
+    customerValidator.validateUpdate(request);
+
+    Customer customer =
+        customerRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Customer " + id + " not found"));
+
+    if (request.getLastName() != null) customer.setLastName(request.getLastName());
+    if (request.getFirstName() != null) customer.setFirstName(request.getFirstName());
+    if (request.getBirthDate() != null) customer.setBirthDate(request.getBirthDate());
+    if (request.getEmail() != null) customer.setEmail(request.getEmail());
+    if (request.getPhone() != null) customer.setPhone(request.getPhone());
+
+    return customerMapper.toResponse(customerRepository.save(customer));
   }
 }
