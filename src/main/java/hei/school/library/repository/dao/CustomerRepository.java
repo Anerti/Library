@@ -14,7 +14,7 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
   @Query(
       value =
-          """
+"""
 SELECT id, last_name, first_name, birth_date, email, password, phone, created_at, updated_at FROM customer
 WHERE (:search IS NULL OR :search = ''
    OR last_name  ILIKE '%' || :search || '%'

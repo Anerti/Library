@@ -58,4 +58,70 @@ public class GenreControllerTest {
         mockMvc.perform(get("/genres/{id}", id))
                 .andExpect(status().isNotFound());
     }
-}
+
+  @Test
+  void should_create_genre() throws Exception {
+
+    UUID id = UUID.randomUUID();
+
+    GenreResponse response =
+        GenreResponse.builder()
+            .id(id)
+            .name("Fantasy")
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .build();
+
+    when(genreService.createGenreByName(any(GenreRequest.class))).thenReturn(response);
+
+    mockMvc
+        .perform(
+            post("/genres")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                            "name":"Fantasy"
+                        }
+                    """))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.name").value("Fantasy"));
+      @Test
+      void should_return_conflict_when_genre_already_exists() throws Exception {
+          when(genreService.createGenreByName(any(GenreRequest.class)))
+                  .thenThrow(new ConflictException("The requested resource already exists"));
+
+          mockMvc
+                  .perform(
+                          post("/genres")
+                                  .contentType(MediaType.APPLICATION_JSON)
+                                  .content(
+                                          """
+                                              {
+                                                  "name":"Fantasy"
+                                              }
+                                          """))
+                  .andExpect(status().isConflict());
+      }
+
+      @Test
+      void should_return_unprocessable_entity_exception_when_request_is_not_valid() throws Exception {
+          when(genreService.createGenreByName(any(GenreRequest.class)))
+                  .thenThrow(
+                          new UnprocessableEntityException(
+                                  "The request body contains invalid JSON or a parameter is malformed"));
+
+          mockMvc
+                  .perform(
+                          post("/genres")
+                                  .contentType(MediaType.APPLICATION_JSON)
+                                  .content(
+                                          """
+                                              {
+                      
+                                              }
+                                          """))
+                  .andExpect(status().isUnprocessableEntity());
+      }
+  }
+
