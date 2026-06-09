@@ -80,4 +80,11 @@ public class CustomerService {
 
     return customerMapper.toResponse(customerRepository.save(customer));
   }
+
+  @Transactional
+  public void delete(UUID id) {
+    customerRepository
+        .delete(id)
+        .orElseThrow(() -> new NotFoundException("Customer " + id + " not found"));
+  }
 }
