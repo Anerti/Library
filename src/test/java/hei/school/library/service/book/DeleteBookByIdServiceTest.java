@@ -1,6 +1,6 @@
 package hei.school.library.service.book;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,13 +38,12 @@ class DeleteBookByIdServiceTest {
   }
 
   @Test
-  @DisplayName("deleteBook: should return the deleted book ID when book exists")
-  void deleteBook_shouldReturnId() {
+  @DisplayName("deleteBook: should delete and not throw when book exists")
+  void deleteBook_shouldNotThrow_whenExists() {
     when(bookRepository.deleteByIdAndReturn(existingId)).thenReturn(Optional.of(existingId));
 
-    UUID result = bookService.deleteBook(existingId);
+    assertThatCode(() -> bookService.deleteBook(existingId)).doesNotThrowAnyException();
 
-    assertThat(result).isEqualTo(existingId);
     verify(bookRepository).deleteByIdAndReturn(existingId);
   }
 
@@ -55,6 +54,6 @@ class DeleteBookByIdServiceTest {
 
     assertThatThrownBy(() -> bookService.deleteBook(unknownId))
         .isInstanceOf(NotFoundException.class)
-        .hasMessage("Book not found with id: " + unknownId);
+        .hasMessage(String.format("Book %s not found", unknownId));
   }
 }
