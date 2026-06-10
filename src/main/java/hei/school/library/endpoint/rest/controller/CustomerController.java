@@ -1,5 +1,6 @@
 package hei.school.library.endpoint.rest.controller;
 
+import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.service.CustomerService;
@@ -27,5 +28,10 @@ public class CustomerController {
   @GetMapping("/{id}")
   public ResponseEntity<CustomerResponse> findById(@PathVariable UUID id) {
     return ResponseEntity.status(HttpStatus.OK).body(customerService.findById(id));
+  }
+
+  @PostMapping
+  public ResponseEntity<CustomerResponse> create(@RequestBody CustomerRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(request));
   }
 }

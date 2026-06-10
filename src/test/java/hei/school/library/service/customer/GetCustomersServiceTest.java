@@ -11,6 +11,7 @@ import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.service.CustomerService;
+import hei.school.library.validator.CustomerValidator;
 import hei.school.library.validator.DataValidator;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -27,13 +28,15 @@ class GetCustomersServiceTest {
 
   @Mock private CustomerRepository customerRepository;
   @Mock private DataValidator dataValidator;
+  @Mock private CustomerValidator customerValidator;
   private CustomerService customerService;
   private Customer customer;
 
   @BeforeEach
   void setUp() {
     CustomerMapper customerMapper = new CustomerMapper();
-    customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
+    customerService =
+        new CustomerService(customerRepository, customerMapper, dataValidator, customerValidator);
 
     customer =
         new Customer(
@@ -42,7 +45,6 @@ class GetCustomersServiceTest {
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "hashed_pw",
             "+261331234567",
             Instant.now(),
             Instant.now());
