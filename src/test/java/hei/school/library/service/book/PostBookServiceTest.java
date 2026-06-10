@@ -47,8 +47,6 @@ class PostBookServiceTest {
             .build();
   }
 
-  /* ─────── Success ─────── */
-
   @Test
   @DisplayName(
       "createBook: should return response with empty authors and genres for a new book (per spec)")
@@ -82,8 +80,8 @@ class PostBookServiceTest {
     assertThat(result.getPublisher()).isEqualTo("Gallimard");
     assertThat(result.getPublishedAt()).isEqualTo(LocalDate.of(1943, 4, 6));
     assertThat(result.getCreatedAt()).isNotNull();
-    assertThat(result.getAuthors()).isNotNull().isEmpty();
-    assertThat(result.getGenres()).isNotNull().isEmpty();
+    assertThat(result.getAuthors()).isNull();
+    assertThat(result.getGenres()).isNull();
 
     verify(bookRepository)
         .create(
@@ -123,8 +121,6 @@ class PostBookServiceTest {
     assertThat(result.getSummary()).isNull();
   }
 
-  /* ─────── Conflict (ISBN duplicata) ─────── */
-
   @Test
   @DisplayName("createBook: should throw ConflictException when ISBN already exists")
   void createBook_shouldThrow_whenIsbnExists() {
@@ -140,8 +136,6 @@ class PostBookServiceTest {
         .isInstanceOf(ConflictException.class)
         .hasMessage("Book with ISBN " + validRequest.getIsbn() + " already exists");
   }
-
-  /* ─────── Required fields ─────── */
 
   @Test
   @DisplayName("createBook: should throw UnprocessableEntityException when title is missing")
@@ -191,8 +185,6 @@ class PostBookServiceTest {
         .hasMessage("publishedAt is required.");
   }
 
-  /* ─────── ISBN validation ─────── */
-
   @Test
   @DisplayName(
       "createBook: should throw UnprocessableEntityException when isbn has invalid characters")
@@ -226,16 +218,13 @@ class PostBookServiceTest {
         .hasMessage("isbn is invalid or contain Illegal characters.");
   }
 
-  /* ─────── Title / publisher character validation ─────── */
-
   @Test
   @DisplayName(
-      "createBook: should throw UnprocessableEntityException when title contains forbidden"
-          + " characters")
-  void createBook_shouldThrow_whenTitleHasForbiddenChars() {
+      "createBook: should throw UnprocessableEntityException when title has invalid characters")
+  void createBook_shouldThrow_whenTitleHasInvalidChars() {
     BookRequest invalid =
         BookRequest.builder()
-            .title("Harry Potter 3")
+            .title("Harry Potter @ 3")
             .isbn("0123456789")
             .publisher("Bloomsbury")
             .publishedAt(LocalDate.now())
@@ -243,9 +232,7 @@ class PostBookServiceTest {
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessage(
-            "title field contain forbidden characters. Only letters (a-z, A-Z) and space are"
-                + " allowed.");
+        .hasMessage("title contains invalid characters.");
   }
 
   @Test

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class DataValidator {
 
   private static final Pattern SAFE_SEARCH_STRING = Pattern.compile("^[a-zA-Z0-9@' ._-]*$");
+  private final Pattern SAFE_STRING_BOOK_NAME = Pattern.compile("^[a-zA-Z0-9' éèê-]+$");
   private static final Pattern SAFE_NAME_STRING = Pattern.compile("^[a-zA-Z' ]+$");
   private static final Pattern VALID_EMAIL_PATTERN =
       Pattern.compile("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z]+){1,2}$");
@@ -73,7 +74,16 @@ public class DataValidator {
   }
 
   public void validateBook(BookRequest request) {
-    validateName("title", request.getTitle());
+    if (request.getTitle() == null || request.getTitle().isBlank()) {
+      throw new UnprocessableEntityException("title is required.");
+    }
+    if (request.getTitle().length() > 100) {
+      throw new UnprocessableEntityException("title cannot be longer than 100 characters.");
+    }
+    if (!SAFE_STRING_BOOK_NAME.matcher(request.getTitle()).matches()) {
+      throw new UnprocessableEntityException("title contains invalid characters.");
+    }
+
     validateIsbn(request.getIsbn());
     validateName("publisher", request.getPublisher());
 
