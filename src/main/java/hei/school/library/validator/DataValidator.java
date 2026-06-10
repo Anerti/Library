@@ -115,12 +115,12 @@ public class DataValidator {
 
   public void checkPatchBook(BookUpdateRequest request) {
     if (request.getTitle() == null
-            && request.getSummary() == null
-            && request.getIsbn() == null
-            && request.getPublisher() == null
-            && request.getPublishedAt() == null) {
+        && request.getSummary() == null
+        && request.getIsbn() == null
+        && request.getPublisher() == null
+        && request.getPublishedAt() == null) {
       throw new UnprocessableEntityException(
-              "At least one field (title, summary, isbn, publisher, publishedAt) must be provided");
+          "At least one field (title, summary, isbn, publisher, publishedAt) must be provided");
     }
   }
 
