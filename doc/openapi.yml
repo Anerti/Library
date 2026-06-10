@@ -137,7 +137,7 @@ components:
           type: string
           maxLength: 100
           example: Le Petit Prince
-        abstract:
+        summary:
           type: string
           nullable: true
           example: Les aventures d'un petit garçon venu d'ailleurs...
@@ -174,7 +174,7 @@ components:
           type: string
           maxLength: 100
           example: Le Petit Prince
-        abstract:
+        summary:
           type: string
           nullable: true
           example: Les aventures d'un petit garçon venu d'ailleurs...
@@ -211,7 +211,7 @@ components:
           type: string
           maxLength: 100
           example: Le Petit Prince
-        abstract:
+        summary:
           type: string
           nullable: true
           example: Les aventures d'un petit garçon venu d'ailleurs...
@@ -1217,7 +1217,7 @@ paths:
                   -
                     id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
                     title: Le Petit Prince
-                    abstract: Les aventures...
+                    summary: Les aventures...
                     isbn: 978-2-07-061275-8
                     publisher: Gallimard
                     publishedAt: 1943-04-06
@@ -1232,7 +1232,7 @@ paths:
                   -
                     id: c2d3e4f5-a6b7-8901-abcd-ef1234567891
                     title: Les Misérables
-                    abstract: null
+                    summary: null
                     isbn: 978-2-07-040922-8
                     publisher: Gallimard
                     publishedAt: 1862-03-30
@@ -1273,7 +1273,7 @@ paths:
               example:
                 id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
                 title: Le Petit Prince
-                abstract: Les aventures...
+                summary: Les aventures...
                 isbn: 978-2-07-061275-8
                 publisher: Gallimard
                 publishedAt: 1943-04-06
@@ -1315,7 +1315,7 @@ paths:
               example:
                 id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
                 title: Le Petit Prince
-                abstract: Les aventures...
+                summary: Les aventures...
                 isbn: 978-2-07-061275-8
                 publisher: Gallimard
                 publishedAt: 1943-04-06
@@ -1362,7 +1362,7 @@ paths:
               example:
                 id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
                 title: Le Petit Prince
-                abstract: Les aventures...
+                summary: Les aventures...
                 isbn: 978-2-07-061275-8
                 publisher: Gallimard
                 publishedAt: 1943-04-06

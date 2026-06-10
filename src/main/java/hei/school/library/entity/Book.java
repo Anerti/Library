@@ -24,7 +24,7 @@ public class Book {
   private String title;
 
   @Column(columnDefinition = "TEXT")
-  private String abstractText;
+  private String summary;
 
   @Column(nullable = false, unique = true, length = 100)
   private String isbn;
@@ -32,7 +32,7 @@ public class Book {
   @Column(nullable = false, length = 100)
   private String publisher;
 
-  @Column(name = "published_at")
+  @Column(name = "published_at", nullable = false)
   private LocalDate publishedAt;
 
   @Column(name = "created_at", updatable = false)
@@ -46,13 +46,13 @@ public class Book {
   @Builder.Default
   private Set<Author> authors = new HashSet<>();
 
-  //    @ManyToMany
-  //    @JoinTable(
-  //            name = "book_genres",
-  //            joinColumns = @JoinColumn(name = "book_id"),
-  //            inverseJoinColumns = @JoinColumn(name = "genre_id")
-  //    )
-  //    private Set<Genre> genres = new HashSet<>();
+  @ManyToMany
+  @JoinTable(
+      name = "book_genres",
+      joinColumns = @JoinColumn(name = "book_id"),
+      inverseJoinColumns = @JoinColumn(name = "genre_id"))
+  @Builder.Default
+  private Set<Genre> genres = new HashSet<>();
 
   @PrePersist
   protected void onCreate() {

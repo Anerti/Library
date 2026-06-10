@@ -11,7 +11,7 @@ import lombok.*;
 public class BookRequest {
 
   private String title;
-  private String abstractText;
+  private String summary;
   private String isbn;
   private String publisher;
   private LocalDate publishedAt;
