@@ -1,6 +1,5 @@
 package hei.school.library.controller.book;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -70,8 +69,7 @@ public class BookControllerTest {
     PageResponse<BookResponse> response =
         PageResponse.<BookResponse>builder().data(List.of(book)).pagination(pagination).build();
 
-    when(bookService.listBooks(
-            eq(null), eq(null), eq(null), eq(null), eq(1), eq(20)))
+    when(bookService.listBooks(eq(null), eq(null), eq(null), eq(null), eq(1), eq(20)))
         .thenReturn(response);
 
     mockMvc
@@ -107,13 +105,11 @@ public class BookControllerTest {
     PageResponse<BookResponse> response =
         PageResponse.<BookResponse>builder().data(List.of(book)).pagination(pagination).build();
 
-    when(bookService.listBooks(
-            eq("Petit"), eq(null), eq(null), eq(null), eq(1), eq(20)))
+    when(bookService.listBooks(eq("Petit"), eq(null), eq(null), eq(null), eq(1), eq(20)))
         .thenReturn(response);
 
     mockMvc
-        .perform(
-            get("/books").param("search", "Petit").accept(MediaType.APPLICATION_JSON))
+        .perform(get("/books").param("search", "Petit").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data[0].title").value("Le Petit Prince"));
   }
@@ -144,15 +140,12 @@ public class BookControllerTest {
     PageResponse<BookResponse> response =
         PageResponse.<BookResponse>builder().data(List.of(book)).pagination(pagination).build();
 
-    when(bookService.listBooks(
-            eq(null), eq(null), eq("de Saint-Exupéry"), eq(null), eq(1), eq(20)))
+    when(bookService.listBooks(eq(null), eq(null), eq("de Saint-Exupéry"), eq(null), eq(1), eq(20)))
         .thenReturn(response);
 
     mockMvc
         .perform(
-            get("/books")
-                .param("lastName", "de Saint-Exupéry")
-                .accept(MediaType.APPLICATION_JSON))
+            get("/books").param("lastName", "de Saint-Exupéry").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data[0].title").value("Le Petit Prince"));
   }
@@ -178,15 +171,11 @@ public class BookControllerTest {
     PageResponse<BookResponse> response =
         PageResponse.<BookResponse>builder().data(List.of(book)).pagination(pagination).build();
 
-    when(bookService.listBooks(
-            eq(null), eq(null), eq(null), eq("Fiction"), eq(1), eq(20)))
+    when(bookService.listBooks(eq(null), eq(null), eq(null), eq("Fiction"), eq(1), eq(20)))
         .thenReturn(response);
 
     mockMvc
-        .perform(
-            get("/books")
-                .param("genreName", "Fiction")
-                .accept(MediaType.APPLICATION_JSON))
+        .perform(get("/books").param("genreName", "Fiction").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data[0].title").value("Le Petit Prince"));
   }
@@ -216,9 +205,7 @@ public class BookControllerTest {
 
     mockMvc
         .perform(
-            get("/books")
-                .param("isbn", "978-2-07-061275-8")
-                .accept(MediaType.APPLICATION_JSON))
+            get("/books").param("isbn", "978-2-07-061275-8").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data[0].isbn").value("978-2-07-061275-8"));
   }
@@ -230,13 +217,11 @@ public class BookControllerTest {
     PageResponse<BookResponse> response =
         PageResponse.<BookResponse>builder().data(List.of()).pagination(pagination).build();
 
-    when(bookService.listBooks(
-            eq("nonexistent"), eq(null), eq(null), eq(null), eq(1), eq(20)))
+    when(bookService.listBooks(eq("nonexistent"), eq(null), eq(null), eq(null), eq(1), eq(20)))
         .thenReturn(response);
 
     mockMvc
-        .perform(
-            get("/books").param("search", "nonexistent").accept(MediaType.APPLICATION_JSON))
+        .perform(get("/books").param("search", "nonexistent").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data").isEmpty())
         .andExpect(jsonPath("$.pagination.total").value(0));

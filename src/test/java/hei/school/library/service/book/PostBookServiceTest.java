@@ -36,7 +36,9 @@ class PostBookServiceTest {
 
   @BeforeEach
   void setUp() {
-    bookService = new BookService(bookRepository, new BookMapper(), new DataValidator(), new PaginationMapper());
+    bookService =
+        new BookService(
+            bookRepository, new BookMapper(), new DataValidator(), new PaginationMapper());
 
     validRequest =
         BookRequest.builder()

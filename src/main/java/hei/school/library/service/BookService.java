@@ -78,7 +78,8 @@ public class BookService {
 
     Pageable pageable = PageRequest.of(page - 1, size);
 
-    Page<Book> bookPage = bookRepository.searchBooks(search, isbn, authorLastName, genreName, pageable);
+    Page<Book> bookPage =
+        bookRepository.searchBooks(search, isbn, authorLastName, genreName, pageable);
 
     List<BookResponse> books = bookPage.getContent().stream().map(bookMapper::toResponse).toList();
 

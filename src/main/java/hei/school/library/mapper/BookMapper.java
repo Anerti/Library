@@ -30,9 +30,7 @@ public class BookMapper {
     if (book.getAuthors() == null) {
       return List.of();
     }
-    return book.getAuthors().stream()
-        .map(this::toAuthorResponse)
-        .toList();
+    return book.getAuthors().stream().map(this::toAuthorResponse).toList();
   }
 
   private AuthorResponse toAuthorResponse(Author author) {
@@ -47,9 +45,7 @@ public class BookMapper {
     if (book.getGenres() == null) {
       return List.of();
     }
-    return book.getGenres().stream()
-        .map(this::toGenreSummary)
-        .toList();
+    return book.getGenres().stream().map(this::toGenreSummary).toList();
   }
 
   private GenreSummary toGenreSummary(Genre genre) {
