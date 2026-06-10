@@ -17,8 +17,8 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
   @Query(
       value =
           """
-          INSERT INTO book (id, title, summary, isbn, publisher, published_at)
-          VALUES (gen_random_uuid(), :title, :summary, :isbn, :publisher, :publishedAt)
+          INSERT INTO book (title, summary, isbn, publisher, published_at)
+          VALUES (:title, :summary, :isbn, :publisher, :publishedAt)
           ON CONFLICT (isbn) DO NOTHING
           RETURNING id, title, summary, isbn, publisher, published_at, created_at
           """,

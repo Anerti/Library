@@ -26,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class CreateBookServiceTest {
+class PostBookServiceTest {
 
   @Mock private BookRepository bookRepository;
 
@@ -136,7 +136,7 @@ class CreateBookServiceTest {
   @DisplayName("createBook: should throw UnprocessableEntityException when publisher is missing")
   void createBook_shouldThrow_whenPublisherMissing() {
     BookRequest invalid =
-        BookRequest.builder().title("Test").isbn("123").publishedAt(LocalDate.now()).build();
+        BookRequest.builder().title("Test").isbn("0123456789").publishedAt(LocalDate.now()).build();
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -146,7 +146,7 @@ class CreateBookServiceTest {
   @Test
   @DisplayName("createBook: should throw UnprocessableEntityException when publishedAt is missing")
   void createBook_shouldThrow_whenPublishedAtMissing() {
-    BookRequest invalid = BookRequest.builder().title("Test").isbn("123").publisher("Pub").build();
+    BookRequest invalid = BookRequest.builder().title("Test").isbn("0123456789").publisher("Pub").build();
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)

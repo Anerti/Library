@@ -15,6 +15,7 @@ public class DataValidator {
   private static final Pattern VALID_EMAIL_PATTERN =
       Pattern.compile("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z]+){1,2}$");
   private static final Pattern ALLOWED_EMAIL_CHAR = Pattern.compile("^[a-zA-Z0-9.@_-]+$");
+  private static final Pattern SAFE_ISBN = Pattern.compile("^[0-9Xx-]{10,}$");
 
   public void validateString(String fieldName, String value) {
     if (value != null && !value.isBlank() && !SAFE_SEARCH_STRING.matcher(value).matches()) {
@@ -59,25 +60,23 @@ public class DataValidator {
     }
   }
 
-  public void validateBook(BookRequest request) {
-    if (request.getTitle() == null || request.getTitle().isBlank()) {
-      throw new UnprocessableEntityException("title is required.");
-    }
-    if (request.getTitle().length() > 100) {
-      throw new UnprocessableEntityException("title cannot be longer than 100 characters.");
-    }
-    if (request.getIsbn() == null || request.getIsbn().isBlank()) {
+  private void validateIsbn(String isbn) {
+    if (isbn == null || isbn.isBlank()) {
       throw new UnprocessableEntityException("isbn is required.");
     }
-    if (request.getIsbn().length() > 100) {
+    if (isbn.length() > 100) {
       throw new UnprocessableEntityException("isbn cannot be longer than 100 characters.");
     }
-    if (request.getPublisher() == null || request.getPublisher().isBlank()) {
-      throw new UnprocessableEntityException("publisher is required.");
+    if (!SAFE_ISBN.matcher(isbn).matches()) {
+      throw new UnprocessableEntityException("isbn is invalid or contain Illegal characters.");
     }
-    if (request.getPublisher().length() > 100) {
-      throw new UnprocessableEntityException("publisher cannot be longer than 100 characters.");
-    }
+  }
+
+  public void validateBook(BookRequest request) {
+    validateName("title",  request.getTitle());
+    validateIsbn(request.getIsbn());
+    validateName("publisher", request.getPublisher());
+
     if (request.getPublishedAt() == null) {
       throw new UnprocessableEntityException("publishedAt is required.");
     }
