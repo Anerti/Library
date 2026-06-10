@@ -64,10 +64,9 @@ public class BookService {
   }
 
   public void deleteBook(UUID id) {
-    if (!bookRepository.existsById(id)) {
-      throw new RuntimeException("Book not found");
-    }
-    bookRepository.deleteById(id);
+    bookRepository
+            .deleteByIdAndReturn(id)
+            .orElseThrow(() -> new NotFoundException(String.format("Book %s not found", id)));
   }
 
   @Transactional(readOnly = true)
