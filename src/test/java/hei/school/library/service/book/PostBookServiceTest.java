@@ -47,9 +47,10 @@ class PostBookServiceTest {
             .build();
   }
 
+  /* ─────── Success ─────── */
+
   @Test
-  @DisplayName(
-      "createBook: should return response with empty authors and genres for a new book (per spec)")
+  @DisplayName("createBook: should return response with empty authors and genres for a new book (per spec)")
   void createBook_shouldReturnEmptyAuthorsAndGenres() {
     UUID newId = UUID.randomUUID();
     Book savedBook =
@@ -75,16 +76,13 @@ class PostBookServiceTest {
 
     assertThat(result.getId()).isEqualTo(newId);
     assertThat(result.getTitle()).isEqualTo("Le Petit Prince");
+    assertThat(result.getSummary()).isEqualTo("Un classique de la littérature française");
     assertThat(result.getIsbn()).isEqualTo("978-2-07-061275-8");
     assertThat(result.getPublisher()).isEqualTo("Gallimard");
     assertThat(result.getPublishedAt()).isEqualTo(LocalDate.of(1943, 4, 6));
     assertThat(result.getCreatedAt()).isNotNull();
-
-    // Spec: authors and genres are required arrays — empty for a new book
-    assertThat(result.getAuthors()).isNotNull();
-    assertThat(result.getAuthors()).isEmpty();
-    assertThat(result.getGenres()).isNotNull();
-    assertThat(result.getGenres()).isEmpty();
+    assertThat(result.getAuthors()).isNotNull().isEmpty();
+    assertThat(result.getGenres()).isNotNull().isEmpty();
 
     verify(bookRepository)
         .create(
@@ -94,6 +92,37 @@ class PostBookServiceTest {
             validRequest.getPublisher(),
             validRequest.getPublishedAt());
   }
+
+  @Test
+  @DisplayName("createBook: should accept null summary")
+  void createBook_shouldAcceptNullSummary() {
+    BookRequest noSummary =
+        BookRequest.builder()
+            .title("Test")
+            .isbn("0123456789")
+            .publisher("Pub")
+            .publishedAt(LocalDate.now())
+            .build();
+
+    Book saved =
+        Book.builder()
+            .id(UUID.randomUUID())
+            .title("Test")
+            .isbn("0123456789")
+            .publisher("Pub")
+            .publishedAt(LocalDate.now())
+            .createdAt(LocalDateTime.now())
+            .build();
+
+    when(bookRepository.create("Test", null, "0123456789", "Pub", LocalDate.now()))
+        .thenReturn(Optional.of(saved));
+
+    BookResponse result = bookService.createBook(noSummary);
+
+    assertThat(result.getSummary()).isNull();
+  }
+
+  /* ─────── Conflict (ISBN duplicata) ─────── */
 
   @Test
   @DisplayName("createBook: should throw ConflictException when ISBN already exists")
@@ -111,10 +140,17 @@ class PostBookServiceTest {
         .hasMessage("Book with ISBN " + validRequest.getIsbn() + " already exists");
   }
 
+  /* ─────── Required fields ─────── */
+
   @Test
   @DisplayName("createBook: should throw UnprocessableEntityException when title is missing")
   void createBook_shouldThrow_whenTitleMissing() {
-    BookRequest invalid = BookRequest.builder().isbn("123").publisher("Pub").publishedAt(LocalDate.now()).build();
+    BookRequest invalid =
+        BookRequest.builder()
+            .isbn("0123456789")
+            .publisher("Pub")
+            .publishedAt(LocalDate.now())
+            .build();
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -146,10 +182,79 @@ class PostBookServiceTest {
   @Test
   @DisplayName("createBook: should throw UnprocessableEntityException when publishedAt is missing")
   void createBook_shouldThrow_whenPublishedAtMissing() {
-    BookRequest invalid = BookRequest.builder().title("Test").isbn("0123456789").publisher("Pub").build();
+    BookRequest invalid =
+        BookRequest.builder().title("Test").isbn("0123456789").publisher("Pub").build();
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessage("publishedAt is required.");
+  }
+
+  /* ─────── ISBN validation ─────── */
+
+  @Test
+  @DisplayName("createBook: should throw UnprocessableEntityException when isbn has invalid characters")
+  void createBook_shouldThrow_whenIsbnHasInvalidChars() {
+    BookRequest invalid =
+        BookRequest.builder()
+            .title("Test")
+            .isbn("abcdefghij")
+            .publisher("Pub")
+            .publishedAt(LocalDate.now())
+            .build();
+
+    assertThatThrownBy(() -> bookService.createBook(invalid))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessage("isbn is invalid or contain Illegal characters.");
+  }
+
+  @Test
+  @DisplayName("createBook: should throw UnprocessableEntityException when isbn is too short")
+  void createBook_shouldThrow_whenIsbnTooShort() {
+    BookRequest invalid =
+        BookRequest.builder()
+            .title("Test")
+            .isbn("123456789")
+            .publisher("Pub")
+            .publishedAt(LocalDate.now())
+            .build();
+
+    assertThatThrownBy(() -> bookService.createBook(invalid))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessage("isbn is invalid or contain Illegal characters.");
+  }
+
+  /* ─────── Title / publisher character validation ─────── */
+
+  @Test
+  @DisplayName("createBook: should throw UnprocessableEntityException when title contains forbidden characters")
+  void createBook_shouldThrow_whenTitleHasForbiddenChars() {
+    BookRequest invalid =
+        BookRequest.builder()
+            .title("Harry Potter 3")
+            .isbn("0123456789")
+            .publisher("Bloomsbury")
+            .publishedAt(LocalDate.now())
+            .build();
+
+    assertThatThrownBy(() -> bookService.createBook(invalid))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessage("title field contain forbidden characters. Only letters (a-z, A-Z) and space are allowed.");
+  }
+
+  @Test
+  @DisplayName("createBook: should throw UnprocessableEntityException when publisher contains digits")
+  void createBook_shouldThrow_whenPublisherContainsDigits() {
+    BookRequest invalid =
+        BookRequest.builder()
+            .title("Test")
+            .isbn("0123456789")
+            .publisher("Pub 123")
+            .publishedAt(LocalDate.now())
+            .build();
+
+    assertThatThrownBy(() -> bookService.createBook(invalid))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessage("publisher field contain forbidden characters. Only letters (a-z, A-Z) and space are allowed.");
   }
 }
