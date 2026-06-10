@@ -5,19 +5,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.BookResponse;
-import hei.school.library.dto.GenreSummary;
-import hei.school.library.entity.Author;
 import hei.school.library.entity.Book;
-import hei.school.library.entity.Genre;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,15 +40,16 @@ class GetBookServiceTest {
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
 
-    book = Book.builder()
-        .id(existingId)
-        .title("Le Petit Prince")
-        .summary("Un classique de la littérature française")
-        .isbn("978-2-07-061275-8")
-        .publisher("Gallimard")
-        .publishedAt(LocalDate.of(1943, 4, 6))
-        .createdAt(LocalDateTime.now())
-        .build();
+    book =
+        Book.builder()
+            .id(existingId)
+            .title("Le Petit Prince")
+            .summary("Un classique de la littérature française")
+            .isbn("978-2-07-061275-8")
+            .publisher("Gallimard")
+            .publishedAt(LocalDate.of(1943, 4, 6))
+            .createdAt(LocalDateTime.now())
+            .build();
   }
 
   @Test

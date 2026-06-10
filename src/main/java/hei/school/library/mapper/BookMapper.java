@@ -29,9 +29,7 @@ public class BookMapper {
   }
 
   private List<AuthorResponse> mapAuthors(Book book) {
-    return Optional.ofNullable(book.getAuthors())
-        .orElse(Collections.emptySet())
-        .stream()
+    return Optional.ofNullable(book.getAuthors()).orElse(Collections.emptySet()).stream()
         .map(this::toAuthorResponse)
         .toList();
   }
@@ -45,17 +43,12 @@ public class BookMapper {
   }
 
   private List<GenreSummary> mapGenres(Book book) {
-    return Optional.ofNullable(book.getGenres())
-        .orElse(Collections.emptySet())
-        .stream()
+    return Optional.ofNullable(book.getGenres()).orElse(Collections.emptySet()).stream()
         .map(this::toGenreSummary)
         .toList();
   }
 
   private GenreSummary toGenreSummary(Genre genre) {
-    return GenreSummary.builder()
-        .id(genre.getId())
-        .name(genre.getName())
-        .build();
+    return GenreSummary.builder().id(genre.getId()).name(genre.getName()).build();
   }
 }

@@ -45,7 +45,8 @@ public class BookService {
 
   @Transactional(readOnly = true)
   public BookResponse getBookById(UUID id) {
-    return bookRepository.findById(id)
+    return bookRepository
+        .findById(id)
         .map(bookMapper::toResponse)
         .orElseThrow(() -> new NotFoundException("Book not found"));
   }
