@@ -45,17 +45,16 @@ public class CustomerService {
   public CustomerResponse create(CustomerRequest request) {
     dataValidator.validateCustomer(request);
 
-    return customerMapper.toResponse(
-        customerRepository
-            .create(
-                request.getLastName(),
-                request.getFirstName(),
-                request.getBirthDate(),
-                request.getEmail(),
-                request.getPhone())
-            .orElseThrow(
-                () ->
-                    new ConflictException(
-                        "Customer with email " + request.getEmail() + " already exists")));
+    return customerRepository
+        .create(
+            request.getLastName(),
+            request.getFirstName(),
+            request.getBirthDate(),
+            request.getEmail(),
+            request.getPhone())
+        .orElseThrow(
+            () ->
+                new ConflictException(
+                    "Customer with email " + request.getEmail() + " already exists"));
   }
 }

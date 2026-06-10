@@ -1,5 +1,6 @@
 package hei.school.library.repository.dao;
 
+import hei.school.library.dto.CustomerResponse;
 import hei.school.library.entity.Customer;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -43,7 +44,7 @@ WHERE (:search IS NULL OR :search = ''
           RETURNING id, first_name, last_name, email, birth_date, email, phone, updated_at, created_at, password
           """,
       nativeQuery = true)
-  Optional<Customer> create(
+  Optional<CustomerResponse> create(
       @Param("lastName") String lastName,
       @Param("firstName") String firstName,
       @Param("birthDate") LocalDate birthDate,

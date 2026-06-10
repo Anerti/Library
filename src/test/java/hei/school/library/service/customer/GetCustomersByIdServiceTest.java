@@ -9,7 +9,6 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.service.CustomerService;
-import hei.school.library.validator.CustomerValidator;
 import hei.school.library.validator.DataValidator;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -25,7 +24,6 @@ class GetCustomersByIdServiceTest {
 
   @Mock private CustomerRepository customerRepository;
   @Mock private DataValidator dataValidator;
-  @Mock private CustomerValidator customerValidator;
   private CustomerService customerService;
 
   private UUID existingId;
@@ -35,8 +33,7 @@ class GetCustomersByIdServiceTest {
   @BeforeEach
   void setUp() {
     CustomerMapper customerMapper = new CustomerMapper();
-    customerService =
-        new CustomerService(customerRepository, customerMapper, dataValidator, customerValidator);
+    customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
