@@ -57,9 +57,7 @@ public class BookCopyController {
   }
 
   @DeleteMapping("/{copyId}")
-  public ResponseEntity<Void> delete(
-          @PathVariable UUID libraryId,
-          @PathVariable UUID copyId) {
+  public ResponseEntity<Void> delete(@PathVariable UUID libraryId, @PathVariable UUID copyId) {
 
     bookCopyService.delete(libraryId, copyId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
