@@ -3,9 +3,11 @@ package hei.school.library.service;
 import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookResponse;
 import hei.school.library.entity.Book;
+import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookMapper;
 import hei.school.library.repository.dao.BookRepository;
+import hei.school.library.validator.DataValidator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,19 +25,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookService {
   private final BookRepository bookRepository;
   private final BookMapper bookMapper;
+  private final DataValidator dataValidator;
 
   public BookResponse createBook(BookRequest request) {
-    Book book =
-        Book.builder()
-            .title(request.getTitle())
-            .summary(request.getSummary())
-            .isbn(request.getIsbn())
-            .publisher(request.getPublisher())
-            .publishedAt(request.getPublishedAt())
-            .build();
+    dataValidator.validateBook(request);
 
-    Book savedBook = bookRepository.save(book);
-    return bookMapper.toResponse(savedBook);
+    return bookRepository
+        .create(
+            request.getTitle(),
+            request.getSummary(),
+            request.getIsbn(),
+            request.getPublisher(),
+            request.getPublishedAt())
+        .map(bookMapper::toResponse)
+        .orElseThrow(
+            () -> new ConflictException("Book with ISBN " + request.getIsbn() + " already exists"));
   }
 
   @Transactional(readOnly = true)

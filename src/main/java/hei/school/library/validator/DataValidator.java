@@ -1,5 +1,6 @@
 package hei.school.library.validator;
 
+import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.CustomerRequest;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;
@@ -55,6 +56,30 @@ public class DataValidator {
     }
     if (request.getBirthDate().isAfter(LocalDate.now())) {
       throw new UnprocessableEntityException("birthDate cannot be in the future.");
+    }
+  }
+
+  public void validateBook(BookRequest request) {
+    if (request.getTitle() == null || request.getTitle().isBlank()) {
+      throw new UnprocessableEntityException("title is required.");
+    }
+    if (request.getTitle().length() > 100) {
+      throw new UnprocessableEntityException("title cannot be longer than 100 characters.");
+    }
+    if (request.getIsbn() == null || request.getIsbn().isBlank()) {
+      throw new UnprocessableEntityException("isbn is required.");
+    }
+    if (request.getIsbn().length() > 100) {
+      throw new UnprocessableEntityException("isbn cannot be longer than 100 characters.");
+    }
+    if (request.getPublisher() == null || request.getPublisher().isBlank()) {
+      throw new UnprocessableEntityException("publisher is required.");
+    }
+    if (request.getPublisher().length() > 100) {
+      throw new UnprocessableEntityException("publisher cannot be longer than 100 characters.");
+    }
+    if (request.getPublishedAt() == null) {
+      throw new UnprocessableEntityException("publishedAt is required.");
     }
   }
 

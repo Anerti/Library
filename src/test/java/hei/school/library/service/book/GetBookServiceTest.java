@@ -11,6 +11,7 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
+import hei.school.library.validator.DataValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -35,7 +36,7 @@ class GetBookServiceTest {
 
   @BeforeEach
   void setUp() {
-    bookService = new BookService(bookRepository, new BookMapper());
+    bookService = new BookService(bookRepository, new BookMapper(), new DataValidator());
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
