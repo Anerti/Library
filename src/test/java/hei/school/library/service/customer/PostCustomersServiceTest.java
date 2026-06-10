@@ -110,7 +110,8 @@ class PostCustomersServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when lastName contains numbers")
   void create_shouldThrow_whenLastNameHasInvalidChars() {
     CustomerRequest invalidRequest =
-        new CustomerRequest("Dupont123", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null);
+        new CustomerRequest(
+            "Dupont123", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null);
 
     doThrow(new UnprocessableEntityException("lastName field contain forbidden characters."))
         .when(dataValidator)
@@ -122,7 +123,8 @@ class PostCustomersServiceTest {
   }
 
   @Test
-  @DisplayName("create: should throw UnprocessableEntityException when lastName exceeds 100 characters")
+  @DisplayName(
+      "create: should throw UnprocessableEntityException when lastName exceeds 100 characters")
   void create_shouldThrow_whenLastNameTooLong() {
     CustomerRequest invalidRequest =
         new CustomerRequest(
@@ -171,7 +173,8 @@ class PostCustomersServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when firstName contains numbers")
   void create_shouldThrow_whenFirstNameHasInvalidChars() {
     CustomerRequest invalidRequest =
-        new CustomerRequest("Dupont", "Marie123", LocalDate.of(1995, 3, 10), "marie@mail.com", null);
+        new CustomerRequest(
+            "Dupont", "Marie123", LocalDate.of(1995, 3, 10), "marie@mail.com", null);
 
     doThrow(new UnprocessableEntityException("firstName field contain forbidden characters."))
         .when(dataValidator)
@@ -183,7 +186,8 @@ class PostCustomersServiceTest {
   }
 
   @Test
-  @DisplayName("create: should throw UnprocessableEntityException when firstName exceeds 100 characters")
+  @DisplayName(
+      "create: should throw UnprocessableEntityException when firstName exceeds 100 characters")
   void create_shouldThrow_whenFirstNameTooLong() {
     CustomerRequest invalidRequest =
         new CustomerRequest(
@@ -214,15 +218,12 @@ class PostCustomersServiceTest {
   }
 
   @Test
-  @DisplayName("create: should throw UnprocessableEntityException when email exceeds 100 characters")
+  @DisplayName(
+      "create: should throw UnprocessableEntityException when email exceeds 100 characters")
   void create_shouldThrow_whenEmailTooLong() {
     CustomerRequest invalidRequest =
         new CustomerRequest(
-            "Dupont",
-            "Marie",
-            LocalDate.of(1995, 3, 10),
-            "m".repeat(90) + "@mail.com",
-            null);
+            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "m".repeat(90) + "@mail.com", null);
 
     doThrow(new UnprocessableEntityException("email cannot be longer than 100 characters."))
         .when(dataValidator)
@@ -234,15 +235,16 @@ class PostCustomersServiceTest {
   }
 
   @Test
-  @DisplayName("create: should throw UnprocessableEntityException when email contains forbidden characters")
+  @DisplayName(
+      "create: should throw UnprocessableEntityException when email contains forbidden characters")
   void create_shouldThrow_whenEmailHasInvalidChars() {
     CustomerRequest invalidRequest =
-        new CustomerRequest(
-            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie @mail.com", null);
+        new CustomerRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie @mail.com", null);
 
     doThrow(
             new UnprocessableEntityException(
-                "Invalid input for email: 'marie @mail.com' only a-zA-Z0-9@_.- characters are allowed."))
+                "Invalid input for email: 'marie @mail.com' only a-zA-Z0-9@_.- characters are"
+                    + " allowed."))
         .when(dataValidator)
         .validateCustomer(invalidRequest);
 

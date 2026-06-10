@@ -2,7 +2,6 @@ package hei.school.library.validator;
 
 import hei.school.library.dto.CustomerRequest;
 import hei.school.library.exception.UnprocessableEntityException;
-
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
@@ -12,7 +11,8 @@ public class DataValidator {
 
   private static final Pattern SAFE_SEARCH_STRING = Pattern.compile("^[a-zA-Z0-9@' ._-]*$");
   private static final Pattern SAFE_NAME_STRING = Pattern.compile("^[a-zA-Z' ]+$");
-  private static final Pattern VALID_EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z]+){1,2}$");
+  private static final Pattern VALID_EMAIL_PATTERN =
+      Pattern.compile("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z]+){1,2}$");
   private static final Pattern ALLOWED_EMAIL_CHAR = Pattern.compile("^[a-zA-Z0-9.@_-]+$");
 
   public void validateString(String fieldName, String value) {
@@ -25,20 +25,22 @@ public class DataValidator {
     }
   }
 
-  public void validateEmail(String email){
+  public void validateEmail(String email) {
     if (email == null && email.isBlank()) {
       throw new UnprocessableEntityException("email is required.");
     }
 
-    if (email.length() > 100){
+    if (email.length() > 100) {
       throw new UnprocessableEntityException("email cannot be longer than 100 characters.");
     }
 
-    if (!ALLOWED_EMAIL_CHAR.matcher(email).matches()){
-      throw new UnprocessableEntityException(String.format("Invalid input for email: '%s' only a-zA-Z0-9@_.- characters are allowed.", email));
+    if (!ALLOWED_EMAIL_CHAR.matcher(email).matches()) {
+      throw new UnprocessableEntityException(
+          String.format(
+              "Invalid input for email: '%s' only a-zA-Z0-9@_.- characters are allowed.", email));
     }
 
-    if (!VALID_EMAIL_PATTERN.matcher(email).matches()){
+    if (!VALID_EMAIL_PATTERN.matcher(email).matches()) {
       throw new UnprocessableEntityException(String.format("Invalid email format: '%s'", email));
     }
   }

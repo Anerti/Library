@@ -55,7 +55,6 @@ public class CustomerService {
         .map(customerMapper::toResponse)
         .orElseThrow(
             () ->
-                new ConflictException(
-                    "Customer email " + request.getEmail() + " already exists"));
+                new ConflictException("Customer email " + request.getEmail() + " already exists"));
   }
 }
