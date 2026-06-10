@@ -3,7 +3,6 @@ package hei.school.library.endpoint.rest.controller;
 import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookResponse;
 import hei.school.library.service.BookService;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +19,7 @@ public class BookController {
 
   @PostMapping
   public ResponseEntity<BookResponse> createBook(@RequestBody BookRequest request) {
-    BookResponse response = bookService.createBook(request);
-    return new ResponseEntity<>(response, HttpStatus.CREATED);
+    return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(request));
   }
 
   @GetMapping
