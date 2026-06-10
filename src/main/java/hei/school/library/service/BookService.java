@@ -39,11 +39,6 @@ public class BookService {
   }
 
   @Transactional(readOnly = true)
-  public List<BookResponse> getAllBooks() {
-    return bookRepository.findAll().stream().map(bookMapper::toResponse).toList();
-  }
-
-  @Transactional(readOnly = true)
   public BookResponse getBookById(UUID id) {
     return bookRepository
         .findById(id)

@@ -24,13 +24,6 @@ public class BookController {
     return new ResponseEntity<>(response, HttpStatus.CREATED);
   }
 
-  // GET simple - tous les livres sans pagination
-  @GetMapping("/all")
-  public ResponseEntity<List<BookResponse>> getAllBooks() {
-    return ResponseEntity.ok(bookService.getAllBooks());
-  }
-
-  // GET avec pagination et filtres (sans genreId)
   @GetMapping
   public ResponseEntity<Map<String, Object>> searchBooks(
       @RequestParam(required = false) String search,
