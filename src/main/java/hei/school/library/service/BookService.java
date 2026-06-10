@@ -2,6 +2,7 @@ package hei.school.library.service;
 
 import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookResponse;
+import hei.school.library.dto.BookUpdateRequest;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.PaginationDto;
 import hei.school.library.entity.Book;
@@ -52,16 +53,13 @@ public class BookService {
         .orElseThrow(() -> new NotFoundException("Book not found"));
   }
 
-  public BookResponse updateBook(UUID id, BookRequest request) {
+  public BookResponse updateBook(UUID id, BookUpdateRequest request) {
     Book book =
-        bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+        bookRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Book " + id + " not found"));
 
-    book.setTitle(request.getTitle());
-    book.setSummary(request.getSummary());
-    book.setIsbn(request.getIsbn());
-    book.setPublisher(request.getPublisher());
-    book.setPublishedAt(request.getPublishedAt());
-
+    dataValidator.validatePatchBook(request, book);
     return bookMapper.toResponse(bookRepository.save(book));
   }
 
@@ -74,7 +72,7 @@ public class BookService {
   @Transactional(readOnly = true)
   public PageResponse<BookResponse> listBooks(
       String search, String isbn, String authorLastName, String genreName, int page, int size) {
-    dataValidator.SearchString("search", search);
+    dataValidator.validateString("search", search);
 
     Pageable pageable = PageRequest.of(page - 1, size);
 

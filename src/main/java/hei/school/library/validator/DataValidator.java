@@ -1,7 +1,9 @@
 package hei.school.library.validator;
 
 import hei.school.library.dto.BookRequest;
+import hei.school.library.dto.BookUpdateRequest;
 import hei.school.library.dto.CustomerRequest;
+import hei.school.library.entity.Book;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
@@ -10,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataValidator {
 
-  private static final Pattern SAFE_SEARCH_STRING = Pattern.compile("^[a-zA-Z0-9@' ._-]*$");
+  private static final Pattern SAFE_STRING = Pattern.compile("^[a-zA-Z0-9@' ._-]*$");
   private final Pattern SAFE_STRING_BOOK_NAME = Pattern.compile("^[a-zA-Z0-9' éèê-]+$");
   private static final Pattern SAFE_NAME_STRING = Pattern.compile("^[a-zA-Z' ]+$");
   private static final Pattern VALID_EMAIL_PATTERN =
@@ -18,8 +20,8 @@ public class DataValidator {
   private static final Pattern ALLOWED_EMAIL_CHAR = Pattern.compile("^[a-zA-Z0-9.@_-]+$");
   private static final Pattern SAFE_ISBN = Pattern.compile("^[0-9Xx-]{10,}$");
 
-  public void SearchString(String fieldName, String value) {
-    if (value != null && !value.isBlank() && !SAFE_SEARCH_STRING.matcher(value).matches()) {
+  public void validateString(String fieldName, String value) {
+    if (value != null && !value.isBlank() && !SAFE_STRING.matcher(value).matches()) {
       throw new UnprocessableEntityException(
           String.format(
               "Field '%s' contains invalid characters. Only letters (a-z, A-Z), digits (0-9), and @"
@@ -108,6 +110,40 @@ public class DataValidator {
               "%s field contain forbidden characters. "
                   + "Only letters (a-z, A-Z) and space are allowed.",
               fieldName));
+    }
+  }
+
+  public void checkPatchBook(BookUpdateRequest request) {
+    if (request.getTitle() == null
+        && request.getSummary() == null
+        && request.getIsbn() == null
+        && request.getPublisher() == null
+        && request.getPublishedAt() == null) {
+      throw new UnprocessableEntityException(
+          "At least one field (title, summary, isbn, publisher, publishedAt) must be provided");
+    }
+  }
+
+  public void validatePatchBook(BookUpdateRequest request, Book book) {
+    checkPatchBook(request);
+    if (request.getTitle() != null) {
+      validateName("title", request.getTitle());
+      book.setTitle(request.getTitle());
+    }
+    if (request.getSummary() != null) {
+      validateString("summary", request.getSummary());
+      book.setSummary(request.getSummary());
+    }
+    if (request.getIsbn() != null) {
+      validateIsbn(request.getIsbn());
+      book.setIsbn(request.getIsbn());
+    }
+    if (request.getPublisher() != null) {
+      validateName("publisher", request.getPublisher());
+      book.setPublisher(request.getPublisher());
+    }
+    if (request.getPublishedAt() != null) {
+      book.setPublishedAt(request.getPublishedAt());
     }
   }
 }

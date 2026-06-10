@@ -25,7 +25,7 @@ public class LibraryService {
 
   @Transactional(readOnly = true)
   public Map<String, Object> listLibraries(String search, int page, int size) {
-    dataValidator.SearchString("search", search);
+    dataValidator.validateString("search", search);
     Page<Library> libraryPage =
         repository
             .searchLibraries(search, PageRequest.of(page - 1, size))
