@@ -40,21 +40,45 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
   Optional<UUID> deleteByIdAndReturn(@Param("id") UUID id);
 
   @Query(
-      """
-      SELECT b FROM Book b
-      LEFT JOIN b.authors a
-      WHERE (:search IS NULL OR :search = ''
-          OR LOWER(b.title) LIKE LOWER(CONCAT('%', :search, '%'))
-          OR LOWER(b.isbn) LIKE LOWER(CONCAT('%', :search, '%'))
-          OR LOWER(b.publisher) LIKE LOWER(CONCAT('%', :search, '%'))
-          OR LOWER(a.lastName) LIKE LOWER(CONCAT('%', :search, '%'))
-      )
-      AND (:isbn IS NULL OR b.isbn = :isbn)
-      AND (:authorId IS NULL OR a.id = :authorId)
-      """)
+      value =
+          """
+          SELECT DISTINCT b.id, b.title, b.summary, b.isbn, b.publisher, b.published_at, b.created_at FROM book b
+          LEFT JOIN author_book ab ON ab.book_id = b.id
+          LEFT JOIN author a ON a.id = ab.author_id
+          LEFT JOIN book_genre bg ON bg.book_id = b.id
+          LEFT JOIN genre g ON g.id = bg.genre_id
+          WHERE (:search IS NULL OR :search = ''
+              OR b.title ILIKE '%' || :search || '%'
+              OR b.isbn ILIKE '%' || :search || '%'
+              OR b.publisher ILIKE '%' || :search || '%'
+              OR a.last_name ILIKE '%' || :search || '%'
+          )
+          AND (:isbn IS NULL OR b.isbn = :isbn)
+          AND (:authorLastName IS NULL OR a.last_name = :authorLastName)
+          AND (:genreName IS NULL OR g.name = :genreName)
+          """,
+      countQuery =
+          """
+          SELECT COUNT(DISTINCT b.id) FROM book b
+          LEFT JOIN author_book ab ON ab.book_id = b.id
+          LEFT JOIN author a ON a.id = ab.author_id
+          LEFT JOIN book_genre bg ON bg.book_id = b.id
+          LEFT JOIN genre g ON g.id = bg.genre_id
+          WHERE (:search IS NULL OR :search = ''
+              OR b.title ILIKE '%' || :search || '%'
+              OR b.isbn ILIKE '%' || :search || '%'
+              OR b.publisher ILIKE '%' || :search || '%'
+              OR a.last_name ILIKE '%' || :search || '%'
+          )
+          AND (:isbn IS NULL OR b.isbn = :isbn)
+          AND (:authorLastName IS NULL OR a.last_name = :authorLastName)
+          AND (:genreName IS NULL OR g.name = :genreName)
+          """,
+      nativeQuery = true)
   Page<Book> searchBooks(
       @Param("search") String search,
       @Param("isbn") String isbn,
-      @Param("authorId") UUID authorId,
+      @Param("authorLastName") String authorLastName,
+      @Param("genreName") String genreName,
       Pageable pageable);
 }

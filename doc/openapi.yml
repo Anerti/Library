@@ -1168,18 +1168,18 @@ paths:
             maxLength: 100
             example: 978-2-07-061275-8
           description: Exact ISBN match
-        - name: authorId
+        - name: lastName
           in: query
           schema:
             type: string
-            format: uuid
-          description: Filter by author
-        - name: genreId
+            maxLength: 100
+          description: Exact author last name match
+        - name: genreName
           in: query
           schema:
             type: string
-            format: uuid
-          description: Filter by genre
+            maxLength: 100
+          description: Exact genre name match
         - name: page
           in: query
           schema:

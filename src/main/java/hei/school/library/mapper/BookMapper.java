@@ -6,9 +6,7 @@ import hei.school.library.dto.GenreSummary;
 import hei.school.library.entity.Author;
 import hei.school.library.entity.Book;
 import hei.school.library.entity.Genre;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,15 +21,16 @@ public class BookMapper {
         .publisher(book.getPublisher())
         .publishedAt(book.getPublishedAt())
         .createdAt(book.getCreatedAt())
-        .authors(mapAuthors(book).isEmpty() ? null : mapAuthors(book))
-        .genres(mapGenres(book).isEmpty() ? null : mapGenres(book))
+        .authors(mapAuthors(book))
+        .genres(mapGenres(book))
         .build();
   }
 
   private List<AuthorResponse> mapAuthors(Book book) {
-    return Optional.ofNullable(book.getAuthors()).orElse(Collections.emptySet()).stream()
-        .map(this::toAuthorResponse)
-        .toList();
+    if (book.getAuthors() == null) {
+      return List.of();
+    }
+    return book.getAuthors().stream().map(this::toAuthorResponse).toList();
   }
 
   private AuthorResponse toAuthorResponse(Author author) {
@@ -43,9 +42,10 @@ public class BookMapper {
   }
 
   private List<GenreSummary> mapGenres(Book book) {
-    return Optional.ofNullable(book.getGenres()).orElse(Collections.emptySet()).stream()
-        .map(this::toGenreSummary)
-        .toList();
+    if (book.getGenres() == null) {
+      return List.of();
+    }
+    return book.getGenres().stream().map(this::toGenreSummary).toList();
   }
 
   private GenreSummary toGenreSummary(Genre genre) {

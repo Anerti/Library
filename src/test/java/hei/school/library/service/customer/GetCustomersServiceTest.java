@@ -9,6 +9,7 @@ import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Customer;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.CustomerMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.service.CustomerService;
 import hei.school.library.validator.DataValidator;
@@ -32,7 +33,7 @@ class GetCustomersServiceTest {
 
   @BeforeEach
   void setUp() {
-    CustomerMapper customerMapper = new CustomerMapper();
+    CustomerMapper customerMapper = new CustomerMapper(new PaginationMapper());
     customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
 
     customer =
@@ -98,7 +99,7 @@ class GetCustomersServiceTest {
                 "Field 'search' contains invalid characters. Only letters (a-z, A-Z), digits (0-9),"
                     + " and @ ' . - _ are allowed."))
         .when(dataValidator)
-        .validateString("search", invalidSearch);
+        .SearchString("search", invalidSearch);
 
     assertThatThrownBy(() -> customerService.findAll(invalidSearch, 1, 20))
         .isInstanceOf(UnprocessableEntityException.class);

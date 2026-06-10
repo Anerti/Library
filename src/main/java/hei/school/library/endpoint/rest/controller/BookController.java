@@ -2,8 +2,8 @@ package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookResponse;
+import hei.school.library.dto.PageResponse;
 import hei.school.library.service.BookService;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,14 +23,15 @@ public class BookController {
   }
 
   @GetMapping
-  public ResponseEntity<Map<String, Object>> searchBooks(
+  public ResponseEntity<PageResponse<BookResponse>> searchBooks(
       @RequestParam(required = false) String search,
       @RequestParam(required = false) String isbn,
-      @RequestParam(required = false) UUID authorId,
+      @RequestParam(required = false) String lastName,
+      @RequestParam(required = false) String genreName,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
 
-    return ResponseEntity.ok(bookService.listBooks(search, isbn, authorId, page, size));
+    return ResponseEntity.ok(bookService.listBooks(search, isbn, lastName, genreName, page, size));
   }
 
   @GetMapping("/{id}")
