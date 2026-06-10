@@ -2,6 +2,7 @@ package hei.school.library.service;
 
 import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookResponse;
+import hei.school.library.dto.BookUpdateRequest;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.PaginationDto;
 import hei.school.library.entity.Book;
@@ -10,6 +11,7 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
+import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +30,7 @@ public class BookService {
   private final BookMapper bookMapper;
   private final DataValidator dataValidator;
   private final PaginationMapper paginationMapper;
+  private final BookValidator bookValidator;
 
   public BookResponse createBook(BookRequest request) {
     dataValidator.validateBook(request);
@@ -52,15 +55,29 @@ public class BookService {
         .orElseThrow(() -> new NotFoundException("Book not found"));
   }
 
-  public BookResponse updateBook(UUID id, BookRequest request) {
-    Book book =
-        bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+  public BookResponse updateBook(UUID id, BookUpdateRequest request) {
+    bookValidator.validateUpdate(request);
 
-    book.setTitle(request.getTitle());
-    book.setSummary(request.getSummary());
-    book.setIsbn(request.getIsbn());
-    book.setPublisher(request.getPublisher());
-    book.setPublishedAt(request.getPublishedAt());
+    Book book =
+        bookRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException("Book with id " + id + " not found"));
+
+    if (request.getTitle() != null) {
+      book.setTitle(request.getTitle());
+    }
+    if (request.getSummary() != null) {
+      book.setSummary(request.getSummary());
+    }
+    if (request.getIsbn() != null) {
+      book.setIsbn(request.getIsbn());
+    }
+    if (request.getPublisher() != null) {
+      book.setPublisher(request.getPublisher());
+    }
+    if (request.getPublishedAt() != null) {
+      book.setPublishedAt(request.getPublishedAt());
+    }
 
     return bookMapper.toResponse(bookRepository.save(book));
   }

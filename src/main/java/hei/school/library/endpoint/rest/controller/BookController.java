@@ -2,6 +2,7 @@ package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookResponse;
+import hei.school.library.dto.BookUpdateRequest;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.service.BookService;
 import java.util.UUID;
@@ -41,7 +42,7 @@ public class BookController {
 
   @PatchMapping("/{id}")
   public ResponseEntity<BookResponse> updateBook(
-      @PathVariable UUID id, @RequestBody BookRequest request) {
+      @PathVariable UUID id, @RequestBody BookUpdateRequest request) {
     return ResponseEntity.ok(bookService.updateBook(id, request));
   }
 
