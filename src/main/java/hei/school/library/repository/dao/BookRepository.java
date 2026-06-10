@@ -31,6 +31,15 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
       @Param("publishedAt") LocalDate publishedAt);
 
   @Query(
+      value =
+          """
+          DELETE FROM book WHERE id = :id
+          RETURNING id
+          """,
+      nativeQuery = true)
+  Optional<UUID> deleteByIdAndReturn(@Param("id") UUID id);
+
+  @Query(
       """
       SELECT b FROM Book b
       LEFT JOIN b.authors a
