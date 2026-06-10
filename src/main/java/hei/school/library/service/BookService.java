@@ -11,7 +11,6 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
-import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.util.List;
 import java.util.UUID;
@@ -30,7 +29,6 @@ public class BookService {
   private final BookMapper bookMapper;
   private final DataValidator dataValidator;
   private final PaginationMapper paginationMapper;
-  private final BookValidator bookValidator;
 
   public BookResponse createBook(BookRequest request) {
     dataValidator.validateBook(request);
@@ -56,29 +54,12 @@ public class BookService {
   }
 
   public BookResponse updateBook(UUID id, BookUpdateRequest request) {
-    bookValidator.validateUpdate(request);
-
     Book book =
         bookRepository
             .findById(id)
-            .orElseThrow(() -> new NotFoundException("Book with id " + id + " not found"));
+            .orElseThrow(() -> new NotFoundException("Book " + id + " not found"));
 
-    if (request.getTitle() != null) {
-      book.setTitle(request.getTitle());
-    }
-    if (request.getSummary() != null) {
-      book.setSummary(request.getSummary());
-    }
-    if (request.getIsbn() != null) {
-      book.setIsbn(request.getIsbn());
-    }
-    if (request.getPublisher() != null) {
-      book.setPublisher(request.getPublisher());
-    }
-    if (request.getPublishedAt() != null) {
-      book.setPublishedAt(request.getPublishedAt());
-    }
-
+    dataValidator.validatePatchBook(request, book);
     return bookMapper.toResponse(bookRepository.save(book));
   }
 
@@ -91,7 +72,7 @@ public class BookService {
   @Transactional(readOnly = true)
   public PageResponse<BookResponse> listBooks(
       String search, String isbn, String authorLastName, String genreName, int page, int size) {
-    dataValidator.SearchString("search", search);
+    dataValidator.validateString("search", search);
 
     Pageable pageable = PageRequest.of(page - 1, size);
 

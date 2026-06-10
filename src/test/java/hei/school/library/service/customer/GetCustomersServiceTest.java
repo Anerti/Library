@@ -99,7 +99,7 @@ class GetCustomersServiceTest {
                 "Field 'search' contains invalid characters. Only letters (a-z, A-Z), digits (0-9),"
                     + " and @ ' . - _ are allowed."))
         .when(dataValidator)
-        .SearchString("search", invalidSearch);
+        .validateString("search", invalidSearch);
 
     assertThatThrownBy(() -> customerService.findAll(invalidSearch, 1, 20))
         .isInstanceOf(UnprocessableEntityException.class);

@@ -10,7 +10,6 @@ import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
-import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,7 +34,7 @@ class DeleteBookByIdServiceTest {
   void setUp() {
     bookService =
         new BookService(
-            bookRepository, new BookMapper(), new DataValidator(), new PaginationMapper(), new BookValidator());
+            bookRepository, new BookMapper(), new DataValidator(), new PaginationMapper());
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
