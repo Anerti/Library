@@ -3,7 +3,6 @@ package hei.school.library.endpoint.rest.controller;
 import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookResponse;
 import hei.school.library.service.BookService;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

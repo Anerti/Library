@@ -73,7 +73,7 @@ public class DataValidator {
   }
 
   public void validateBook(BookRequest request) {
-    validateName("title",  request.getTitle());
+    validateName("title", request.getTitle());
     validateIsbn(request.getIsbn());
     validateName("publisher", request.getPublisher());
 

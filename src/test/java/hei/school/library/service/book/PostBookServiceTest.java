@@ -50,7 +50,8 @@ class PostBookServiceTest {
   /* ─────── Success ─────── */
 
   @Test
-  @DisplayName("createBook: should return response with empty authors and genres for a new book (per spec)")
+  @DisplayName(
+      "createBook: should return response with empty authors and genres for a new book (per spec)")
   void createBook_shouldReturnEmptyAuthorsAndGenres() {
     UUID newId = UUID.randomUUID();
     Book savedBook =
@@ -193,7 +194,8 @@ class PostBookServiceTest {
   /* ─────── ISBN validation ─────── */
 
   @Test
-  @DisplayName("createBook: should throw UnprocessableEntityException when isbn has invalid characters")
+  @DisplayName(
+      "createBook: should throw UnprocessableEntityException when isbn has invalid characters")
   void createBook_shouldThrow_whenIsbnHasInvalidChars() {
     BookRequest invalid =
         BookRequest.builder()
@@ -227,7 +229,9 @@ class PostBookServiceTest {
   /* ─────── Title / publisher character validation ─────── */
 
   @Test
-  @DisplayName("createBook: should throw UnprocessableEntityException when title contains forbidden characters")
+  @DisplayName(
+      "createBook: should throw UnprocessableEntityException when title contains forbidden"
+          + " characters")
   void createBook_shouldThrow_whenTitleHasForbiddenChars() {
     BookRequest invalid =
         BookRequest.builder()
@@ -239,11 +243,14 @@ class PostBookServiceTest {
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessage("title field contain forbidden characters. Only letters (a-z, A-Z) and space are allowed.");
+        .hasMessage(
+            "title field contain forbidden characters. Only letters (a-z, A-Z) and space are"
+                + " allowed.");
   }
 
   @Test
-  @DisplayName("createBook: should throw UnprocessableEntityException when publisher contains digits")
+  @DisplayName(
+      "createBook: should throw UnprocessableEntityException when publisher contains digits")
   void createBook_shouldThrow_whenPublisherContainsDigits() {
     BookRequest invalid =
         BookRequest.builder()
@@ -255,6 +262,8 @@ class PostBookServiceTest {
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessage("publisher field contain forbidden characters. Only letters (a-z, A-Z) and space are allowed.");
+        .hasMessage(
+            "publisher field contain forbidden characters. Only letters (a-z, A-Z) and space are"
+                + " allowed.");
   }
 }
