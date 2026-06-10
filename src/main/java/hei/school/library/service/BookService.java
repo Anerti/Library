@@ -63,10 +63,10 @@ public class BookService {
     return bookMapper.toResponse(bookRepository.save(book));
   }
 
-  public void deleteBook(UUID id) {
-    bookRepository
-            .deleteByIdAndReturn(id)
-            .orElseThrow(() -> new NotFoundException(String.format("Book %s not found", id)));
+  public UUID deleteBook(UUID id) {
+    return bookRepository
+        .deleteByIdAndReturn(id)
+        .orElseThrow(() -> new NotFoundException("Book", id));
   }
 
   @Transactional(readOnly = true)
