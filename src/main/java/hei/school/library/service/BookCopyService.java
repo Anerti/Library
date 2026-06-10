@@ -1,12 +1,10 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.BookCopyRequest;
-import hei.school.library.dto.BookCopyResponse;
-import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.PaginationDto;
+import hei.school.library.dto.*;
 import hei.school.library.entity.BookCopy;
 import hei.school.library.entity.enums.BookCopyFormat;
 import hei.school.library.entity.enums.BookCopyStatus;
+import hei.school.library.exception.BadRequestException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookCopyMapper;
 import hei.school.library.mapper.PaginationMapper;
@@ -83,5 +81,26 @@ public class BookCopyService {
             request.getPageNumber())
         .map(bookCopyMapper::toResponse)
         .orElseThrow(() -> new NotFoundException("Failed to create BookCopy"));
+  }
+
+  public BookCopyResponse update(UUID libraryId, UUID copyId, BookCopyUpdateRequest request) {
+    if (request.getPrice() == null
+        && request.getFormat() == null
+        && request.getStatus() == null
+        && request.getPageNumber() == null) {
+      throw new BadRequestException("At least one field is required");
+    }
+
+    BookCopy bookCopy =
+        bookCopyRepository
+            .findById(copyId)
+            .orElseThrow(() -> new NotFoundException("BookCopy with id " + copyId + " not found"));
+
+    if (request.getPrice() != null) bookCopy.setPrice(request.getPrice());
+    if (request.getFormat() != null) bookCopy.setFormat(request.getFormat());
+    if (request.getStatus() != null) bookCopy.setStatus(request.getStatus());
+    if (request.getPageNumber() != null) bookCopy.setPageNumber(request.getPageNumber());
+
+    return bookCopyMapper.toResponse(bookCopyRepository.save(bookCopy));
   }
 }
