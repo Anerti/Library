@@ -1,6 +1,8 @@
 package hei.school.library.validator;
 
+import hei.school.library.dto.CustomerRequest;
 import hei.school.library.exception.UnprocessableEntityException;
+import java.time.LocalDate;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
@@ -9,9 +11,9 @@ public class DataValidator {
 
   private static final Pattern SAFE_SEARCH_STRING = Pattern.compile("^[a-zA-Z0-9@' ._-]*$");
   private static final Pattern SAFE_NAME_STRING = Pattern.compile("^[a-zA-Z' ]+$");
-  private static final Pattern UUID_PATTERN =
-      Pattern.compile(
-          "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+  private static final Pattern VALID_EMAIL_PATTERN =
+      Pattern.compile("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z]+){1,2}$");
+  private static final Pattern ALLOWED_EMAIL_CHAR = Pattern.compile("^[a-zA-Z0-9.@_-]+$");
 
   public void validateString(String fieldName, String value) {
     if (value != null && !value.isBlank() && !SAFE_SEARCH_STRING.matcher(value).matches()) {
@@ -23,18 +25,36 @@ public class DataValidator {
     }
   }
 
-  public void validateUuid(String fieldName, String value) {
-    if (value == null || value.isBlank()) {
-      throw new UnprocessableEntityException(
-          String.format("Field '%s' cannot be null or empty.", fieldName));
+  public void validateEmail(String email) {
+    if (email == null && email.isBlank()) {
+      throw new UnprocessableEntityException("email is required.");
     }
 
-    if (!UUID_PATTERN.matcher(value).matches()) {
+    if (email.length() > 100) {
+      throw new UnprocessableEntityException("email cannot be longer than 100 characters.");
+    }
+
+    if (!ALLOWED_EMAIL_CHAR.matcher(email).matches()) {
       throw new UnprocessableEntityException(
           String.format(
-              "Field '%s' must be a valid UUID format (e.g.,"
-                  + " 123e4567-e89b-12d3-a456-426614174000).",
-              fieldName));
+              "Invalid input for email: '%s' only a-zA-Z0-9@_.- characters are allowed.", email));
+    }
+
+    if (!VALID_EMAIL_PATTERN.matcher(email).matches()) {
+      throw new UnprocessableEntityException(String.format("Invalid email format: '%s'", email));
+    }
+  }
+
+  public void validateCustomer(CustomerRequest request) {
+    validateName("lastName", request.getLastName());
+    validateName("firstName", request.getFirstName());
+    validateEmail(request.getEmail());
+
+    if (request.getBirthDate() == null) {
+      throw new UnprocessableEntityException("birthDate is required.");
+    }
+    if (request.getBirthDate().isAfter(LocalDate.now())) {
+      throw new UnprocessableEntityException("birthDate cannot be in the future.");
     }
   }
 
