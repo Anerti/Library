@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerResponse;
+import hei.school.library.entity.Customer;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.CustomerMapper;
@@ -28,7 +29,7 @@ class PostCustomersServiceTest {
   @Mock private DataValidator dataValidator;
   private CustomerService customerService;
 
-  private CustomerResponse customerResponse;
+  private Customer customer;
   private CustomerRequest validRequest;
 
   @BeforeEach
@@ -36,17 +37,16 @@ class PostCustomersServiceTest {
     CustomerMapper customerMapper = new CustomerMapper();
     customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
 
-    customerResponse =
-        CustomerResponse.builder()
-            .id(UUID.randomUUID())
-            .lastName("Dupont")
-            .firstName("Marie")
-            .birthDate(LocalDate.of(1995, 3, 10))
-            .email("marie@mail.com")
-            .phone("+261****4567")
-            .createdAt(Instant.now())
-            .updatedAt(Instant.now())
-            .build();
+    customer =
+        new Customer(
+            UUID.randomUUID(),
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "marie@mail.com",
+            "+261****4567",
+            Instant.now(),
+            Instant.now());
 
     validRequest =
         new CustomerRequest(
@@ -57,7 +57,7 @@ class PostCustomersServiceTest {
   @DisplayName("create: should save and return DTO")
   void create_shouldSaveAndReturnDto() {
     when(customerRepository.create(any(), any(), any(), any(), any()))
-        .thenReturn(Optional.of(customerResponse));
+        .thenReturn(Optional.of(customer));
 
     CustomerResponse result = customerService.create(validRequest);
 

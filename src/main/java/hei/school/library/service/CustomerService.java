@@ -52,9 +52,10 @@ public class CustomerService {
             request.getBirthDate(),
             request.getEmail(),
             request.getPhone())
+        .map(customerMapper::toResponse)
         .orElseThrow(
             () ->
                 new ConflictException(
-                    "Customer with email " + request.getEmail() + " already exists"));
+                    "Customer email " + request.getEmail() + " already exists"));
   }
 }

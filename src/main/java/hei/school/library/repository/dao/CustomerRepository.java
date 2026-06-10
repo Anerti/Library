@@ -1,6 +1,5 @@
 package hei.school.library.repository.dao;
 
-import hei.school.library.dto.CustomerResponse;
 import hei.school.library.entity.Customer;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -41,10 +40,10 @@ WHERE (:search IS NULL OR :search = ''
           INSERT INTO customer (last_name, first_name, birth_date, email, phone)
           VALUES (:lastName, :firstName, :birthDate, :email, :phone)
           ON CONFLICT (email) DO NOTHING
-          RETURNING id, first_name, last_name, email, birth_date, email, phone, updated_at, created_at, password
+          RETURNING id, last_name, first_name, birth_date, email, phone, created_at, updated_at
           """,
       nativeQuery = true)
-  Optional<CustomerResponse> create(
+  Optional<Customer> create(
       @Param("lastName") String lastName,
       @Param("firstName") String firstName,
       @Param("birthDate") LocalDate birthDate,
