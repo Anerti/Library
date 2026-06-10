@@ -9,7 +9,7 @@ import java.util.UUID;
 import lombok.*;
 
 @Entity
-@Table(name = "books")
+@Table(name = "book")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -40,7 +40,7 @@ public class Book {
 
   @ManyToMany
   @JoinTable(
-      name = "book_authors",
+      name = "author_book",
       joinColumns = @JoinColumn(name = "book_id"),
       inverseJoinColumns = @JoinColumn(name = "author_id"))
   @Builder.Default
@@ -48,7 +48,7 @@ public class Book {
 
   @ManyToMany
   @JoinTable(
-      name = "book_genres",
+      name = "book_genre",
       joinColumns = @JoinColumn(name = "book_id"),
       inverseJoinColumns = @JoinColumn(name = "genre_id"))
   @Builder.Default
