@@ -11,6 +11,7 @@ import hei.school.library.entity.Book;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.BookMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
 import hei.school.library.validator.DataValidator;
@@ -35,7 +36,7 @@ class PostBookServiceTest {
 
   @BeforeEach
   void setUp() {
-    bookService = new BookService(bookRepository, new BookMapper(), new DataValidator());
+    bookService = new BookService(bookRepository, new BookMapper(), new DataValidator(), new PaginationMapper());
 
     validRequest =
         BookRequest.builder()
@@ -80,8 +81,8 @@ class PostBookServiceTest {
     assertThat(result.getPublisher()).isEqualTo("Gallimard");
     assertThat(result.getPublishedAt()).isEqualTo(LocalDate.of(1943, 4, 6));
     assertThat(result.getCreatedAt()).isNotNull();
-    assertThat(result.getAuthors()).isNull();
-    assertThat(result.getGenres()).isNull();
+    assertThat(result.getAuthors()).isEmpty();
+    assertThat(result.getGenres()).isEmpty();
 
     verify(bookRepository)
         .create(

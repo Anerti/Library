@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
 import hei.school.library.validator.DataValidator;
@@ -31,7 +32,7 @@ class DeleteBookByIdServiceTest {
 
   @BeforeEach
   void setUp() {
-    bookService = new BookService(bookRepository, new BookMapper(), new DataValidator());
+    bookService = new BookService(bookRepository, new BookMapper(), new DataValidator(), new PaginationMapper());
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();

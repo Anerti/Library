@@ -2,13 +2,16 @@ package hei.school.library.mapper;
 
 import hei.school.library.dto.CustomerResponse;
 import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.PaginationDto;
 import hei.school.library.entity.Customer;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class CustomerMapper {
+
+  private final PaginationMapper paginationMapper;
 
   public CustomerResponse toResponse(Customer customer) {
     return CustomerResponse.builder()
@@ -27,12 +30,7 @@ public class CustomerMapper {
       Page<Customer> page, int pageNum, int pageSize) {
     return PageResponse.<CustomerResponse>builder()
         .data(page.getContent().stream().map(this::toResponse).toList())
-        .pagination(
-            PaginationDto.builder()
-                .page(pageNum)
-                .size(pageSize)
-                .total(page.getTotalElements())
-                .build())
+        .pagination(paginationMapper.toPaginationDto(page, pageNum, pageSize))
         .build();
   }
 }

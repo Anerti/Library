@@ -18,7 +18,7 @@ public class DataValidator {
   private static final Pattern ALLOWED_EMAIL_CHAR = Pattern.compile("^[a-zA-Z0-9.@_-]+$");
   private static final Pattern SAFE_ISBN = Pattern.compile("^[0-9Xx-]{10,}$");
 
-  public void validateString(String fieldName, String value) {
+  public void SearchString(String fieldName, String value) {
     if (value != null && !value.isBlank() && !SAFE_SEARCH_STRING.matcher(value).matches()) {
       throw new UnprocessableEntityException(
           String.format(

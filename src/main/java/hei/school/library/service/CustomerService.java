@@ -24,7 +24,7 @@ public class CustomerService {
 
   @Transactional(readOnly = true)
   public PageResponse<CustomerResponse> findAll(String search, int page, int size) {
-    dataValidator.validateString("search", search);
+    dataValidator.SearchString("search", search);
     PageRequest pageable = PageRequest.of(page - 1, size);
 
     return (search == null || search.isBlank())

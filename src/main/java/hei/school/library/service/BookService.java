@@ -2,15 +2,16 @@ package hei.school.library.service;
 
 import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookResponse;
+import hei.school.library.dto.PageResponse;
+import hei.school.library.dto.PaginationDto;
 import hei.school.library.entity.Book;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.validator.DataValidator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ public class BookService {
   private final BookRepository bookRepository;
   private final BookMapper bookMapper;
   private final DataValidator dataValidator;
+  private final PaginationMapper paginationMapper;
 
   public BookResponse createBook(BookRequest request) {
     dataValidator.validateBook(request);
@@ -70,26 +72,18 @@ public class BookService {
   }
 
   @Transactional(readOnly = true)
-  public Map<String, Object> listBooks(
-      String search, String isbn, UUID authorId, int page, int size) {
+  public PageResponse<BookResponse> listBooks(
+      String search, String isbn, String authorLastName, String genreName, int page, int size) {
+    dataValidator.SearchString("search", search);
+
     Pageable pageable = PageRequest.of(page - 1, size);
 
-    Page<Book> bookPage = bookRepository.searchBooks(search, isbn, authorId, pageable);
+    Page<Book> bookPage = bookRepository.searchBooks(search, isbn, authorLastName, genreName, pageable);
 
-    List<BookResponse> dtos = bookPage.getContent().stream().map(bookMapper::toResponse).toList();
+    List<BookResponse> books = bookPage.getContent().stream().map(bookMapper::toResponse).toList();
 
-    Map<String, Object> response = new HashMap<>();
-    response.put("data", dtos);
-    response.put("pagination", buildPagination(bookPage, page, size));
+    PaginationDto pagination = paginationMapper.toPaginationDto(bookPage, page, size);
 
-    return response;
-  }
-
-  private Map<String, Object> buildPagination(Page<Book> page, int currentPage, int size) {
-    Map<String, Object> pagination = new HashMap<>();
-    pagination.put("page", currentPage);
-    pagination.put("size", size);
-    pagination.put("total", page.getTotalElements());
-    return pagination;
+    return PageResponse.<BookResponse>builder().data(books).pagination(pagination).build();
   }
 }
