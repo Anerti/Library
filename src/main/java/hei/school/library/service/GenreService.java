@@ -39,4 +39,11 @@ public class GenreService {
             .orElseThrow(
                 () -> new ConflictException("Genre " + request.getName() + " already exists")));
   }
+
+  @Transactional
+  public void deleteGenreById(UUID id) {
+    genreRepository
+        .deleteByUUId(id)
+        .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found"));
+  }
 }
