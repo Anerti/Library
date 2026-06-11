@@ -7,11 +7,10 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.validator.DataValidator;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -30,10 +29,11 @@ public class GenreService {
             .orElseThrow(
                 () -> new ConflictException("Genre " + request.getName() + " already exists")));
   }
-    @Transactional
-    public void deleteGenreById(UUID id) {
-        genreRepository
-                .deleteByUUId(id)
-                .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found"));
-    }
+
+  @Transactional
+  public void deleteGenreById(UUID id) {
+    genreRepository
+        .deleteByUUId(id)
+        .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found"));
+  }
 }

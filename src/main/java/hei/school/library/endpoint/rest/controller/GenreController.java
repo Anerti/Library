@@ -2,12 +2,11 @@ package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.service.GenreService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -19,9 +18,10 @@ public class GenreController {
   public ResponseEntity<?> create(@RequestBody GenreRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(genreService.createGenreByName(request));
   }
-    @DeleteMapping("/{genreId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID genreId) {
-        genreService.deleteGenreById(genreId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
+
+  @DeleteMapping("/{genreId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID genreId) {
+    genreService.deleteGenreById(genreId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
 }

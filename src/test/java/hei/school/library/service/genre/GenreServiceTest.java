@@ -79,23 +79,24 @@ public class GenreServiceTest {
         () -> genreService.createGenreByName(GenreRequest.builder().name(null).build()));
   }
 
-    @Test
-    void should_delete_genre_by_id() throws Exception {
+  @Test
+  void should_delete_genre_by_id() throws Exception {
 
-        UUID id = UUID.randomUUID();
-        when(genreRepository.deleteByUUId(id))
-                .thenReturn(Optional.of(id));
-        genreService.deleteGenreById(id);
+    UUID id = UUID.randomUUID();
+    when(genreRepository.deleteByUUId(id)).thenReturn(Optional.of(id));
+    genreService.deleteGenreById(id);
 
-        verify(genreRepository, times(1)).deleteByUUId(id);
-    }
-    @Test
-    void should_return_not_found_when_genre_id_does_not_exist_on_deleting() throws Exception {
-        UUID id = UUID.randomUUID();
-        when(genreRepository.deleteByUUId(id)).thenReturn(Optional.empty());
+    verify(genreRepository, times(1)).deleteByUUId(id);
+  }
 
-        assertThatThrownBy(() -> genreService.deleteGenreById(id)).isInstanceOf(NotFoundException.class);
+  @Test
+  void should_return_not_found_when_genre_id_does_not_exist_on_deleting() throws Exception {
+    UUID id = UUID.randomUUID();
+    when(genreRepository.deleteByUUId(id)).thenReturn(Optional.empty());
 
-        verify(genreRepository).deleteByUUId(id);
-    }
+    assertThatThrownBy(() -> genreService.deleteGenreById(id))
+        .isInstanceOf(NotFoundException.class);
+
+    verify(genreRepository).deleteByUUId(id);
+  }
 }

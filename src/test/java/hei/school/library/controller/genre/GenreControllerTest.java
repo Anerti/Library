@@ -101,30 +101,30 @@ public class GenreControllerTest {
                     """))
         .andExpect(status().isUnprocessableEntity());
   }
-    @Test
-    void should_delete_genre_by_id() throws Exception {
 
-        UUID id = UUID.randomUUID();
+  @Test
+  void should_delete_genre_by_id() throws Exception {
 
-        GenreResponse response =
-                new GenreResponse();
-        response.setId(id);
-        response.setName("Fantasy");
-        response.setCreatedAt(Instant.now());
-        response.setUpdatedAt(Instant.now());
+    UUID id = UUID.randomUUID();
 
-        Mockito.doNothing().when(genreService).deleteGenreById(id);
+    GenreResponse response = new GenreResponse();
+    response.setId(id);
+    response.setName("Fantasy");
+    response.setCreatedAt(Instant.now());
+    response.setUpdatedAt(Instant.now());
 
-        mockMvc.perform(delete("/genres/{id}", id))
-                .andExpect(status().isNoContent());
-    }
-    @Test
-    void should_return_not_found_when_genre_id_does_not_exist_on_deleting() throws Exception {
-        Mockito.doThrow(new NotFoundException("The requested resource was not found"))
-                .when(genreService).deleteGenreById(any(UUID.class));
-        UUID id = UUID.randomUUID();
+    Mockito.doNothing().when(genreService).deleteGenreById(id);
 
-        mockMvc.perform(delete("/genres/{id}", id))
-                .andExpect(status().isNotFound());
-    }
+    mockMvc.perform(delete("/genres/{id}", id)).andExpect(status().isNoContent());
+  }
+
+  @Test
+  void should_return_not_found_when_genre_id_does_not_exist_on_deleting() throws Exception {
+    Mockito.doThrow(new NotFoundException("The requested resource was not found"))
+        .when(genreService)
+        .deleteGenreById(any(UUID.class));
+    UUID id = UUID.randomUUID();
+
+    mockMvc.perform(delete("/genres/{id}", id)).andExpect(status().isNotFound());
+  }
 }

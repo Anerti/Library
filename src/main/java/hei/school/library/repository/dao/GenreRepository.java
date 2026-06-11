@@ -19,12 +19,12 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
       nativeQuery = true)
   Optional<Genre> insertGenreIgnoreConflict(@Param("name") String name);
 
-    @Query(
-            value =
-                    """
+  @Query(
+      value =
+          """
                     DELETE FROM genre WHERE id = :id
                     RETURNING id
                     """,
-            nativeQuery = true)
-    Optional<UUID> deleteByUUId(@Param("id") UUID id);
+      nativeQuery = true)
+  Optional<UUID> deleteByUUId(@Param("id") UUID id);
 }
