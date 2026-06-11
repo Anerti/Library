@@ -4,12 +4,21 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Genre;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
@@ -40,6 +49,30 @@ public class GenreServiceTest {
   @BeforeEach
   void setUp() {
     genreService = new GenreService(genreRepository, genreMapper, dataValidator);
+  }
+
+  @Test
+  void should_get_genre_by_id() throws Exception {
+
+    UUID id = UUID.randomUUID();
+    Genre genre =
+        Genre.builder()
+            .id(id)
+            .name("Fantasy")
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .build();
+
+    when(genreRepository.findById(any(UUID.class))).thenReturn(Optional.of(genre));
+
+    assertEquals(genreMapper.toResponse(genre), genreService.getGenreById(id));
+  }
+
+  @Test
+  void should_return_not_found_when_genre_id_does_not_exist() throws Exception {
+    UUID id = UUID.randomUUID();
+    when(genreRepository.findById(id)).thenReturn(Optional.empty());
+    assertThrows(NotFoundException.class, () -> genreService.getGenreById(id));
   }
 
   @Test
@@ -121,5 +154,65 @@ public class GenreServiceTest {
     verify(genreRepository, times(1)).findBySearch(eq(search), eq(pageable));
     verify(genreRepository, never()).findAll(any(Pageable.class));
     verify(genreMapper, times(1)).toPageResponse(genrePage, page, size);
+  }
+
+  @Test
+  void should_update_genre_by_id() throws Exception {
+    UUID id = UUID.randomUUID();
+    String newName = "Action";
+
+    GenreRequest request = new GenreRequest();
+    request.setName(newName);
+
+    Genre updatedGenreFromDb = new Genre();
+    updatedGenreFromDb.setId(id);
+    updatedGenreFromDb.setName(newName);
+
+    GenreResponse expectedResponse = new GenreResponse();
+    expectedResponse.setId(id);
+    expectedResponse.setName(newName);
+    doNothing().when(dataValidator).validateName("name", newName);
+    when(genreRepository.updateGenreName(id, newName)).thenReturn(Optional.of(updatedGenreFromDb));
+    when(genreMapper.toResponse(updatedGenreFromDb)).thenReturn(expectedResponse);
+    GenreResponse actualResponse = genreService.updateGenreByName(id, request);
+    assertNotNull(actualResponse);
+    assertEquals(newName, actualResponse.getName());
+    assertEquals(id, actualResponse.getId());
+    verify(dataValidator, times(1)).validateName("name", newName);
+    verify(genreRepository, times(1)).updateGenreName(id, newName);
+    verify(genreMapper, times(1)).toResponse(updatedGenreFromDb);
+  }
+
+  @Test
+  void should_return_not_found_when_genre_id_does_not_exist_on_updating() throws Exception {
+    UUID id = UUID.randomUUID();
+    GenreRequest request = GenreRequest.builder().name("Fantasy").build();
+    when(genreRepository.updateGenreName(id, request.getName())).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> genreService.updateGenreByName(id, request))
+        .isInstanceOf(NotFoundException.class);
+
+    verify(genreRepository).updateGenreName(id, request.getName());
+  }
+
+  @Test
+  void should_delete_genre_by_id() throws Exception {
+
+    UUID id = UUID.randomUUID();
+    when(genreRepository.deleteByUUId(id)).thenReturn(Optional.of(id));
+    genreService.deleteGenreById(id);
+
+    verify(genreRepository, times(1)).deleteByUUId(id);
+  }
+
+  @Test
+  void should_return_not_found_when_genre_id_does_not_exist_on_deleting() throws Exception {
+    UUID id = UUID.randomUUID();
+    when(genreRepository.deleteByUUId(id)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> genreService.deleteGenreById(id))
+        .isInstanceOf(NotFoundException.class);
+
+    verify(genreRepository).deleteByUUId(id);
   }
 }

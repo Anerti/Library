@@ -1,6 +1,8 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.Customer;
+import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,4 +33,20 @@ WHERE (:search IS NULL OR :search = ''
           """,
       nativeQuery = true)
   Page<Customer> findBySearch(@Param("search") String search, Pageable pageable);
+
+  @Query(
+      value =
+          """
+          INSERT INTO customer (last_name, first_name, birth_date, email, phone)
+          VALUES (:lastName, :firstName, :birthDate, :email, :phone)
+          ON CONFLICT (email) DO NOTHING
+          RETURNING id, last_name, first_name, birth_date, email, phone, created_at, updated_at
+          """,
+      nativeQuery = true)
+  Optional<Customer> create(
+      @Param("lastName") String lastName,
+      @Param("firstName") String firstName,
+      @Param("birthDate") LocalDate birthDate,
+      @Param("email") String email,
+      @Param("phone") String phone);
 }

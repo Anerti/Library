@@ -9,6 +9,7 @@ import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Customer;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.CustomerMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.service.CustomerService;
 import hei.school.library.validator.DataValidator;
@@ -32,7 +33,7 @@ class GetCustomersServiceTest {
 
   @BeforeEach
   void setUp() {
-    CustomerMapper customerMapper = new CustomerMapper();
+    CustomerMapper customerMapper = new CustomerMapper(new PaginationMapper());
     customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
 
     customer =
@@ -42,7 +43,6 @@ class GetCustomersServiceTest {
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "hashed_pw",
             "+261331234567",
             Instant.now(),
             Instant.now());

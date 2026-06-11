@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AuthorMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.service.AuthorService;
 import hei.school.library.validator.AuthorValidator;
@@ -31,7 +32,7 @@ class DeleteAuthorsByIdServiceTest {
 
   @BeforeEach
   void setUp() {
-    AuthorMapper authorMapper = new AuthorMapper();
+    AuthorMapper authorMapper = new AuthorMapper(new PaginationMapper());
     authorService =
         new AuthorService(authorRepository, authorValidator, authorMapper, dataValidator);
 

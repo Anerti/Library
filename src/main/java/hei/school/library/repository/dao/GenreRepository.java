@@ -24,6 +24,26 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
   @Query(
       value =
           """
+          DELETE FROM genre WHERE id = :id
+          RETURNING id
+          """,
+      nativeQuery = true)
+  Optional<UUID> deleteByUUId(@Param("id") UUID id);
+
+  @Query(
+      value =
+          """
+          UPDATE genre
+          SET name = :name, updated_at = NOW()
+          WHERE id = :id
+          RETURNING id, name, created_at, updated_at
+          """,
+      nativeQuery = true)
+  Optional<Genre> updateGenreName(@Param("id") UUID id, @Param("name") String name);
+
+  @Query(
+      value =
+          """
                     SELECT id, name, created_at, updated_at FROM genre
                     WHERE (:search IS NULL OR :search = ''
                        OR name ILIKE '%' || :search || '%')
