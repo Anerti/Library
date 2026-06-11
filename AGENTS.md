@@ -70,6 +70,11 @@ Library/
 - **AWS Lambda:** The app is deployed as a Lambda container (`springboot3` container type). `LambdaHandler` is the entry point.
 - **Mail:** Uses AWS SES via Jakarta Mail under the hood. Configured in `EmailConf`.
 - **TestContainers:** Integration tests use TestContainers (PostgreSQL module). `FacadeIT` is the base test class.
+- **Architecture layers:** Controller ↔ Service ↔ Repository. Controllers only handle DTOs, services validate + orchestrate, repositories return entities.
+- **Mapper:** Entity → DTO conversion in dedicated mapper classes (e.g. `CustomerMapper`). Called in the service, not the repository.
+- **Validation:** Centralised in `DataValidator` (package `validator`). Called at the top of each service method. No JSR-380 annotations on DTOs.
+- **INSERT RETURNING pattern:** Repositories use native `@Query` with `INSERT ... RETURNING *` to insert and return the entity in one round-trip. Return type is `Optional<Entity>`, never a DTO.
+- **Service tests:** Live under `src/test/java/hei/school/library/service/<domain>/`. Mock repository — no Spring context, no `@ExtendWith(SpringExtension.class)`. Constructor injection only (no `@Autowired`).
 
 ## Common pitfalls
 - Don't commit `.env` (it's already in `.gitignore`? — verify).

@@ -51,6 +51,22 @@ Tous les endpoints retournent des réponses paginées (listes) avec des exemples
 
 Java 21 · Spring Boot 3.2.2 · PostgreSQL · AWS Lambda/SQS/SES · Gradle 8.5 · Lombok · TestContainers · JaCoCo
 
+## Architecture
+
+```
+Controller (DTO) → Service (validation + orchestration) → Repository (entité JPA)
+                                                               ↓
+                                                          Mapper → DTO
+```
+
+- **Repository** : exécute les queries natives (`@Query`), retourne des entités
+- **Service** : valide via `DataValidator`, orchestre, mappe entité → DTO via le Mapper
+- **Controller** : reçoit/renvoie des DTOs, aucun traitement métier
+
+## Validation
+
+Les règles métier sont centralisées dans `DataValidator` (package `validator`) — appelées dans le service, pas d'annotations JSR-380 sur les DTOs.
+
 ---
 
 *POJA-generated — [hei.school](https://hei.school)*

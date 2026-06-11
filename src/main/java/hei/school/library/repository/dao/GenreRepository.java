@@ -22,6 +22,15 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
   @Query(
       value =
           """
+          DELETE FROM genre WHERE id = :id
+          RETURNING id
+          """,
+      nativeQuery = true)
+  Optional<UUID> deleteByUUId(@Param("id") UUID id);
+
+  @Query(
+      value =
+          """
                     UPDATE genre
                     SET name = :name, updated_at = NOW()
                     WHERE id = :id

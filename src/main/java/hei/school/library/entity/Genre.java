@@ -17,7 +17,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "genre")
 public class Genre {
-
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;

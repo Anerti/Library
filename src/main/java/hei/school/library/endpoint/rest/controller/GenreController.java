@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.*;
 public class GenreController {
   private final GenreService genreService;
 
+  @GetMapping("/{genreId}")
+  public ResponseEntity<?> getGenreById(@PathVariable UUID genreId) {
+    return ResponseEntity.ok(genreService.getGenreById(genreId));
+  }
+
   @PostMapping
   public ResponseEntity<?> create(@RequestBody GenreRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(genreService.createGenreByName(request));
@@ -21,5 +26,11 @@ public class GenreController {
   @PatchMapping("/{genreId}")
   public ResponseEntity<?> create(@PathVariable UUID genreId, @RequestBody GenreRequest request) {
       return ResponseEntity.status(HttpStatus.OK).body(genreService.updateGenreByName(genreId,request));
+  }
+
+  @DeleteMapping("/{genreId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID genreId) {
+    genreService.deleteGenreById(genreId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
