@@ -1,6 +1,8 @@
 package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.dto.GenreRequest;
+import hei.school.library.dto.GenreResponse;
+import hei.school.library.dto.PageResponse;
 import hei.school.library.service.GenreService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -34,5 +36,13 @@ public class GenreController {
   public ResponseEntity<Void> delete(@PathVariable UUID genreId) {
     genreService.deleteGenreById(genreId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
+  @GetMapping
+  public ResponseEntity<PageResponse<GenreResponse>> findAll(
+      @RequestParam(required = false) String search,
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int size) {
+    return ResponseEntity.status(HttpStatus.OK).body(genreService.findAll(search, page, size));
   }
 }

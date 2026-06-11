@@ -1,6 +1,7 @@
 package hei.school.library.controller.genre;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
+import hei.school.library.dto.PageResponse;
 import hei.school.library.endpoint.rest.controller.GenreController;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
@@ -130,6 +132,30 @@ public class GenreControllerTest {
                         }
                     """))
         .andExpect(status().isUnprocessableEntity());
+  }
+
+  @Test
+  void should_get_all_genres_with_pagination() throws Exception {
+    String search = "Fantasy";
+    int page = 1;
+    int size = 20;
+    PageResponse<GenreResponse> mockPageResponse = new PageResponse<>();
+    when(genreService.findAll(search, page, size)).thenReturn(mockPageResponse);
+    mockMvc
+        .perform(
+            get("/genres")
+                .param("search", search)
+                .param("page", String.valueOf(page))
+                .param("size", String.valueOf(size)))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  void should_use_default_pagination_parameters_when_not_provided() throws Exception {
+    PageResponse<GenreResponse> mockPageResponse = new PageResponse<>();
+    when(genreService.findAll(null, 1, 20)).thenReturn(mockPageResponse);
+    mockMvc.perform(get("/genres")).andExpect(status().isOk());
+    verify(genreService, times(1)).findAll(null, 1, 20);
   }
 
   @Test
