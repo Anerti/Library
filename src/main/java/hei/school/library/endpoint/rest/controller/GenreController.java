@@ -24,6 +24,12 @@ public class GenreController {
     return ResponseEntity.status(HttpStatus.CREATED).body(genreService.createGenreByName(request));
   }
 
+  @PatchMapping("/{genreId}")
+  public ResponseEntity<?> create(@PathVariable UUID genreId, @RequestBody GenreRequest request) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(genreService.updateGenreByName(genreId, request));
+  }
+
   @DeleteMapping("/{genreId}")
   public ResponseEntity<Void> delete(@PathVariable UUID genreId) {
     genreService.deleteGenreById(genreId);

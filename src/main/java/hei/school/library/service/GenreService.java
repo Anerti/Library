@@ -46,4 +46,13 @@ public class GenreService {
         .deleteByUUId(id)
         .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found"));
   }
+
+  @Transactional
+  public GenreResponse updateGenreByName(UUID id, GenreRequest request) {
+    dataValidator.validateName("name", request.getName());
+    return genreMapper.toResponse(
+        genreRepository
+            .updateGenreName(id, request.getName())
+            .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found")));
+  }
 }

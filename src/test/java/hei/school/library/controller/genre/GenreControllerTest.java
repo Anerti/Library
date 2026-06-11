@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -155,5 +156,53 @@ public class GenreControllerTest {
     UUID id = UUID.randomUUID();
 
     mockMvc.perform(delete("/genres/{id}", id)).andExpect(status().isNotFound());
+  }
+
+  @Test
+  void should_update_genre_by_name() throws Exception {
+
+    UUID id = UUID.randomUUID();
+
+    GenreResponse response = new GenreResponse();
+    response.setId(id);
+    response.setName("Fantasy");
+    response.setCreatedAt(Instant.now());
+    response.setUpdatedAt(Instant.now());
+
+    when(genreService.updateGenreByName(any(UUID.class), any(GenreRequest.class)))
+        .thenReturn(response);
+
+    mockMvc
+        .perform(
+            patch("/genres/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                            "name":"Fantasy"
+                        }
+                    """))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(id.toString()))
+        .andExpect(jsonPath("$.name").value("Fantasy"));
+  }
+
+  @Test
+  void should_return_not_found_when_genre_id_does_not_exist_on_updating() throws Exception {
+    UUID id = UUID.randomUUID();
+    when(genreService.updateGenreByName(any(UUID.class), any(GenreRequest.class)))
+        .thenThrow(new NotFoundException("Genre with id " + id + " not found"));
+
+    mockMvc
+        .perform(
+            patch("/genres/{id}", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    """
+                        {
+                            "name": "Action"
+                        }
+                    """))
+        .andExpect(status().isNotFound());
   }
 }
