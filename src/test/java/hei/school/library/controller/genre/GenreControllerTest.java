@@ -2,9 +2,9 @@ package hei.school.library.controller.genre;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -178,10 +178,10 @@ public class GenreControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
-                                            {
-                                                "name":"Fantasy"
-                                            }
-                                        """))
+                        {
+                            "name":"Fantasy"
+                        }
+                    """))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(id.toString()))
         .andExpect(jsonPath("$.name").value("Fantasy"));
@@ -199,10 +199,10 @@ public class GenreControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                     """
-                {
-                    "name": "Action"
-                }
-            """))
+                        {
+                            "name": "Action"
+                        }
+                    """))
         .andExpect(status().isNotFound());
   }
 }
