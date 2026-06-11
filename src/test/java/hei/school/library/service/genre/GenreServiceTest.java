@@ -1,7 +1,6 @@
 package hei.school.library.service.genre;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -109,7 +108,7 @@ public class GenreServiceTest {
   }
 
   @Test
-  void should_delete_genre_by_id() throws Exception {
+  void should_update_genre_by_id() throws Exception {
     UUID id = UUID.randomUUID();
     String newName = "Action";
 
@@ -136,7 +135,7 @@ public class GenreServiceTest {
   }
 
   @Test
-  void should_return_not_found_when_genre_id_does_not_exist_on_deleting() throws Exception {
+  void should_return_not_found_when_genre_id_does_not_exist_on_updating() throws Exception {
     UUID id = UUID.randomUUID();
     GenreRequest request = GenreRequest.builder().name("Fantasy").build();
     when(genreRepository.updateGenreName(id, request.getName())).thenReturn(Optional.empty());
