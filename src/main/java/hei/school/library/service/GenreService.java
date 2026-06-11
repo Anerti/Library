@@ -4,7 +4,6 @@ import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.exception.ConflictException;
-import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.validator.DataValidator;

@@ -22,15 +22,16 @@ public class GenreMapper {
         .updatedAt(genre.getUpdatedAt())
         .build();
   }
-    public PageResponse<GenreResponse> toPageResponse(Page<Genre> page, int pageNum, int pageSize) {
-        return PageResponse.<GenreResponse>builder()
-                .data(page.getContent().stream().map(this::toResponse).toList())
-                .pagination(
-                        PaginationDto.builder()
-                                .page(pageNum)
-                                .size(pageSize)
-                                .total(page.getTotalElements())
-                                .build())
-                .build();
-    }
+
+  public PageResponse<GenreResponse> toPageResponse(Page<Genre> page, int pageNum, int pageSize) {
+    return PageResponse.<GenreResponse>builder()
+        .data(page.getContent().stream().map(this::toResponse).toList())
+        .pagination(
+            PaginationDto.builder()
+                .page(pageNum)
+                .size(pageSize)
+                .total(page.getTotalElements())
+                .build())
+        .build();
+  }
 }

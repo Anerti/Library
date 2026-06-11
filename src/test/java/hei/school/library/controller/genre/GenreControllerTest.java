@@ -101,29 +101,28 @@ public class GenreControllerTest {
                     """))
         .andExpect(status().isUnprocessableEntity());
   }
-    @Test
-    void should_get_all_genres_with_pagination() throws Exception {
-        String search = "Fantasy";
-        int page = 1;
-        int size = 20;
-        PageResponse<GenreResponse> mockPageResponse = new PageResponse<>();
-        when(genreService.findAll(search, page, size))
-                .thenReturn(mockPageResponse);
-        mockMvc.perform(get("/genres")
-                        .param("search", search)
-                        .param("page", String.valueOf(page))
-                        .param("size", String.valueOf(size)))
-                .andExpect(status().isOk());
-    }
 
-    @Test
-    void should_use_default_pagination_parameters_when_not_provided() throws Exception {
-        PageResponse<GenreResponse> mockPageResponse = new PageResponse<>();
-        when(genreService.findAll(null, 1, 20))
-                .thenReturn(mockPageResponse);
-        mockMvc.perform(get("/genres"))
-                .andExpect(status().isOk());
-        verify(genreService, times(1)).findAll(null, 1, 20);
-    }
+  @Test
+  void should_get_all_genres_with_pagination() throws Exception {
+    String search = "Fantasy";
+    int page = 1;
+    int size = 20;
+    PageResponse<GenreResponse> mockPageResponse = new PageResponse<>();
+    when(genreService.findAll(search, page, size)).thenReturn(mockPageResponse);
+    mockMvc
+        .perform(
+            get("/genres")
+                .param("search", search)
+                .param("page", String.valueOf(page))
+                .param("size", String.valueOf(size)))
+        .andExpect(status().isOk());
+  }
 
+  @Test
+  void should_use_default_pagination_parameters_when_not_provided() throws Exception {
+    PageResponse<GenreResponse> mockPageResponse = new PageResponse<>();
+    when(genreService.findAll(null, 1, 20)).thenReturn(mockPageResponse);
+    mockMvc.perform(get("/genres")).andExpect(status().isOk());
+    verify(genreService, times(1)).findAll(null, 1, 20);
+  }
 }

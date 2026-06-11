@@ -20,11 +20,11 @@ public class GenreController {
     return ResponseEntity.status(HttpStatus.CREATED).body(genreService.createGenreByName(request));
   }
 
-    @GetMapping
-    public ResponseEntity<PageResponse<GenreResponse>> findAll(
-            @RequestParam(required = false) String search,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.status(HttpStatus.OK).body(genreService.findAll(search, page, size));
-    }
+  @GetMapping
+  public ResponseEntity<PageResponse<GenreResponse>> findAll(
+      @RequestParam(required = false) String search,
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "20") int size) {
+    return ResponseEntity.status(HttpStatus.OK).body(genreService.findAll(search, page, size));
+  }
 }
