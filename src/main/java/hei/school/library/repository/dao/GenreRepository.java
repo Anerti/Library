@@ -22,9 +22,9 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
   @Query(
       value =
           """
-                    DELETE FROM genre WHERE id = :id
-                    RETURNING id
-                    """,
+          DELETE FROM genre WHERE id = :id
+          RETURNING id
+          """,
       nativeQuery = true)
   Optional<UUID> deleteByUUId(@Param("id") UUID id);
 }
