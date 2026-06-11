@@ -44,16 +44,16 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
   @Query(
       value =
           """
-                    SELECT id, name, created_at, updated_at FROM genre
-                    WHERE (:search IS NULL OR :search = ''
-                       OR name ILIKE '%' || :search || '%')
-                    """,
+          SELECT id, name, created_at, updated_at FROM genre
+          WHERE (:search IS NULL OR :search = ''
+             OR name ILIKE '%' || :search || '%')
+          """,
       countQuery =
           """
-                    SELECT COUNT(id) FROM genre
-                    WHERE (:search IS NULL OR :search = ''
-                       OR name ILIKE '%' || :search || '%')
-                    """,
+          SELECT COUNT(id) FROM genre
+          WHERE (:search IS NULL OR :search = ''
+             OR name ILIKE '%' || :search || '%')
+          """,
       nativeQuery = true)
   Page<Genre> findBySearch(@Param("search") String search, Pageable pageable);
 }

@@ -41,14 +41,15 @@ public class GenreService {
             .orElseThrow(
                 () -> new ConflictException("Genre " + request.getName() + " already exists")));
   }
-    @Transactional(readOnly = true)
-    public PageResponse<GenreResponse> findAll(String search, int page, int size) {
-        PageRequest pageable = PageRequest.of(page - 1, size);
 
-        return (search == null || search.isBlank())
-                ? genreMapper.toPageResponse(genreRepository.findAll(pageable), page, size)
-                : genreMapper.toPageResponse(genreRepository.findBySearch(search, pageable), page, size);
-    }
+  @Transactional(readOnly = true)
+  public PageResponse<GenreResponse> findAll(String search, int page, int size) {
+    PageRequest pageable = PageRequest.of(page - 1, size);
+
+    return (search == null || search.isBlank())
+        ? genreMapper.toPageResponse(genreRepository.findAll(pageable), page, size)
+        : genreMapper.toPageResponse(genreRepository.findBySearch(search, pageable), page, size);
+  }
 
   @Transactional
   public void deleteGenreById(UUID id) {
