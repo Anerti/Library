@@ -40,7 +40,8 @@ public class BookCopyService {
     }
 
     Pageable pageable = PageRequest.of(page - 1, size);
-    Page<BookCopy> bookCopyPage = bookCopyRepository.findByFilters(
+    Page<BookCopy> bookCopyPage =
+        bookCopyRepository.findByFilters(
             libraryId,
             status != null ? status.name() : null,
             format != null ? format.name() : null,

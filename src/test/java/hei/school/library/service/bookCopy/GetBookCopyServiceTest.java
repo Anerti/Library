@@ -108,8 +108,7 @@ public class GetBookCopyServiceTest {
   @DisplayName("findByFilters : return filtered list by status and format")
   void findByFilters_shouldReturnFilteredList() {
     Page<BookCopy> bookCopyPage = new PageImpl<>(List.of(bookCopy));
-    PaginationDto pagination = PaginationDto.builder()
-            .page(1).size(20).total(1).build();
+    PaginationDto pagination = PaginationDto.builder().page(1).size(20).total(1).build();
 
     when(libraryRepository.existsById(libraryId)).thenReturn(true);
     when(bookCopyRepository.findByFilters(
@@ -118,11 +117,12 @@ public class GetBookCopyServiceTest {
             eq(BookCopyFormat.PAPERBACK.name()),
             isNull(),
             any(Pageable.class)))
-            .thenReturn(bookCopyPage);
+        .thenReturn(bookCopyPage);
     when(bookCopyMapper.toResponse(bookCopy)).thenReturn(bookCopyResponse);
     when(paginationMapper.toPaginationDto(bookCopyPage, 1, 20)).thenReturn(pagination);
 
-    PageResponse<BookCopyResponse> result = bookCopyService.findByFilters(
+    PageResponse<BookCopyResponse> result =
+        bookCopyService.findByFilters(
             libraryId, BookCopyStatus.AVAILABLE, BookCopyFormat.PAPERBACK, null, 1, 20);
 
     assertThat(result.getData()).hasSize(1);
