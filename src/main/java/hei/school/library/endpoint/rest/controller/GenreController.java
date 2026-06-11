@@ -2,12 +2,11 @@ package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.service.GenreService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController

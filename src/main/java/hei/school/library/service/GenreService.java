@@ -1,20 +1,16 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.AuthorResponse;
-import hei.school.library.dto.AuthorUpdateRequest;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
-import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.validator.DataValidator;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -33,13 +29,13 @@ public class GenreService {
             .orElseThrow(
                 () -> new ConflictException("Genre " + request.getName() + " already exists")));
   }
-    @Transactional
-    public GenreResponse updateGenreByName(UUID id,GenreRequest request) {
-        dataValidator.validateName("name", request.getName());
-        return genreMapper.toResponse(
-                genreRepository
-                        .updateGenreName(id,request.getName())
-                        .orElseThrow(
-                                () -> new NotFoundException("Genre with id " + id + " not found")));
-    }
+
+  @Transactional
+  public GenreResponse updateGenreByName(UUID id, GenreRequest request) {
+    dataValidator.validateName("name", request.getName());
+    return genreMapper.toResponse(
+        genreRepository
+            .updateGenreName(id, request.getName())
+            .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found")));
+  }
 }
