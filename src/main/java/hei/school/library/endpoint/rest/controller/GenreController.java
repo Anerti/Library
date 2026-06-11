@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.*;
 public class GenreController {
   private final GenreService genreService;
 
+  @GetMapping("/{genreId}")
+  public ResponseEntity<?> getGenreById(@PathVariable UUID genreId) {
+    return ResponseEntity.ok(genreService.getGenreById(genreId));
+  }
+
   @PostMapping
   public ResponseEntity<?> create(@RequestBody GenreRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(genreService.createGenreByName(request));

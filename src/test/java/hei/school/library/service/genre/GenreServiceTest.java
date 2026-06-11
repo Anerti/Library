@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
@@ -35,6 +38,30 @@ public class GenreServiceTest {
   @BeforeEach
   void setUp() {
     genreService = new GenreService(genreRepository, genreMapper, dataValidator);
+  }
+
+  @Test
+  void should_get_genre_by_id() throws Exception {
+
+    UUID id = UUID.randomUUID();
+    Genre genre =
+        Genre.builder()
+            .id(id)
+            .name("Fantasy")
+            .createdAt(Instant.now())
+            .updatedAt(Instant.now())
+            .build();
+
+    when(genreRepository.findById(any(UUID.class))).thenReturn(Optional.of(genre));
+
+    assertEquals(genreMapper.toResponse(genre), genreService.getGenreById(id));
+  }
+
+  @Test
+  void should_return_not_found_when_genre_id_does_not_exist() throws Exception {
+    UUID id = UUID.randomUUID();
+    when(genreRepository.findById(id)).thenReturn(Optional.empty());
+    assertThrows(NotFoundException.class, () -> genreService.getGenreById(id));
   }
 
   @Test
