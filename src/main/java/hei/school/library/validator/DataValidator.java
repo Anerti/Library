@@ -3,7 +3,9 @@ package hei.school.library.validator;
 import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookUpdateRequest;
 import hei.school.library.dto.CustomerRequest;
+import hei.school.library.dto.CustomerUpdateRequest;
 import hei.school.library.entity.Book;
+import hei.school.library.entity.Customer;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
@@ -144,6 +146,51 @@ public class DataValidator {
     }
     if (request.getPublishedAt() != null) {
       book.setPublishedAt(request.getPublishedAt());
+    }
+  }
+
+  public void validateCustomerUpdate(CustomerUpdateRequest request) {
+    if (request.getLastName() == null
+        && request.getFirstName() == null
+        && request.getBirthDate() == null
+        && request.getEmail() == null
+        && request.getPhone() == null) {
+      throw new UnprocessableEntityException("At least one field is required.");
+    }
+    if (request.getLastName() != null && request.getLastName().length() > 100) {
+      throw new UnprocessableEntityException("lastName cannot be longer than 100 characters.");
+    }
+    if (request.getFirstName() != null && request.getFirstName().length() > 100) {
+      throw new UnprocessableEntityException("firstName cannot be longer than 100 characters.");
+    }
+    if (request.getEmail() != null && request.getEmail().length() > 100) {
+      throw new UnprocessableEntityException("email cannot be longer than 100 characters.");
+    }
+    if (request.getBirthDate() != null && request.getBirthDate().isAfter(LocalDate.now())) {
+      throw new UnprocessableEntityException("birthDate cannot be in the future.");
+    }
+  }
+
+  public void validatePatchCustomer(CustomerUpdateRequest request, Customer customer) {
+    validateCustomerUpdate(request);
+
+    if (request.getLastName() != null) {
+      validateName("lastName", request.getLastName());
+      customer.setLastName(request.getLastName());
+    }
+    if (request.getFirstName() != null) {
+      validateName("firstName", request.getFirstName());
+      customer.setFirstName(request.getFirstName());
+    }
+    if (request.getBirthDate() != null) {
+      customer.setBirthDate(request.getBirthDate());
+    }
+    if (request.getEmail() != null) {
+      validateEmail(request.getEmail());
+      customer.setEmail(request.getEmail());
+    }
+    if (request.getPhone() != null) {
+      customer.setPhone(request.getPhone());
     }
   }
 }

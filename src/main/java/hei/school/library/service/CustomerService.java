@@ -6,11 +6,9 @@ import hei.school.library.dto.CustomerUpdateRequest;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Customer;
 import hei.school.library.exception.ConflictException;
-import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.repository.dao.CustomerRepository;
-import hei.school.library.validator.CustomerValidator;
 import hei.school.library.validator.DataValidator;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +23,6 @@ public class CustomerService {
   private final CustomerRepository customerRepository;
   private final CustomerMapper customerMapper;
   private final DataValidator dataValidator;
-  private final CustomerValidator customerValidator;
 
   @Transactional(readOnly = true)
   public PageResponse<CustomerResponse> findAll(String search, int page, int size) {
@@ -65,19 +62,12 @@ public class CustomerService {
 
   @Transactional
   public CustomerResponse update(UUID id, CustomerUpdateRequest request) {
-    customerValidator.validateUpdate(request);
-
     Customer customer =
         customerRepository
             .findById(id)
             .orElseThrow(() -> new NotFoundException("Customer " + id + " not found"));
 
-    if (request.getLastName() != null) customer.setLastName(request.getLastName());
-    if (request.getFirstName() != null) customer.setFirstName(request.getFirstName());
-    if (request.getBirthDate() != null) customer.setBirthDate(request.getBirthDate());
-    if (request.getEmail() != null) customer.setEmail(request.getEmail());
-    if (request.getPhone() != null) customer.setPhone(request.getPhone());
-
+    dataValidator.validatePatchCustomer(request, customer);
     return customerMapper.toResponse(customerRepository.save(customer));
   }
 }

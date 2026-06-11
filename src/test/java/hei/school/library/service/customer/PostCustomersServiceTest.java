@@ -13,7 +13,6 @@ import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.service.CustomerService;
-import hei.school.library.validator.CustomerValidator;
 import hei.school.library.validator.DataValidator;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -28,7 +27,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PostCustomersServiceTest {
 
   @Mock private CustomerRepository customerRepository;
-  @Mock private CustomerValidator customerValidator;
   @Mock private DataValidator dataValidator;
   private CustomerService customerService;
 
@@ -37,30 +35,25 @@ class PostCustomersServiceTest {
 
   @BeforeEach
   void setUp() {
-    CustomerMapper customerMapper = new CustomerMapper();
     customerService =
-        new CustomerService(customerRepository, customerMapper, dataValidator, customerValidator);
-    CustomerMapper customerMapper = new CustomerMapper(new PaginationMapper());
-    customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
+        new CustomerService(
+            customerRepository, new CustomerMapper(new PaginationMapper()), dataValidator);
 
     UUID id = UUID.randomUUID();
     customer =
         new Customer(
-            UUID.randomUUID(),
             id,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
             "+261****4567",
-            "+261331234567",
             Instant.now(),
             Instant.now());
 
     validRequest =
         new CustomerRequest(
             "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", "+261****4567");
-            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", "+261331234567");
   }
 
   @Test
@@ -74,7 +67,6 @@ class PostCustomersServiceTest {
     assertThat(result.getLastName()).isEqualTo("Dupont");
     assertThat(result.getEmail()).isEqualTo("marie@mail.com");
     verify(dataValidator).validateCustomer(validRequest);
-    verify(customerValidator).validateCreate(validRequest);
   }
 
   @Test
@@ -96,8 +88,6 @@ class PostCustomersServiceTest {
     doThrow(new UnprocessableEntityException("lastName is required."))
         .when(dataValidator)
         .validateCustomer(invalidRequest);
-        .when(customerValidator)
-        .validateCreate(invalidRequest);
 
     assertThatThrownBy(() -> customerService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -304,8 +294,6 @@ class PostCustomersServiceTest {
             "Dupont", "Marie", LocalDate.now().plusDays(1), "future@mail.com", null);
 
     doThrow(new UnprocessableEntityException("birthDate cannot be in the future."))
-        .when(customerValidator)
-        .validateCreate(futureRequest);
         .when(dataValidator)
         .validateCustomer(futureRequest);
 

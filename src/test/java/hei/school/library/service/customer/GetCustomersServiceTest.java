@@ -12,7 +12,6 @@ import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.service.CustomerService;
-import hei.school.library.validator.CustomerValidator;
 import hei.school.library.validator.DataValidator;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -29,17 +28,14 @@ class GetCustomersServiceTest {
 
   @Mock private CustomerRepository customerRepository;
   @Mock private DataValidator dataValidator;
-  @Mock private CustomerValidator customerValidator;
   private CustomerService customerService;
   private Customer customer;
 
   @BeforeEach
   void setUp() {
-    CustomerMapper customerMapper = new CustomerMapper();
     customerService =
-        new CustomerService(customerRepository, customerMapper, dataValidator, customerValidator);
-    CustomerMapper customerMapper = new CustomerMapper(new PaginationMapper());
-    customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
+        new CustomerService(
+            customerRepository, new CustomerMapper(new PaginationMapper()), dataValidator);
 
     customer =
         new Customer(
@@ -48,7 +44,7 @@ class GetCustomersServiceTest {
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "+261331234567",
+            "+261****4567",
             Instant.now(),
             Instant.now());
   }
