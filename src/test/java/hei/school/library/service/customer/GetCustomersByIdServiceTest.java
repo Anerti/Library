@@ -7,6 +7,7 @@ import hei.school.library.dto.CustomerResponse;
 import hei.school.library.entity.Customer;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.CustomerMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.service.CustomerService;
 import hei.school.library.validator.CustomerValidator;
@@ -37,6 +38,8 @@ class GetCustomersByIdServiceTest {
     CustomerMapper customerMapper = new CustomerMapper();
     customerService =
         new CustomerService(customerRepository, customerMapper, dataValidator, customerValidator);
+    CustomerMapper customerMapper = new CustomerMapper(new PaginationMapper());
+    customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();

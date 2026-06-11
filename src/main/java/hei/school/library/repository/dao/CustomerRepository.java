@@ -40,7 +40,7 @@ WHERE (:search IS NULL OR :search = ''
           INSERT INTO customer (last_name, first_name, birth_date, email, phone)
           VALUES (:lastName, :firstName, :birthDate, :email, :phone)
           ON CONFLICT (email) DO NOTHING
-          RETURNING *
+          RETURNING id, last_name, first_name, birth_date, email, phone, created_at, updated_at
           """,
       nativeQuery = true)
   Optional<Customer> create(

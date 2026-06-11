@@ -6,6 +6,7 @@ import hei.school.library.dto.CustomerUpdateRequest;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Customer;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.repository.dao.CustomerRepository;
@@ -47,20 +48,19 @@ public class CustomerService {
 
   @Transactional
   public CustomerResponse create(CustomerRequest request) {
-    customerValidator.validateCreate(request);
+    dataValidator.validateCustomer(request);
 
-    return customerMapper.toResponse(
-        customerRepository
-            .create(
-                request.getLastName(),
-                request.getFirstName(),
-                request.getBirthDate(),
-                request.getEmail(),
-                request.getPhone())
-            .orElseThrow(
-                () ->
-                    new ConflictException(
-                        "Customer with email " + request.getEmail() + " already exists")));
+    return customerRepository
+        .create(
+            request.getLastName(),
+            request.getFirstName(),
+            request.getBirthDate(),
+            request.getEmail(),
+            request.getPhone())
+        .map(customerMapper::toResponse)
+        .orElseThrow(
+            () ->
+                new ConflictException("Customer email " + request.getEmail() + " already exists"));
   }
 
   @Transactional
