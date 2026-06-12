@@ -33,7 +33,7 @@ public class DataValidator {
   }
 
   public void validateEmail(String email) {
-    if (email == null && email.isBlank()) {
+    if (email == null || email.isBlank()) {
       throw new UnprocessableEntityException("email is required.");
     }
 
