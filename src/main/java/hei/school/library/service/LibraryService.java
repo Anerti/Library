@@ -1,7 +1,5 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.GenreRequest;
-import hei.school.library.dto.GenreResponse;
 import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.entity.Library;
@@ -24,7 +22,8 @@ public class LibraryService {
   private final DataValidator dataValidator;
   private final LibraryMapper mapper;
 
-  public LibraryService(LibraryRepository repository, DataValidator dataValidator,  LibraryMapper mapper) {
+  public LibraryService(
+      LibraryRepository repository, DataValidator dataValidator, LibraryMapper mapper) {
     this.repository = repository;
     this.dataValidator = dataValidator;
     this.mapper = mapper;
@@ -56,14 +55,18 @@ public class LibraryService {
         "pagination",
         Map.of("page", page, "size", size, "total", libraryPage.getTotalElements()));
   }
-    @Transactional
-    public LibraryResponse createLibrary(LibraryRequest request) {
-        dataValidator.validateName("name", request.getName());
 
-        return mapper.toResponse(
-                repository
-                        .insertLibraryIgnoreConflict(request.getName(), request.getPhone(), request.getEmail(), request.getAddress())
-                        .orElseThrow(
-                                () -> new ConflictException("Library with email " + request.getEmail() + " already exists")));
-    }
+  @Transactional
+  public LibraryResponse createLibrary(LibraryRequest request) {
+    dataValidator.validateName("name", request.getName());
+
+    return mapper.toResponse(
+        repository
+            .insertLibraryIgnoreConflict(
+                request.getName(), request.getPhone(), request.getEmail(), request.getAddress())
+            .orElseThrow(
+                () ->
+                    new ConflictException(
+                        "Library with email " + request.getEmail() + " already exists")));
+  }
 }

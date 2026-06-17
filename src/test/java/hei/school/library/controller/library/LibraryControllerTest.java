@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.endpoint.rest.controller.LibraryController;
@@ -19,43 +20,49 @@ import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 class LibraryControllerTest {
 
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper = new ObjectMapper();
-    private LibraryController  libraryController;
+  private MockMvc mockMvc;
+  private ObjectMapper objectMapper = new ObjectMapper();
+  private LibraryController libraryController;
 
-    private LibraryService libraryService;
-    @BeforeEach
-    void setup() {
-        this.libraryService = Mockito.mock(LibraryService.class);
-        this.libraryController = new LibraryController(this.libraryService);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(this.libraryController).build();
-    }
+  private LibraryService libraryService;
 
-    @Test
-    void should_create_library() throws Exception {
-        LibraryRequest request = new LibraryRequest();
-        request.setName("Central Library");
-        request.setEmail("contact@central.com");
+  @BeforeEach
+  void setup() {
+    this.libraryService = Mockito.mock(LibraryService.class);
+    this.libraryController = new LibraryController(this.libraryService);
+    this.mockMvc = MockMvcBuilders.standaloneSetup(this.libraryController).build();
+  }
 
-        LibraryResponse response = new LibraryResponse();
+  @Test
+  void should_create_library() throws Exception {
+    LibraryRequest request = new LibraryRequest();
+    request.setName("Central Library");
+    request.setEmail("contact@central.com");
 
-        when(libraryService.createLibrary(any(LibraryRequest.class))).thenReturn(response);
-        mockMvc.perform(post("/libraries")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated());
-    }
-    @Test
-    void should_throw_conflict_exception() throws Exception {
-        LibraryRequest request = new LibraryRequest();
-        request.setName("Central Library");
-        request.setEmail("contact@central.com");
-        String errorMessage = "Library with email contact@central.com already exists";
-        when(libraryService.createLibrary(any(LibraryRequest.class)))
-                .thenThrow(new ConflictException(errorMessage));
-        mockMvc.perform(post("/libraries")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict());
-    }
+    LibraryResponse response = new LibraryResponse();
+
+    when(libraryService.createLibrary(any(LibraryRequest.class))).thenReturn(response);
+    mockMvc
+        .perform(
+            post("/libraries")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isCreated());
+  }
+
+  @Test
+  void should_throw_conflict_exception() throws Exception {
+    LibraryRequest request = new LibraryRequest();
+    request.setName("Central Library");
+    request.setEmail("contact@central.com");
+    String errorMessage = "Library with email contact@central.com already exists";
+    when(libraryService.createLibrary(any(LibraryRequest.class)))
+        .thenThrow(new ConflictException(errorMessage));
+    mockMvc
+        .perform(
+            post("/libraries")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isConflict());
+  }
 }

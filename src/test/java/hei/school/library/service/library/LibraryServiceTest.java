@@ -94,8 +94,9 @@ class LibraryServiceTest {
 
   @Test
   void should_throw_when_search_contains_invalid_characters() {
-      doThrow(new UnprocessableEntityException("Search contains invalid characters"))
-              .when(dataValidator).validateString("search", "library!</>");
+    doThrow(new UnprocessableEntityException("Search contains invalid characters"))
+        .when(dataValidator)
+        .validateString("search", "library!</>");
     UnprocessableEntityException ex =
         assertThrows(
             UnprocessableEntityException.class, () -> service.listLibraries("library!</>", 1, 20));
@@ -181,46 +182,51 @@ class LibraryServiceTest {
   private static Library aLibrary(String name, String email, String address) {
     return new Library(UUID.randomUUID(), name, "+261330000000", email, address);
   }
-    @Test
-    void should_create_library() {
-        LibraryRequest request = new LibraryRequest();
-        request.setName("Central Library");
-        request.setPhone("0123456789");
-        request.setEmail("contact@central.com");
-        request.setAddress("123 Main St");
 
-        Library savedLibrary = new Library();
-        LibraryResponse expectedResponse = new LibraryResponse();
-        doNothing().when(dataValidator).validateName("name", request.getName());
+  @Test
+  void should_create_library() {
+    LibraryRequest request = new LibraryRequest();
+    request.setName("Central Library");
+    request.setPhone("0123456789");
+    request.setEmail("contact@central.com");
+    request.setAddress("123 Main St");
 
-        when(repository.insertLibraryIgnoreConflict(
-                request.getName(), request.getPhone(), request.getEmail(), request.getAddress()))
-                .thenReturn(Optional.of(savedLibrary));
+    Library savedLibrary = new Library();
+    LibraryResponse expectedResponse = new LibraryResponse();
+    doNothing().when(dataValidator).validateName("name", request.getName());
 
-        when(mapper.toResponse(savedLibrary)).thenReturn(expectedResponse);
-        LibraryResponse actualResponse = service.createLibrary(request);
+    when(repository.insertLibraryIgnoreConflict(
+            request.getName(), request.getPhone(), request.getEmail(), request.getAddress()))
+        .thenReturn(Optional.of(savedLibrary));
 
-        assertNotNull(actualResponse);
-        verify(dataValidator, times(1)).validateName("name", request.getName());
-        verify(repository, times(1)).insertLibraryIgnoreConflict(
-                request.getName(), request.getPhone(), request.getEmail(), request.getAddress());
-        verify(mapper, times(1)).toResponse(savedLibrary);
-    }
+    when(mapper.toResponse(savedLibrary)).thenReturn(expectedResponse);
+    LibraryResponse actualResponse = service.createLibrary(request);
 
-    @Test
-    void should_throw_conflict_exception() {
-        LibraryRequest request = new LibraryRequest();
-        request.setName("Central Library");
-        request.setEmail("contact@central.com");
+    assertNotNull(actualResponse);
+    verify(dataValidator, times(1)).validateName("name", request.getName());
+    verify(repository, times(1))
+        .insertLibraryIgnoreConflict(
+            request.getName(), request.getPhone(), request.getEmail(), request.getAddress());
+    verify(mapper, times(1)).toResponse(savedLibrary);
+  }
 
-        doNothing().when(dataValidator).validateName("name", request.getName());
-        when(repository.insertLibraryIgnoreConflict(any(), any(), any(), any()))
-                .thenReturn(Optional.empty());
-        ConflictException exception = assertThrows(ConflictException.class, () -> {
-            service.createLibrary(request);
-        });
+  @Test
+  void should_throw_conflict_exception() {
+    LibraryRequest request = new LibraryRequest();
+    request.setName("Central Library");
+    request.setEmail("contact@central.com");
 
-        assertEquals("Library with email contact@central.com already exists", exception.getMessage());
-        verify(mapper, never()).toResponse(any());
-    }
+    doNothing().when(dataValidator).validateName("name", request.getName());
+    when(repository.insertLibraryIgnoreConflict(any(), any(), any(), any()))
+        .thenReturn(Optional.empty());
+    ConflictException exception =
+        assertThrows(
+            ConflictException.class,
+            () -> {
+              service.createLibrary(request);
+            });
+
+    assertEquals("Library with email contact@central.com already exists", exception.getMessage());
+    verify(mapper, never()).toResponse(any());
+  }
 }

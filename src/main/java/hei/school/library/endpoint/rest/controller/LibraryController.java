@@ -3,10 +3,10 @@ package hei.school.library.endpoint.rest.controller;
 import hei.school.library.dto.LibraryRequest;
 import hei.school.library.service.LibraryService;
 import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 @RequestMapping("/libraries")
 @RestController
 public record LibraryController(LibraryService libraryService) {
