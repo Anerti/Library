@@ -141,7 +141,7 @@ class PatchCustomersServiceTest {
   @DisplayName("update: should update phone only and return DTO")
   void update_shouldUpdatePhoneOnly() {
     CustomerUpdateRequest request =
-        new CustomerUpdateRequest(null, null, null, null, "+261****4000");
+        new CustomerUpdateRequest(null, null, null, null, "+261 34 12 340 00");
 
     Customer updated =
         customer(
@@ -150,15 +150,15 @@ class PatchCustomersServiceTest {
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "+261****4000",
+            "+261 34 12 340 00",
             now);
     when(customerRepository.patch(
-            eq(existingId), isNull(), isNull(), isNull(), isNull(), eq("+261****4000")))
+            eq(existingId), isNull(), isNull(), isNull(), isNull(), eq("+261 34 12 340 00")))
         .thenReturn(Optional.of(updated));
 
     CustomerResponse result = customerService.update(existingId, request);
 
-    assertThat(result.getPhone()).isEqualTo("+261****4000");
+    assertThat(result.getPhone()).isEqualTo("+261 34 12 340 00");
     assertThat(result.getLastName()).isEqualTo("Dupont");
   }
 
@@ -185,7 +185,7 @@ class PatchCustomersServiceTest {
   void update_shouldUpdateAllFields() {
     CustomerUpdateRequest request =
         new CustomerUpdateRequest(
-            "Martin", "Jean", LocalDate.of(1988, 1, 1), "jean@mail.com", "+261****4999");
+            "Martin", "Jean", LocalDate.of(1988, 1, 1), "jean@mail.com", "+261 34 12 349 99");
 
     Customer updated =
         customer(
@@ -194,7 +194,7 @@ class PatchCustomersServiceTest {
             "Jean",
             LocalDate.of(1988, 1, 1),
             "jean@mail.com",
-            "+261****4999",
+            "+261 34 12 349 99",
             now);
     when(customerRepository.patch(
             eq(existingId),
@@ -202,7 +202,7 @@ class PatchCustomersServiceTest {
             eq("Jean"),
             eq(LocalDate.of(1988, 1, 1)),
             eq("jean@mail.com"),
-            eq("+261****4999")))
+            eq("+261 34 12 349 99")))
         .thenReturn(Optional.of(updated));
 
     CustomerResponse result = customerService.update(existingId, request);
@@ -211,7 +211,7 @@ class PatchCustomersServiceTest {
     assertThat(result.getFirstName()).isEqualTo("Jean");
     assertThat(result.getBirthDate()).isEqualTo(LocalDate.of(1988, 1, 1));
     assertThat(result.getEmail()).isEqualTo("jean@mail.com");
-    assertThat(result.getPhone()).isEqualTo("+261****4999");
+    assertThat(result.getPhone()).isEqualTo("+261 34 12 349 99");
   }
 
   @Test
