@@ -56,28 +56,28 @@ public class GetBookCopyServiceTest {
     Book book = Book.builder().id(bookId).build();
 
     bookCopy =
-            BookCopy.builder()
-                    .id(copyId)
-                    .library(library)
-                    .book(book)
-                    .price(25.0)
-                    .format(BookCopyFormat.PAPERBACK)
-                    .status(BookCopyStatus.AVAILABLE)
-                    .pageNumber(120)
-                    .updatedAt(LocalDateTime.now())
-                    .build();
+        BookCopy.builder()
+            .id(copyId)
+            .library(library)
+            .book(book)
+            .price(25.0)
+            .format(BookCopyFormat.PAPERBACK)
+            .status(BookCopyStatus.AVAILABLE)
+            .pageNumber(120)
+            .updatedAt(LocalDateTime.now())
+            .build();
 
     bookCopyResponse =
-            BookCopyResponse.builder()
-                    .id(copyId)
-                    .libraryId(libraryId)
-                    .bookId(bookId)
-                    .price(25.0)
-                    .format(BookCopyFormat.PAPERBACK)
-                    .status(BookCopyStatus.AVAILABLE)
-                    .pageNumber(120)
-                    .updatedAt(LocalDateTime.now())
-                    .build();
+        BookCopyResponse.builder()
+            .id(copyId)
+            .libraryId(libraryId)
+            .bookId(bookId)
+            .price(25.0)
+            .format(BookCopyFormat.PAPERBACK)
+            .status(BookCopyStatus.AVAILABLE)
+            .pageNumber(120)
+            .updatedAt(LocalDateTime.now())
+            .build();
   }
 
   @Test
@@ -89,19 +89,19 @@ public class GetBookCopyServiceTest {
     when(libraryRepository.existsById(libraryId)).thenReturn(true);
     when(bookCopyRepository.findByFilters(
             eq(libraryId), isNull(), isNull(), isNull(), any(Pageable.class)))
-            .thenReturn(bookCopyPage);
+        .thenReturn(bookCopyPage);
     when(bookCopyMapper.toResponse(bookCopy)).thenReturn(bookCopyResponse);
     when(paginationMapper.toPaginationDto(bookCopyPage, 1, 20)).thenReturn(pagination);
 
     PageResponse<BookCopyResponse> result =
-            bookCopyService.findByFilters(libraryId, null, null, null, 1, 20);
+        bookCopyService.findByFilters(libraryId, null, null, null, 1, 20);
 
     assertThat(result).isNotNull();
     assertThat(result.getData()).hasSize(1);
     assertThat(result.getData().get(0).getId()).isEqualTo(copyId);
     assertThat(result.getPagination().getTotal()).isEqualTo(1);
     verify(bookCopyRepository)
-            .findByFilters(eq(libraryId), isNull(), isNull(), isNull(), any(Pageable.class));
+        .findByFilters(eq(libraryId), isNull(), isNull(), isNull(), any(Pageable.class));
   }
 
   @Test
@@ -117,13 +117,13 @@ public class GetBookCopyServiceTest {
             eq(BookCopyFormat.PAPERBACK.name()),
             isNull(),
             any(Pageable.class)))
-            .thenReturn(bookCopyPage);
+        .thenReturn(bookCopyPage);
     when(bookCopyMapper.toResponse(bookCopy)).thenReturn(bookCopyResponse);
     when(paginationMapper.toPaginationDto(bookCopyPage, 1, 20)).thenReturn(pagination);
 
     PageResponse<BookCopyResponse> result =
-            bookCopyService.findByFilters(
-                    libraryId, BookCopyStatus.AVAILABLE, BookCopyFormat.PAPERBACK, null, 1, 20);
+        bookCopyService.findByFilters(
+            libraryId, BookCopyStatus.AVAILABLE, BookCopyFormat.PAPERBACK, null, 1, 20);
 
     assertThat(result.getData()).hasSize(1);
     assertThat(result.getData().get(0).getStatus()).isEqualTo(BookCopyStatus.AVAILABLE);
@@ -136,8 +136,8 @@ public class GetBookCopyServiceTest {
     when(libraryRepository.existsById(libraryId)).thenReturn(false);
 
     assertThatThrownBy(() -> bookCopyService.findByFilters(libraryId, null, null, null, 1, 20))
-            .isInstanceOf(NotFoundException.class)
-            .hasMessageContaining(libraryId.toString());
+        .isInstanceOf(NotFoundException.class)
+        .hasMessageContaining(libraryId.toString());
 
     verify(bookCopyRepository, never()).findByFilters(any(), any(), any(), any(), any());
   }
