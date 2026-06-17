@@ -45,8 +45,7 @@ class GetBookServiceTest {
   @BeforeEach
   void setUp() {
     bookService =
-        new BookService(
-            bookRepository, new BookMapper(),dataValidator, new PaginationMapper());
+        new BookService(bookRepository, new BookMapper(), dataValidator, new PaginationMapper());
 
     Author author =
         Author.builder()
