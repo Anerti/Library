@@ -59,6 +59,8 @@ public class LibraryService {
   @Transactional
   public LibraryResponse createLibrary(LibraryRequest request) {
     dataValidator.validateName("name", request.getName());
+    dataValidator.validateEmail(request.getEmail());
+    dataValidator.validatePhone(request.getPhone());
 
     return mapper.toResponse(
         repository
