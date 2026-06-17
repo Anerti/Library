@@ -1,5 +1,6 @@
 package hei.school.library.endpoint.rest.controller;
 
+import hei.school.library.dto.BookCopyRequest;
 import hei.school.library.dto.BookCopyResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.enums.BookCopyFormat;
@@ -11,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/api/libraries/{libraryId}/copies")
+@RequestMapping("/libraries/{libraryId}/copies")
 @RequiredArgsConstructor
 @RestController
 public class BookCopyController {
@@ -35,5 +36,12 @@ public class BookCopyController {
       @PathVariable UUID libraryId, @PathVariable UUID copyId) {
 
     return ResponseEntity.status(HttpStatus.OK).body(bookCopyService.findById(libraryId, copyId));
+  }
+
+  @PostMapping
+  public ResponseEntity<BookCopyResponse> create(
+      @PathVariable UUID libraryId, @RequestBody BookCopyRequest bookCopyRequest) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(bookCopyService.create(libraryId, bookCopyRequest));
   }
 }
