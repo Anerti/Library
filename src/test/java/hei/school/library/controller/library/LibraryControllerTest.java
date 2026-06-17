@@ -9,6 +9,7 @@ import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.endpoint.rest.controller.LibraryController;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.service.LibraryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,5 +65,20 @@ class LibraryControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isConflict());
+  }
+
+  @Test
+  void create_should_return_422_unprocessable_entity_when_service_validation_fails()
+      throws Exception {
+    LibraryRequest invalidRequest = new LibraryRequest();
+    invalidRequest.setName("Librairie Invalide");
+    when(libraryService.createLibrary(any(LibraryRequest.class)))
+        .thenThrow(new UnprocessableEntityException("Invalid phone format: 'abc'."));
+    mockMvc
+        .perform(
+            post("/libraries")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
+        .andExpect(status().isUnprocessableEntity());
   }
 }

@@ -19,8 +19,9 @@ public record LibraryController(LibraryService libraryService) {
 
     return ResponseEntity.ok(libraryService.listLibraries(search, page, size));
   }
-    @PostMapping
-    public ResponseEntity<?> create(@RequestBody LibraryRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(libraryService.createLibrary(request));
-    }
+
+  @PostMapping
+  public ResponseEntity<?> create(@RequestBody LibraryRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(libraryService.createLibrary(request));
+  }
 }

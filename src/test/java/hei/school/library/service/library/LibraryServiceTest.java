@@ -32,11 +32,12 @@ class LibraryServiceTest {
 
   @Mock private LibraryRepository repository;
   @Mock private LibraryMapper mapper;
-  @Mock private DataValidator dataValidator;
+  private DataValidator dataValidator;
   private LibraryService service;
 
   @BeforeEach
   void setUp() {
+    dataValidator = new DataValidator();
     service = new LibraryService(repository, dataValidator, mapper);
   }
 
@@ -45,9 +46,9 @@ class LibraryServiceTest {
     Library lib = aLibrary("Lib A", "a@mail.com", "123 Street");
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries(null, PageRequest.of(0, 20))).thenReturn(Optional.of(page));
+    when(repository.searchLibraries("Lib A", PageRequest.of(0, 20))).thenReturn(Optional.of(page));
 
-    Map<String, Object> result = service.listLibraries(null, 1, 20);
+    Map<String, Object> result = service.listLibraries("Lib A", 1, 20);
 
     assertSuccess(result, 1, 20, 1);
     LibraryResponse dto = ((List<LibraryResponse>) result.get("data")).get(0);
@@ -60,9 +61,9 @@ class LibraryServiceTest {
     Library lib = aLibrary("Lib A", "a@mail.com", "123 Street");
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries("", PageRequest.of(0, 20))).thenReturn(Optional.of(page));
+    when(repository.searchLibraries("Lib A", PageRequest.of(0, 20))).thenReturn(Optional.of(page));
 
-    Map<String, Object> result = service.listLibraries("", 1, 20);
+    Map<String, Object> result = service.listLibraries("Lib A", 1, 20);
 
     assertSuccess(result, 1, 20, 1);
   }
@@ -94,9 +95,6 @@ class LibraryServiceTest {
 
   @Test
   void should_throw_when_search_contains_invalid_characters() {
-    doThrow(new UnprocessableEntityException("Search contains invalid characters"))
-        .when(dataValidator)
-        .validateString("search", "library!</>");
     UnprocessableEntityException ex =
         assertThrows(
             UnprocessableEntityException.class, () -> service.listLibraries("library!</>", 1, 20));
@@ -112,7 +110,7 @@ class LibraryServiceTest {
 
     when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(Optional.of(page));
 
-    service.listLibraries(null, 3, 10);
+    service.listLibraries("Lib", 3, 10);
 
     ArgumentCaptor<PageRequest> captor = ArgumentCaptor.forClass(PageRequest.class);
     verify(repository).searchLibraries(any(), captor.capture());
@@ -142,7 +140,7 @@ class LibraryServiceTest {
 
     when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(Optional.of(page));
 
-    Map<String, Object> result = service.listLibraries(null, 1, 20);
+    Map<String, Object> result = service.listLibraries("Main Library", 1, 20);
 
     LibraryResponse dto = ((List<LibraryResponse>) result.get("data")).get(0);
     assertEquals(id, dto.getId());
@@ -159,7 +157,7 @@ class LibraryServiceTest {
 
     when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(Optional.of(page));
 
-    Map<String, Object> result = service.listLibraries(null, 2, 5);
+    Map<String, Object> result = service.listLibraries("Lib", 2, 5);
 
     @SuppressWarnings("unchecked")
     Map<String, Object> pagination = (Map<String, Object>) result.get("pagination");
@@ -187,13 +185,12 @@ class LibraryServiceTest {
   void should_create_library() {
     LibraryRequest request = new LibraryRequest();
     request.setName("Central Library");
-    request.setPhone("0123456789");
     request.setEmail("contact@central.com");
     request.setAddress("123 Main St");
+    request.setPhone("+261340000000");
 
     Library savedLibrary = new Library();
     LibraryResponse expectedResponse = new LibraryResponse();
-    doNothing().when(dataValidator).validateName("name", request.getName());
 
     when(repository.insertLibraryIgnoreConflict(
             request.getName(), request.getPhone(), request.getEmail(), request.getAddress()))
@@ -203,7 +200,6 @@ class LibraryServiceTest {
     LibraryResponse actualResponse = service.createLibrary(request);
 
     assertNotNull(actualResponse);
-    verify(dataValidator, times(1)).validateName("name", request.getName());
     verify(repository, times(1))
         .insertLibraryIgnoreConflict(
             request.getName(), request.getPhone(), request.getEmail(), request.getAddress());
@@ -211,12 +207,13 @@ class LibraryServiceTest {
   }
 
   @Test
-  void should_throw_conflict_exception() {
+  void should_throw_conflict_exception_when__library_already_exists() {
     LibraryRequest request = new LibraryRequest();
     request.setName("Central Library");
     request.setEmail("contact@central.com");
+    request.setAddress("123 Main St");
+    request.setPhone("+261340000000");
 
-    doNothing().when(dataValidator).validateName("name", request.getName());
     when(repository.insertLibraryIgnoreConflict(any(), any(), any(), any()))
         .thenReturn(Optional.empty());
     ConflictException exception =
@@ -228,5 +225,63 @@ class LibraryServiceTest {
 
     assertEquals("Library with email contact@central.com already exists", exception.getMessage());
     verify(mapper, never()).toResponse(any());
+  }
+
+  @Test
+  void createLibrary_should_throw_UnprocessableEntityException_when_name_is_invalid() {
+    LibraryRequest badRequest = new LibraryRequest();
+    badRequest.setName("Librairie_Invalide#");
+    badRequest.setEmail("contact@library.com");
+    badRequest.setPhone("+261340000000");
+    badRequest.setAddress("123 Rue de l'Independance");
+
+    UnprocessableEntityException exception =
+        assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
+
+    assertTrue(exception.getMessage().contains("forbidden characters"));
+    verifyNoInteractions(repository);
+  }
+
+  @Test
+  void createLibrary_should_throw_UnprocessableEntityException_when_email_is_missing() {
+    LibraryRequest badRequest = new LibraryRequest();
+    badRequest.setName("Librairie Generale");
+    badRequest.setEmail("   ");
+    badRequest.setPhone("+261340000000");
+    badRequest.setAddress("123 Rue de l'Independance");
+
+    UnprocessableEntityException exception =
+        assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
+
+    assertEquals("email is required.", exception.getMessage());
+    verifyNoInteractions(repository);
+  }
+
+  @Test
+  void createLibrary_should_throw_UnprocessableEntityException_when_phone_format_is_invalid() {
+    LibraryRequest badRequest = new LibraryRequest();
+    badRequest.setName("Librairie Generale");
+    badRequest.setEmail("contact@library.com");
+    badRequest.setPhone("abc12345");
+    badRequest.setAddress("123 Rue de l'Independance");
+    UnprocessableEntityException exception =
+        assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
+
+    assertTrue(exception.getMessage().contains("Invalid phone format"));
+    verifyNoInteractions(repository);
+  }
+
+  @Test
+  void createLibrary_should_throw_UnprocessableEntityException_when_address_format_is_missing() {
+    LibraryRequest badRequest = new LibraryRequest();
+    badRequest.setName("Librairie Generale");
+    badRequest.setEmail("contact@library.com");
+    badRequest.setPhone("+261340000000");
+    badRequest.setAddress("");
+    UnprocessableEntityException exception =
+        assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
+
+    assertEquals("address is required.", exception.getMessage());
+    verifyNoInteractions(repository);
   }
 }
