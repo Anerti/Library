@@ -4,7 +4,6 @@ import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerResponse;
 import hei.school.library.dto.CustomerUpdateRequest;
 import hei.school.library.dto.PageResponse;
-import hei.school.library.entity.Customer;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.CustomerMapper;
