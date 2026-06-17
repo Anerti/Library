@@ -53,7 +53,11 @@ public class DataValidator {
   }
 
   public void validatePhone(String phone) {
-    if (phone != null && !phone.isBlank() && !VALID_PHONE_PATTERN.matcher(phone).matches()) {
+      if (phone == null || phone.isBlank()) {
+          throw new UnprocessableEntityException("Phone number is required.");
+      }
+
+    if (!VALID_PHONE_PATTERN.matcher(phone).matches()) {
       throw new UnprocessableEntityException(
           String.format(
               "Invalid phone format: '%s'. Only +, digits, spaces, hyphens and parentheses are"

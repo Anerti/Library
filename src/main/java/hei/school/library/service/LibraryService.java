@@ -58,6 +58,7 @@ public class LibraryService {
 
   @Transactional
   public LibraryResponse createLibrary(LibraryRequest request) {
+      dataValidator.validateString("address", request.getAddress());
     dataValidator.validateName("name", request.getName());
     dataValidator.validateEmail(request.getEmail());
     dataValidator.validatePhone(request.getPhone());
