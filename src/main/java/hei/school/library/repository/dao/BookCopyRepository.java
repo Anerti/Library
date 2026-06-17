@@ -25,7 +25,7 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, UUID> {
           """,
       countQuery =
           """
-          SELECT COUNT(*) FROM book_copy bc
+          SELECT COUNT(id) FROM book_copy bc
           WHERE bc.library_id = CAST(:libraryId AS uuid)
           AND (:status IS NULL OR bc.status = :status)
           AND (:format IS NULL OR bc.format = :format)
