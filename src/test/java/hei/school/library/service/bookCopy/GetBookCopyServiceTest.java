@@ -113,8 +113,8 @@ public class GetBookCopyServiceTest {
     when(libraryRepository.existsById(libraryId)).thenReturn(true);
     when(bookCopyRepository.findByFilters(
             eq(libraryId),
-            eq(BookCopyStatus.AVAILABLE),
-            eq(BookCopyFormat.PAPERBACK),
+            eq(BookCopyStatus.AVAILABLE.name()),
+            eq(BookCopyFormat.PAPERBACK.name()),
             isNull(),
             any(Pageable.class)))
         .thenReturn(bookCopyPage);

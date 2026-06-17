@@ -44,7 +44,12 @@ public class BookCopyService {
 
     Pageable pageable = PageRequest.of(page - 1, size);
     Page<BookCopy> bookCopyPage =
-        bookCopyRepository.findByFilters(libraryId, status, format, bookId, pageable);
+        bookCopyRepository.findByFilters(
+            libraryId,
+            status != null ? status.name() : null,
+            format != null ? format.name() : null,
+            bookId != null ? bookId.toString() : null,
+            pageable);
     List<BookCopyResponse> bookCopyResponses =
         bookCopyPage.getContent().stream().map(bookCopyMapper::toResponse).toList();
 
