@@ -35,12 +35,14 @@ class PostCustomersServiceTest {
 
   @BeforeEach
   void setUp() {
-    CustomerMapper customerMapper = new CustomerMapper(new PaginationMapper());
-    customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
+    customerService =
+        new CustomerService(
+            customerRepository, new CustomerMapper(new PaginationMapper()), dataValidator);
 
+    UUID id = UUID.randomUUID();
     customer =
         new Customer(
-            UUID.randomUUID(),
+            id,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),

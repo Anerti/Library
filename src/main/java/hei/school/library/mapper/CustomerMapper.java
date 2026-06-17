@@ -1,5 +1,6 @@
 package hei.school.library.mapper;
 
+import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Customer;
@@ -24,6 +25,18 @@ public class CustomerMapper {
         .createdAt(customer.getCreatedAt())
         .updatedAt(customer.getUpdatedAt())
         .build();
+  }
+
+  public Customer toEntity(CustomerRequest request) {
+    return new Customer(
+        null,
+        request.getLastName(),
+        request.getFirstName(),
+        request.getBirthDate(),
+        request.getEmail(),
+        request.getPhone(),
+        null,
+        null);
   }
 
   public PageResponse<CustomerResponse> toPageResponse(

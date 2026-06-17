@@ -37,6 +37,29 @@ WHERE (:search IS NULL OR :search = ''
   @Query(
       value =
           """
+          UPDATE customer
+          SET
+            last_name = COALESCE(:lastName, last_name),
+            first_name = COALESCE(:firstName, first_name),
+            birth_date = COALESCE(:birthDate, birth_date),
+            email = COALESCE(:email, email),
+            phone = COALESCE(:phone, phone),
+            updated_at = NOW()
+          WHERE id = :id
+          RETURNING id, last_name, first_name, birth_date, email, phone, created_at, updated_at
+          """,
+      nativeQuery = true)
+  Optional<Customer> patch(
+      @Param("id") UUID id,
+      @Param("lastName") String lastName,
+      @Param("firstName") String firstName,
+      @Param("birthDate") LocalDate birthDate,
+      @Param("email") String email,
+      @Param("phone") String phone);
+
+  @Query(
+      value =
+          """
           INSERT INTO customer (last_name, first_name, birth_date, email, phone)
           VALUES (:lastName, :firstName, :birthDate, :email, :phone)
           ON CONFLICT (email) DO NOTHING
