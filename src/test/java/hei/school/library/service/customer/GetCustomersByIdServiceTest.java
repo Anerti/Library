@@ -24,7 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class GetCustomersByIdServiceTest {
 
   @Mock private CustomerRepository customerRepository;
-  @Mock private DataValidator dataValidator;
+
   private CustomerService customerService;
 
   private UUID existingId;
@@ -33,8 +33,9 @@ class GetCustomersByIdServiceTest {
 
   @BeforeEach
   void setUp() {
-    CustomerMapper customerMapper = new CustomerMapper(new PaginationMapper());
-    customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
+    customerService =
+        new CustomerService(
+            customerRepository, new CustomerMapper(new PaginationMapper()), new DataValidator());
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
@@ -45,7 +46,7 @@ class GetCustomersByIdServiceTest {
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "+261331234567",
+            "+261****4567",
             Instant.now(),
             Instant.now());
   }

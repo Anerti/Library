@@ -1,6 +1,7 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.BookCopy;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +25,7 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, UUID> {
           """,
       countQuery =
           """
-          SELECT COUNT(*) FROM book_copy bc
+          SELECT COUNT(id) FROM book_copy bc
           WHERE bc.library_id = CAST(:libraryId AS uuid)
           AND (:status IS NULL OR bc.status = :status)
           AND (:format IS NULL OR bc.format = :format)
@@ -37,4 +38,19 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, UUID> {
       @Param("format") String format,
       @Param("bookId") String bookId,
       Pageable pageable);
+
+  @Query(
+      value =
+          """
+          INSERT INTO book_copy (id, price, format, library_id, book_id, status, page_number, updated_at)
+          VALUES (gen_random_uuid(), :price, :format, :libraryId, :bookId, 'AVAILABLE', :pageNumber, now())
+          RETURNING id, price, format, library_id, book_id, status, page_number, updated_at
+          """,
+      nativeQuery = true)
+  Optional<BookCopy> create(
+      @Param("price") Double price,
+      @Param("format") String format,
+      @Param("libraryId") UUID libraryId,
+      @Param("bookId") UUID bookId,
+      @Param("pageNumber") Integer pageNumber);
 }

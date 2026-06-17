@@ -3,6 +3,7 @@ package hei.school.library.validator;
 import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookUpdateRequest;
 import hei.school.library.dto.CustomerRequest;
+import hei.school.library.dto.CustomerUpdateRequest;
 import hei.school.library.entity.Book;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ public class DataValidator {
       Pattern.compile("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z]+){1,2}$");
   private static final Pattern ALLOWED_EMAIL_CHAR = Pattern.compile("^[a-zA-Z0-9.@_-]+$");
   private static final Pattern SAFE_ISBN = Pattern.compile("^[0-9Xx-]{10,}$");
+  private static final Pattern VALID_PHONE_PATTERN = Pattern.compile("^[0-9 +]{7,30}$");
 
   public void validateString(String fieldName, String value) {
     if (value != null && !value.isBlank() && !SAFE_STRING.matcher(value).matches()) {
@@ -31,7 +33,7 @@ public class DataValidator {
   }
 
   public void validateEmail(String email) {
-    if (email == null && email.isBlank()) {
+    if (email == null || email.isBlank()) {
       throw new UnprocessableEntityException("email is required.");
     }
 
@@ -47,6 +49,16 @@ public class DataValidator {
 
     if (!VALID_EMAIL_PATTERN.matcher(email).matches()) {
       throw new UnprocessableEntityException(String.format("Invalid email format: '%s'", email));
+    }
+  }
+
+  public void validatePhone(String phone) {
+    if (phone != null && !phone.isBlank() && !VALID_PHONE_PATTERN.matcher(phone).matches()) {
+      throw new UnprocessableEntityException(
+          String.format(
+              "Invalid phone format: '%s'. Only +, digits, spaces, hyphens and parentheses are"
+                  + " allowed.",
+              phone));
     }
   }
 
@@ -144,6 +156,43 @@ public class DataValidator {
     }
     if (request.getPublishedAt() != null) {
       book.setPublishedAt(request.getPublishedAt());
+    }
+  }
+
+  public void validateCustomerUpdate(CustomerUpdateRequest request) {
+    if (request.getLastName() == null
+        && request.getFirstName() == null
+        && request.getBirthDate() == null
+        && request.getEmail() == null
+        && request.getPhone() == null) {
+      throw new UnprocessableEntityException("At least one field is required.");
+    }
+    if (request.getLastName() != null && request.getLastName().length() > 100) {
+      throw new UnprocessableEntityException("lastName cannot be longer than 100 characters.");
+    }
+    if (request.getFirstName() != null && request.getFirstName().length() > 100) {
+      throw new UnprocessableEntityException("firstName cannot be longer than 100 characters.");
+    }
+    if (request.getEmail() != null && request.getEmail().length() > 100) {
+      throw new UnprocessableEntityException("email cannot be longer than 100 characters.");
+    }
+    if (request.getBirthDate() != null && request.getBirthDate().isAfter(LocalDate.now())) {
+      throw new UnprocessableEntityException("birthDate cannot be in the future.");
+    }
+  }
+
+  public void validateCustomerPatchFields(CustomerUpdateRequest request) {
+    if (request.getLastName() != null) {
+      validateName("lastName", request.getLastName());
+    }
+    if (request.getFirstName() != null) {
+      validateName("firstName", request.getFirstName());
+    }
+    if (request.getEmail() != null) {
+      validateEmail(request.getEmail());
+    }
+    if (request.getPhone() != null) {
+      validatePhone(request.getPhone());
     }
   }
 }

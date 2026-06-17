@@ -33,8 +33,9 @@ class GetCustomersServiceTest {
 
   @BeforeEach
   void setUp() {
-    CustomerMapper customerMapper = new CustomerMapper(new PaginationMapper());
-    customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
+    customerService =
+        new CustomerService(
+            customerRepository, new CustomerMapper(new PaginationMapper()), dataValidator);
 
     customer =
         new Customer(
@@ -43,7 +44,7 @@ class GetCustomersServiceTest {
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "+261331234567",
+            "+261****4567",
             Instant.now(),
             Instant.now());
   }
