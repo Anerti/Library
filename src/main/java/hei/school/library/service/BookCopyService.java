@@ -31,12 +31,12 @@ public class BookCopyService {
   private final PaginationMapper paginationMapper;
 
   public PageResponse<BookCopyResponse> findByFilters(
-      UUID libraryId,
-      BookCopyStatus status,
-      BookCopyFormat format,
-      UUID bookId,
-      int page,
-      int size) {
+          UUID libraryId,
+          BookCopyStatus status,
+          BookCopyFormat format,
+          UUID bookId,
+          int page,
+          int size) {
 
     if (!libraryRepository.existsById(libraryId)) {
       throw new NotFoundException("Library with id " + libraryId + " not found");
@@ -44,16 +44,21 @@ public class BookCopyService {
 
     Pageable pageable = PageRequest.of(page - 1, size);
     Page<BookCopy> bookCopyPage =
-        bookCopyRepository.findByFilters(libraryId, status, format, bookId, pageable);
+            bookCopyRepository.findByFilters(
+                    libraryId,
+                    status != null ? status.name() : null,
+                    format != null ? format.name() : null,
+                    bookId != null ? bookId.toString() : null,
+                    pageable);
     List<BookCopyResponse> bookCopyResponses =
-        bookCopyPage.getContent().stream().map(bookCopyMapper::toResponse).toList();
+            bookCopyPage.getContent().stream().map(bookCopyMapper::toResponse).toList();
 
     PaginationDto pagination = paginationMapper.toPaginationDto(bookCopyPage, page, size);
 
     return PageResponse.<BookCopyResponse>builder()
-        .data(bookCopyResponses)
-        .pagination(pagination)
-        .build();
+            .data(bookCopyResponses)
+            .pagination(pagination)
+            .build();
   }
 
   public BookCopyResponse findById(UUID libraryId, UUID copyId) {
