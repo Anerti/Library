@@ -1,8 +1,13 @@
 package hei.school.library.service;
 
+import hei.school.library.dto.GenreRequest;
+import hei.school.library.dto.GenreResponse;
+import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.entity.Library;
+import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
+import hei.school.library.mapper.LibraryMapper;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.validator.DataValidator;
 import java.util.List;
@@ -17,10 +22,12 @@ public class LibraryService {
 
   private final LibraryRepository repository;
   private final DataValidator dataValidator;
+  private final LibraryMapper mapper;
 
-  public LibraryService(LibraryRepository repository, DataValidator dataValidator) {
+  public LibraryService(LibraryRepository repository, DataValidator dataValidator,  LibraryMapper mapper) {
     this.repository = repository;
     this.dataValidator = dataValidator;
+    this.mapper = mapper;
   }
 
   @Transactional(readOnly = true)
@@ -49,4 +56,14 @@ public class LibraryService {
         "pagination",
         Map.of("page", page, "size", size, "total", libraryPage.getTotalElements()));
   }
+    @Transactional
+    public LibraryResponse createLibrary(LibraryRequest request) {
+        dataValidator.validateName("name", request.getName());
+
+        return mapper.toResponse(
+                repository
+                        .insertLibraryIgnoreConflict(request.getName(), request.getPhone(), request.getEmail(), request.getAddress())
+                        .orElseThrow(
+                                () -> new ConflictException("Library with email " + request.getEmail() + " already exists")));
+    }
 }
