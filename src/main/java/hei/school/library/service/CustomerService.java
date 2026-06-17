@@ -62,12 +62,18 @@ public class CustomerService {
 
   @Transactional
   public CustomerResponse update(UUID id, CustomerUpdateRequest request) {
-    Customer customer =
-        customerRepository
-            .findById(id)
-            .orElseThrow(() -> new NotFoundException("Customer " + id + " not found"));
+    dataValidator.validateCustomerUpdate(request);
+    dataValidator.validateCustomerPatchFields(request);
 
-    dataValidator.validatePatchCustomer(request, customer);
-    return customerMapper.toResponse(customerRepository.save(customer));
+    return customerRepository
+        .patch(
+            id,
+            request.getLastName(),
+            request.getFirstName(),
+            request.getBirthDate(),
+            request.getEmail(),
+            request.getPhone())
+        .map(customerMapper::toResponse)
+        .orElseThrow(() -> new NotFoundException("Customer " + id + " not found"));
   }
 }

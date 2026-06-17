@@ -21,6 +21,8 @@ public class DataValidator {
       Pattern.compile("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z]+){1,2}$");
   private static final Pattern ALLOWED_EMAIL_CHAR = Pattern.compile("^[a-zA-Z0-9.@_-]+$");
   private static final Pattern SAFE_ISBN = Pattern.compile("^[0-9Xx-]{10,}$");
+  private static final Pattern VALID_PHONE_PATTERN =
+      Pattern.compile("^[0-9 +]{7,30}$");
 
   public void validateString(String fieldName, String value) {
     if (value != null && !value.isBlank() && !SAFE_STRING.matcher(value).matches()) {
@@ -49,6 +51,13 @@ public class DataValidator {
 
     if (!VALID_EMAIL_PATTERN.matcher(email).matches()) {
       throw new UnprocessableEntityException(String.format("Invalid email format: '%s'", email));
+    }
+  }
+
+  public void validatePhone(String phone) {
+    if (phone != null && !phone.isBlank() && !VALID_PHONE_PATTERN.matcher(phone).matches()) {
+      throw new UnprocessableEntityException(
+          String.format("Invalid phone format: '%s'. Only +, digits, spaces, hyphens and parentheses are allowed.", phone));
     }
   }
 
@@ -171,26 +180,18 @@ public class DataValidator {
     }
   }
 
-  public void validatePatchCustomer(CustomerUpdateRequest request, Customer customer) {
-    validateCustomerUpdate(request);
-
+  public void validateCustomerPatchFields(CustomerUpdateRequest request) {
     if (request.getLastName() != null) {
       validateName("lastName", request.getLastName());
-      customer.setLastName(request.getLastName());
     }
     if (request.getFirstName() != null) {
       validateName("firstName", request.getFirstName());
-      customer.setFirstName(request.getFirstName());
-    }
-    if (request.getBirthDate() != null) {
-      customer.setBirthDate(request.getBirthDate());
     }
     if (request.getEmail() != null) {
       validateEmail(request.getEmail());
-      customer.setEmail(request.getEmail());
     }
     if (request.getPhone() != null) {
-      customer.setPhone(request.getPhone());
+      validatePhone(request.getPhone());
     }
   }
 }
