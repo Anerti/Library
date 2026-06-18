@@ -1,14 +1,18 @@
 package hei.school.library.mapper;
 
+import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerResponse;
 import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.PaginationDto;
 import hei.school.library.entity.Customer;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class CustomerMapper {
+
+  private final PaginationMapper paginationMapper;
 
   public CustomerResponse toResponse(Customer customer) {
     return CustomerResponse.builder()
@@ -23,16 +27,23 @@ public class CustomerMapper {
         .build();
   }
 
+  public Customer toEntity(CustomerRequest request) {
+    return new Customer(
+        null,
+        request.getLastName(),
+        request.getFirstName(),
+        request.getBirthDate(),
+        request.getEmail(),
+        request.getPhone(),
+        null,
+        null);
+  }
+
   public PageResponse<CustomerResponse> toPageResponse(
       Page<Customer> page, int pageNum, int pageSize) {
     return PageResponse.<CustomerResponse>builder()
         .data(page.getContent().stream().map(this::toResponse).toList())
-        .pagination(
-            PaginationDto.builder()
-                .page(pageNum)
-                .size(pageSize)
-                .total(page.getTotalElements())
-                .build())
+        .pagination(paginationMapper.toPaginationDto(page, pageNum, pageSize))
         .build();
   }
 }

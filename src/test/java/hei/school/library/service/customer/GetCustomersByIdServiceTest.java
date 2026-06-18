@@ -7,6 +7,7 @@ import hei.school.library.dto.CustomerResponse;
 import hei.school.library.entity.Customer;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.CustomerMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.service.CustomerService;
 import hei.school.library.validator.DataValidator;
@@ -23,7 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class GetCustomersByIdServiceTest {
 
   @Mock private CustomerRepository customerRepository;
-  @Mock private DataValidator dataValidator;
+
   private CustomerService customerService;
 
   private UUID existingId;
@@ -32,8 +33,9 @@ class GetCustomersByIdServiceTest {
 
   @BeforeEach
   void setUp() {
-    CustomerMapper customerMapper = new CustomerMapper();
-    customerService = new CustomerService(customerRepository, customerMapper, dataValidator);
+    customerService =
+        new CustomerService(
+            customerRepository, new CustomerMapper(new PaginationMapper()), new DataValidator());
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
@@ -44,8 +46,7 @@ class GetCustomersByIdServiceTest {
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "hashed_pw",
-            "+261331234567",
+            "+261****4567",
             Instant.now(),
             Instant.now());
   }

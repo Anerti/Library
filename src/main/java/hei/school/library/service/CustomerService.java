@@ -1,7 +1,10 @@
 package hei.school.library.service;
 
+import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerResponse;
+import hei.school.library.dto.CustomerUpdateRequest;
 import hei.school.library.dto.PageResponse;
+import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.repository.dao.CustomerRepository;
@@ -35,6 +38,40 @@ public class CustomerService {
   public CustomerResponse findById(UUID id) {
     return customerRepository
         .findById(id)
+        .map(customerMapper::toResponse)
+        .orElseThrow(() -> new NotFoundException("Customer " + id + " not found"));
+  }
+
+  @Transactional
+  public CustomerResponse create(CustomerRequest request) {
+    dataValidator.validateCustomer(request);
+
+    return customerRepository
+        .create(
+            request.getLastName(),
+            request.getFirstName(),
+            request.getBirthDate(),
+            request.getEmail(),
+            request.getPhone())
+        .map(customerMapper::toResponse)
+        .orElseThrow(
+            () ->
+                new ConflictException("Customer email " + request.getEmail() + " already exists"));
+  }
+
+  @Transactional
+  public CustomerResponse update(UUID id, CustomerUpdateRequest request) {
+    dataValidator.validateCustomerUpdate(request);
+    dataValidator.validateCustomerPatchFields(request);
+
+    return customerRepository
+        .patch(
+            id,
+            request.getLastName(),
+            request.getFirstName(),
+            request.getBirthDate(),
+            request.getEmail(),
+            request.getPhone())
         .map(customerMapper::toResponse)
         .orElseThrow(() -> new NotFoundException("Customer " + id + " not found"));
   }

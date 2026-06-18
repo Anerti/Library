@@ -9,6 +9,7 @@ import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Author;
 import hei.school.library.mapper.AuthorMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.service.AuthorService;
 import hei.school.library.validator.AuthorValidator;
@@ -37,7 +38,7 @@ class GetAuthorsServiceTest {
 
   @BeforeEach
   void setUp() {
-    AuthorMapper authorMapper = new AuthorMapper();
+    AuthorMapper authorMapper = new AuthorMapper(new PaginationMapper());
     authorService =
         new AuthorService(authorRepository, authorValidator, authorMapper, dataValidator);
 
