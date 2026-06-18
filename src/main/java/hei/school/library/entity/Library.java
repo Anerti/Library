@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Library {
 
   @Id
