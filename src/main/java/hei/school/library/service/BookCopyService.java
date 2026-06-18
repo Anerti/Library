@@ -108,4 +108,14 @@ public class BookCopyService {
 
     return bookCopyMapper.toResponse(bookCopyRepository.save(bookCopy));
   }
+
+  public void delete(UUID libraryId, UUID copyId) {
+    if (!libraryRepository.existsById(libraryId)) {
+      throw new NotFoundException("Library with id " + libraryId + " not found");
+    }
+    if (!bookCopyRepository.existsById(copyId)) {
+      throw new NotFoundException("BookCopy with id " + copyId + " not found");
+    }
+    bookCopyRepository.deleteById(copyId);
+  }
 }
