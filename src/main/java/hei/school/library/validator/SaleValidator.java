@@ -1,6 +1,7 @@
 package hei.school.library.validator;
 
 import hei.school.library.dto.SaleRequest;
+import hei.school.library.dto.SaleUpdateRequest;
 import hei.school.library.exception.UnprocessableEntityException;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,12 @@ public class SaleValidator {
     }
     if (request.getCustomer().getBirthDate().isAfter(java.time.LocalDate.now())) {
       throw new UnprocessableEntityException("customer.birthDate cannot be in the future.");
+    }
+  }
+
+  public void validateUpdate(SaleUpdateRequest request) {
+    if (request.getStatus() == null && request.getSaleDate() == null) {
+      throw new UnprocessableEntityException("At least one field is required.");
     }
   }
 }

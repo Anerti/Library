@@ -197,4 +197,24 @@ public class SaleService {
 
     return saleMapper.toResponse(sale, customerResponse, libraryResponse);
   }
+
+  @Transactional
+  public SaleResponse update(UUID libraryId, UUID saleId, SaleUpdateRequest request) {
+    saleValidator.validateUpdate(request);
+
+    libraryRepository
+        .findById(libraryId)
+        .orElseThrow(() -> new NotFoundException("Library " + libraryId + " not found"));
+
+    Sale sale =
+        saleRepository
+            .findById(saleId)
+            .orElseThrow(() -> new NotFoundException("Sale " + saleId + " not found"));
+
+    if (request.getStatus() != null) sale.setStatus(request.getStatus());
+    if (request.getSaleDate() != null) sale.setSaleDate(request.getSaleDate());
+
+    Sale updated = saleRepository.save(sale);
+    return buildSaleResponse(updated);
+  }
 }
