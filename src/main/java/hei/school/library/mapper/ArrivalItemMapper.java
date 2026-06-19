@@ -6,14 +6,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ArrivalItemMapper {
-    public ArrivalItemResponse toResponse(ArrivalItem item) {
-        return ArrivalItemResponse.builder()
-                .bookCopyId(item.getBookCopy().getId())
-                .arrivalId(item.getArrival().getId())
-                .createdAt(item.getCreatedAt())
-                .purchasePrice(item.getPurchasePrice())
-                .quantity(item.getQuantity())
-                .updatedAt(item.getUpdatedAt())
-                .build();
-    }
+  public ArrivalItemResponse toResponse(ArrivalItem item) {
+    return ArrivalItemResponse.builder()
+        .bookCopyId(item.getBookCopy().getId())
+        .arrivalId(item.getArrival().getId())
+        .createdAt(item.getCreatedAt())
+        .purchasePrice(item.getPurchasePrice())
+        .quantity(item.getQuantity())
+        .updatedAt(item.getUpdatedAt())
+        .build();
+  }
 }
