@@ -2,6 +2,7 @@ package hei.school.library.repository.dao;
 
 import hei.school.library.entity.Sale;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,4 +41,19 @@ public interface SaleRepository extends JpaRepository<Sale, UUID> {
       @Param("from") Instant from,
       @Param("to") Instant to,
       Pageable pageable);
+
+  @Query(
+      value =
+          """
+          INSERT INTO sale (sale_date, status, customer_id, library_id, expiration_date)
+          VALUES (:saleDate, :status, :customerId, :libraryId, :expirationDate)
+          RETURNING *
+          """,
+      nativeQuery = true)
+  Optional<Sale> create(
+      @Param("saleDate") Instant saleDate,
+      @Param("status") String status,
+      @Param("customerId") UUID customerId,
+      @Param("libraryId") UUID libraryId,
+      @Param("expirationDate") Instant expirationDate);
 }

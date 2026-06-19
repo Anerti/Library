@@ -72,4 +72,7 @@ WHERE (:search IS NULL OR :search = ''
       @Param("birthDate") LocalDate birthDate,
       @Param("email") String email,
       @Param("phone") String phone);
+
+  @Query(value = "SELECT * FROM customer WHERE email = :email", nativeQuery = true)
+  Optional<Customer> findByEmail(@Param("email") String email);
 }

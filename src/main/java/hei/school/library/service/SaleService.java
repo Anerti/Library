@@ -1,9 +1,6 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.CustomerResponse;
-import hei.school.library.dto.LibraryResponse;
-import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.SaleResponse;
+import hei.school.library.dto.*;
 import hei.school.library.entity.Customer;
 import hei.school.library.entity.Library;
 import hei.school.library.entity.Sale;
@@ -108,6 +105,79 @@ public class SaleService {
             .orElseThrow(
                 () -> new NotFoundException("Customer " + sale.getCustomerId() + " not found"));
 
+    Library library =
+        libraryRepository
+            .findById(sale.getLibraryId())
+            .orElseThrow(
+                () -> new NotFoundException("Library " + sale.getLibraryId() + " not found"));
+
+    CustomerResponse customerResponse = customerMapper.toResponse(customer);
+    LibraryResponse libraryResponse =
+        new LibraryResponse(
+            library.getId(),
+            library.getName(),
+            library.getPhone(),
+            library.getEmail(),
+            library.getAddress());
+
+    return saleMapper.toResponse(sale, customerResponse, libraryResponse);
+  }
+
+  @Transactional
+  public SaleResponse create(UUID libraryId, SaleRequest request) {
+    saleValidator.validateCreate(request);
+
+    Library library =
+        libraryRepository
+            .findById(libraryId)
+            .orElseThrow(() -> new NotFoundException("Library " + libraryId + " not found"));
+
+    CustomerRequest customerRequest = request.getCustomer();
+    Customer customer =
+        customerRepository
+            .findByEmail(customerRequest.getEmail())
+            .orElseGet(
+                () ->
+                    customerRepository
+                        .create(
+                            customerRequest.getLastName(),
+                            customerRequest.getFirstName(),
+                            customerRequest.getBirthDate(),
+                            customerRequest.getEmail(),
+                            customerRequest.getPhone())
+                        .orElseThrow(
+                            () ->
+                                new NotFoundException(
+                                    "Failed to create customer with email "
+                                        + customerRequest.getEmail())));
+
+    Instant saleDate = request.getSaleDate() != null ? request.getSaleDate() : Instant.now();
+    SaleStatus status = request.getStatus() != null ? request.getStatus() : SaleStatus.BOOKED;
+    Instant expirationDate = saleDate.plus(14, java.time.temporal.ChronoUnit.DAYS);
+
+    Sale sale =
+        saleRepository
+            .create(saleDate, status.name(), customer.getId(), libraryId, expirationDate)
+            .orElseThrow(() -> new NotFoundException("Failed to create sale"));
+
+    CustomerResponse customerResponse = customerMapper.toResponse(customer);
+    LibraryResponse libraryResponse =
+        new LibraryResponse(
+            library.getId(),
+            library.getName(),
+            library.getPhone(),
+            library.getEmail(),
+            library.getAddress());
+
+    return saleMapper.toResponse(sale, customerResponse, libraryResponse);
+  }
+
+  private SaleResponse buildSaleResponse(Sale sale) {
+    Customer customer =
+        customerRepository
+            .findById(sale.getCustomerId())
+            .orElseThrow(
+                () -> new NotFoundException("Customer " + sale.getCustomerId() + " not found"));
     Library library =
         libraryRepository
             .findById(sale.getLibraryId())
