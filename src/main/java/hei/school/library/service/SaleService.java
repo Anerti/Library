@@ -11,6 +11,7 @@ import hei.school.library.mapper.SaleMapper;
 import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.repository.dao.SaleRepository;
+import hei.school.library.validator.SaleValidator;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class SaleService {
   private final LibraryRepository libraryRepository;
   private final CustomerMapper customerMapper;
   private final SaleMapper saleMapper;
+  private final SaleValidator saleValidator;
 
   @Transactional(readOnly = true)
   public PageResponse<SaleResponse> findAll(

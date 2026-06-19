@@ -18,6 +18,7 @@ import hei.school.library.repository.dao.CustomerRepository;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.repository.dao.SaleRepository;
 import hei.school.library.service.SaleService;
+import hei.school.library.validator.SaleValidator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -36,6 +37,7 @@ class GetSalesServiceTest {
   @Mock private CustomerRepository customerRepository;
   @Mock private LibraryRepository libraryRepository;
   @Mock private CustomerMapper customerMapper;
+  @Mock private SaleValidator saleValidator;
   private SaleMapper saleMapper;
   private SaleService saleService;
 
@@ -52,7 +54,12 @@ class GetSalesServiceTest {
     saleMapper = new SaleMapper();
     saleService =
         new SaleService(
-            saleRepository, customerRepository, libraryRepository, customerMapper, saleMapper);
+            saleRepository,
+            customerRepository,
+            libraryRepository,
+            customerMapper,
+            saleMapper,
+            saleValidator);
 
     libraryId = UUID.randomUUID();
     saleId = UUID.randomUUID();

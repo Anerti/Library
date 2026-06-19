@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import hei.school.library.dto.CustomerRequest;
+import hei.school.library.dto.CustomerResponse;
 import hei.school.library.dto.SaleRequest;
 import hei.school.library.dto.SaleResponse;
 import hei.school.library.entity.Customer;
@@ -36,6 +37,8 @@ class PostSalesServiceTest {
   @Mock private CustomerRepository customerRepository;
   @Mock private LibraryRepository libraryRepository;
   @Mock private SaleValidator saleValidator;
+  @Mock private CustomerMapper customerMapper;
+  private SaleMapper saleMapper;
   private SaleService saleService;
 
   private UUID libraryId;
@@ -45,11 +48,11 @@ class PostSalesServiceTest {
   private Customer customer;
   private Sale sale;
   private SaleRequest validRequest;
+  private CustomerResponse customerResponse;
 
   @BeforeEach
   void setUp() {
-    CustomerMapper customerMapper = new CustomerMapper();
-    SaleMapper saleMapper = new SaleMapper();
+    saleMapper = new SaleMapper();
     saleService =
         new SaleService(
             saleRepository,
@@ -78,6 +81,17 @@ class PostSalesServiceTest {
         new Sale(
             saleId, Instant.now(), SaleStatus.BOOKED, customerId, libraryId, null, Instant.now());
 
+    customerResponse =
+        new CustomerResponse(
+            customerId,
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "marie@mail.com",
+            "+261331234567",
+            Instant.now(),
+            Instant.now());
+
     CustomerRequest customerRequest =
         new CustomerRequest(
             "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", "+261331234567");
@@ -90,6 +104,7 @@ class PostSalesServiceTest {
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
     when(customerRepository.findByEmail("marie@mail.com")).thenReturn(Optional.of(customer));
     when(saleRepository.create(any(), any(), any(), any(), any())).thenReturn(Optional.of(sale));
+    when(customerMapper.toResponse(customer)).thenReturn(customerResponse);
 
     SaleResponse result = saleService.create(libraryId, validRequest);
 
@@ -106,6 +121,7 @@ class PostSalesServiceTest {
     when(customerRepository.create(any(), any(), any(), any(), any()))
         .thenReturn(Optional.of(customer));
     when(saleRepository.create(any(), any(), any(), any(), any())).thenReturn(Optional.of(sale));
+    when(customerMapper.toResponse(customer)).thenReturn(customerResponse);
 
     SaleResponse result = saleService.create(libraryId, validRequest);
 
