@@ -75,4 +75,11 @@ public class CustomerService {
         .map(customerMapper::toResponse)
         .orElseThrow(() -> new NotFoundException("Customer " + id + " not found"));
   }
+
+  @Transactional
+  public void delete(UUID id) {
+    customerRepository
+        .delete(id)
+        .orElseThrow(() -> new NotFoundException("Customer with id " + id + " not found"));
+  }
 }

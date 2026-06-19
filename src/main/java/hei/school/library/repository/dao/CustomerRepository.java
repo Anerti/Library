@@ -72,4 +72,13 @@ WHERE (:search IS NULL OR :search = ''
       @Param("birthDate") LocalDate birthDate,
       @Param("email") String email,
       @Param("phone") String phone);
+
+  @Query(
+      value =
+          """
+          DELETE FROM customer WHERE id = :id
+          RETURNING id
+          """,
+      nativeQuery = true)
+  Optional<UUID> delete(@Param("id") UUID id);
 }
