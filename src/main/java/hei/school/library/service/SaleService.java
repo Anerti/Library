@@ -13,6 +13,7 @@ import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.repository.dao.SaleRepository;
 import hei.school.library.validator.SaleValidator;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -52,7 +53,7 @@ public class SaleService {
     Page<Sale> salePage =
         saleRepository.findByLibraryId(libraryId, statusStr, customerId, from, to, pageable);
 
-    java.util.List<SaleResponse> responses =
+    List<SaleResponse> responses =
         salePage.getContent().stream()
             .map(
                 sale -> {

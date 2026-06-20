@@ -75,4 +75,14 @@ WHERE (:search IS NULL OR :search = ''
 
   @Query(value = "SELECT * FROM customer WHERE email = :email", nativeQuery = true)
   Optional<Customer> findByEmail(@Param("email") String email);
+
+  @Query(
+      value =
+          """
+          DELETE FROM customer WHERE id = :id
+          RETURNING id
+          """,
+      nativeQuery = true)
+  Optional<UUID> delete(@Param("id") UUID id);
+  
 }
