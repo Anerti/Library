@@ -75,7 +75,7 @@ public class PostArrivalItemServiceTest {
   }
 
   @Test
-  @DisplayName("create : crée et retourne l'item")
+  @DisplayName("create : should create and return item")
   void create_shouldCreateAndReturnItem() {
     when(arrivalRepository.findById(arrivalId)).thenReturn(Optional.of(arrival));
     when(bookCopyRepository.findById(bookCopyId)).thenReturn(Optional.of(bookCopy));
@@ -92,7 +92,7 @@ public class PostArrivalItemServiceTest {
   }
 
   @Test
-  @DisplayName("create : utilise quantity=1 par défaut si non fournie")
+  @DisplayName("create : use default quantity when not provided")
   void create_shouldUseDefaultQuantity_whenNotProvided() {
     ArrivalItemRequest requestWithoutQuantity = new ArrivalItemRequest(bookCopyId, 15.00, null);
 
@@ -107,7 +107,7 @@ public class PostArrivalItemServiceTest {
   }
 
   @Test
-  @DisplayName("create : lève NotFoundException si arrival absente")
+  @DisplayName("create : throw NotFoundException if arrival is missing")
   void create_shouldThrow_whenArrivalNotFound() {
     when(arrivalRepository.findById(arrivalId)).thenReturn(Optional.empty());
 
@@ -119,7 +119,7 @@ public class PostArrivalItemServiceTest {
   }
 
   @Test
-  @DisplayName("create : lève NotFoundException si bookCopy absent")
+  @DisplayName("create : throw NotFoundException if bookCopy is missing")
   void create_shouldThrow_whenBookCopyNotFound() {
     when(arrivalRepository.findById(arrivalId)).thenReturn(Optional.of(arrival));
     when(bookCopyRepository.findById(bookCopyId)).thenReturn(Optional.empty());
