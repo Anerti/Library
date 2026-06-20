@@ -84,5 +84,4 @@ WHERE (:search IS NULL OR :search = ''
           """,
       nativeQuery = true)
   Optional<UUID> delete(@Param("id") UUID id);
-  
 }
