@@ -41,4 +41,10 @@ public class CustomerController {
       @PathVariable UUID id, @RequestBody CustomerUpdateRequest request) {
     return ResponseEntity.status(HttpStatus.OK).body(customerService.update(id, request));
   }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    customerService.delete(id);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
 }
