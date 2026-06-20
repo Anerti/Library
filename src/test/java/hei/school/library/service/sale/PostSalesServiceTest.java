@@ -4,14 +4,16 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerResponse;
-import hei.school.library.dto.PageResponse;
+import hei.school.library.dto.SaleRequest;
 import hei.school.library.dto.SaleResponse;
 import hei.school.library.entity.Customer;
 import hei.school.library.entity.Library;
 import hei.school.library.entity.Sale;
 import hei.school.library.entity.enums.SaleStatus;
 import hei.school.library.exception.NotFoundException;
+import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.mapper.SaleMapper;
 import hei.school.library.repository.dao.CustomerRepository;
@@ -21,32 +23,31 @@ import hei.school.library.service.SaleService;
 import hei.school.library.validator.SaleValidator;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
 
 @ExtendWith(MockitoExtension.class)
-class GetSalesServiceTest {
+class PostSalesServiceTest {
 
   @Mock private SaleRepository saleRepository;
   @Mock private CustomerRepository customerRepository;
   @Mock private LibraryRepository libraryRepository;
-  @Mock private CustomerMapper customerMapper;
   @Mock private SaleValidator saleValidator;
+  @Mock private CustomerMapper customerMapper;
   private SaleMapper saleMapper;
   private SaleService saleService;
 
   private UUID libraryId;
-  private UUID saleId;
   private UUID customerId;
-  private Sale sale;
-  private Customer customer;
+  private UUID saleId;
   private Library library;
+  private Customer customer;
+  private Sale sale;
+  private SaleRequest validRequest;
   private CustomerResponse customerResponse;
 
   @BeforeEach
@@ -62,8 +63,8 @@ class GetSalesServiceTest {
             saleValidator);
 
     libraryId = UUID.randomUUID();
-    saleId = UUID.randomUUID();
     customerId = UUID.randomUUID();
+    saleId = UUID.randomUUID();
 
     library = new Library(libraryId, "Lib A", "+261341234567", "lib@mail.com", "Antananarivo");
     customer =
@@ -78,7 +79,7 @@ class GetSalesServiceTest {
             Instant.now());
     sale =
         new Sale(
-            saleId, Instant.now(), SaleStatus.SOLD, customerId, libraryId, null, Instant.now());
+            saleId, Instant.now(), SaleStatus.BOOKED, customerId, libraryId, null, Instant.now());
 
     customerResponse =
         new CustomerResponse(
@@ -90,77 +91,65 @@ class GetSalesServiceTest {
             "+261331234567",
             Instant.now(),
             Instant.now());
+
+    CustomerRequest customerRequest =
+        new CustomerRequest(
+            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", "+261331234567");
+    validRequest = new SaleRequest(null, customerRequest, null);
   }
 
   @Test
-  @DisplayName("findAll: should return page of sales for a library")
-  void findAll_shouldReturnPageOfSales() {
-    Page<Sale> salePage = new PageImpl<>(List.of(sale));
-
+  @DisplayName("create: should save and return DTO")
+  void create_shouldSaveAndReturnDto() {
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
-    when(saleRepository.findByLibraryId(any(), any(), any(), any(), any(), any()))
-        .thenReturn(salePage);
-    when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+    when(customerRepository.findByEmail("marie@mail.com")).thenReturn(Optional.of(customer));
+    when(saleRepository.create(any(), any(), any(), any(), any())).thenReturn(Optional.of(sale));
     when(customerMapper.toResponse(customer)).thenReturn(customerResponse);
 
-    PageResponse<SaleResponse> result =
-        saleService.findAll(libraryId, null, null, null, null, 1, 20);
+    SaleResponse result = saleService.create(libraryId, validRequest);
 
-    assertThat(result.getData()).hasSize(1);
-    assertThat(result.getData().getFirst().getStatus()).isEqualTo(SaleStatus.SOLD);
-    assertThat(result.getData().getFirst().getCustomer().getEmail()).isEqualTo("marie@mail.com");
-    assertThat(result.getPagination().getTotal()).isEqualTo(1);
-    assertThat(result.getPagination().getPage()).isEqualTo(1);
-    assertThat(result.getPagination().getSize()).isEqualTo(20);
-  }
-
-  @Test
-  @DisplayName("findAll: should throw NotFoundException when library not found")
-  void findAll_shouldThrow_whenLibraryNotFound() {
-    UUID unknownLibraryId = UUID.randomUUID();
-    when(libraryRepository.findById(unknownLibraryId)).thenReturn(Optional.empty());
-
-    assertThatThrownBy(() -> saleService.findAll(unknownLibraryId, null, null, null, null, 1, 20))
-        .isInstanceOf(NotFoundException.class)
-        .hasMessageContaining(unknownLibraryId.toString());
-  }
-
-  @Test
-  @DisplayName("findById: should return sale when found")
-  void findById_shouldReturnSale() {
-    when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
-    when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
-    when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
-    when(customerMapper.toResponse(customer)).thenReturn(customerResponse);
-
-    SaleResponse result = saleService.findById(libraryId, saleId);
-
-    assertThat(result.getId()).isEqualTo(saleId);
-    assertThat(result.getStatus()).isEqualTo(SaleStatus.SOLD);
+    assertThat(result.getStatus()).isEqualTo(SaleStatus.BOOKED);
     assertThat(result.getCustomer().getEmail()).isEqualTo("marie@mail.com");
-    assertThat(result.getLibrary().getName()).isEqualTo("Lib A");
+    verify(saleValidator).validateCreate(validRequest);
   }
 
   @Test
-  @DisplayName("findById: should throw NotFoundException when sale not found")
-  void findById_shouldThrow_whenSaleNotFound() {
-    UUID unknownSaleId = UUID.randomUUID();
+  @DisplayName("create: should create new customer when not found by email")
+  void create_shouldCreateCustomer_whenNotFound() {
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
-    when(saleRepository.findById(unknownSaleId)).thenReturn(Optional.empty());
+    when(customerRepository.findByEmail("marie@mail.com")).thenReturn(Optional.empty());
+    when(customerRepository.create(any(), any(), any(), any(), any()))
+        .thenReturn(Optional.of(customer));
+    when(saleRepository.create(any(), any(), any(), any(), any())).thenReturn(Optional.of(sale));
+    when(customerMapper.toResponse(customer)).thenReturn(customerResponse);
 
-    assertThatThrownBy(() -> saleService.findById(libraryId, unknownSaleId))
-        .isInstanceOf(NotFoundException.class)
-        .hasMessageContaining(unknownSaleId.toString());
+    SaleResponse result = saleService.create(libraryId, validRequest);
+
+    assertThat(result.getCustomer().getEmail()).isEqualTo("marie@mail.com");
+    verify(customerRepository).create(any(), any(), any(), any(), any());
   }
 
   @Test
-  @DisplayName("findById: should throw NotFoundException when library not found")
-  void findById_shouldThrow_whenLibraryNotFound() {
+  @DisplayName("create: should throw NotFoundException when library not found")
+  void create_shouldThrow_whenLibraryNotFound() {
     UUID unknownLibraryId = UUID.randomUUID();
     when(libraryRepository.findById(unknownLibraryId)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> saleService.findById(unknownLibraryId, saleId))
-        .isInstanceOf(NotFoundException.class)
-        .hasMessageContaining(unknownLibraryId.toString());
+    assertThatThrownBy(() -> saleService.create(unknownLibraryId, validRequest))
+        .isInstanceOf(NotFoundException.class);
+  }
+
+  @Test
+  @DisplayName("create: should throw UnprocessableEntityException when customer is null")
+  void create_shouldThrow_whenCustomerNull() {
+    SaleRequest invalidRequest = new SaleRequest(null, null, null);
+
+    doThrow(new UnprocessableEntityException("customer is required."))
+        .when(saleValidator)
+        .validateCreate(invalidRequest);
+
+    assertThatThrownBy(() -> saleService.create(libraryId, invalidRequest))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessageContaining("customer is required.");
   }
 }

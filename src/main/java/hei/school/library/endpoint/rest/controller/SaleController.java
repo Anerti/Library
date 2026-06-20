@@ -1,6 +1,7 @@
 package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.dto.PageResponse;
+import hei.school.library.dto.SaleRequest;
 import hei.school.library.dto.SaleResponse;
 import hei.school.library.entity.enums.SaleStatus;
 import hei.school.library.service.SaleService;
@@ -35,5 +36,11 @@ public class SaleController {
   public ResponseEntity<SaleResponse> findById(
       @PathVariable UUID libraryId, @PathVariable UUID saleId) {
     return ResponseEntity.status(HttpStatus.OK).body(saleService.findById(libraryId, saleId));
+  }
+
+  @PostMapping
+  public ResponseEntity<SaleResponse> create(
+      @PathVariable UUID libraryId, @RequestBody SaleRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(saleService.create(libraryId, request));
   }
 }
