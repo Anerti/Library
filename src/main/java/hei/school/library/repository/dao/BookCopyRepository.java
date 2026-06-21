@@ -20,16 +20,16 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, UUID> {
                  bc.status, bc.price, bc.page_number, bc.updated_at
           FROM book_copy bc
           WHERE bc.library_id = CAST(:libraryId AS uuid)
-          AND (:status IS NULL OR bc.status = :status)
-          AND (:format IS NULL OR bc.format = :format)
+          AND (:status IS NULL OR bc.status = CAST(:status AS book_copy_status))
+          AND (:format IS NULL OR bc.format = CAST(:format AS book_copy_format))
           AND (CAST(:bookId AS uuid) IS NULL OR bc.book_id = CAST(:bookId AS uuid))
           """,
       countQuery =
           """
           SELECT COUNT(id) FROM book_copy bc
           WHERE bc.library_id = CAST(:libraryId AS uuid)
-          AND (:status IS NULL OR bc.status = :status)
-          AND (:format IS NULL OR bc.format = :format)
+          AND (:status IS NULL OR bc.status = CAST(:status AS book_copy_status))
+          AND (:format IS NULL OR bc.format = CAST(:format AS book_copy_format))
           AND (CAST(:bookId AS uuid) IS NULL OR bc.book_id = CAST(:bookId AS uuid))
           """,
       nativeQuery = true)
@@ -44,7 +44,7 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, UUID> {
       value =
           """
           INSERT INTO book_copy (id, price, format, library_id, book_id, status, page_number, updated_at)
-          VALUES (gen_random_uuid(), :price, :format, :libraryId, :bookId, 'AVAILABLE', :pageNumber, now())
+          VALUES (gen_random_uuid(), :price, CAST(:format AS book_copy_format), :libraryId, :bookId, 'AVAILABLE', :pageNumber, now())
           RETURNING id, price, format, library_id, book_id, status, page_number, updated_at
           """,
       nativeQuery = true)
