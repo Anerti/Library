@@ -21,7 +21,6 @@ import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.service.GenreService;
 import hei.school.library.validator.DataValidator;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

@@ -17,7 +17,7 @@ public class GenreMapper {
     }
     return GenreResponse.builder().id(genre.getId()).name(genre.getName()).build();
   }
-  
+
   public PageResponse<GenreResponse> toPageResponse(Page<Genre> page, int pageNum, int pageSize) {
     return PageResponse.<GenreResponse>builder()
         .data(page.getContent().stream().map(this::toResponse).toList())

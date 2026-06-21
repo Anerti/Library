@@ -10,19 +10,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.endpoint.rest.controller.GenreController;
 import hei.school.library.exception.ConflictException;
-import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.GlobalExceptionHandler;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.service.GenreService;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -37,7 +37,6 @@ public class GenreControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private GenreService genreService;
-
 
   @Test
   void should_get_genre_by_id() throws Exception {
@@ -181,7 +180,7 @@ public class GenreControllerTest {
     GenreResponse response = new GenreResponse();
     response.setId(id);
     response.setName("Fantasy");
-    
+
     when(genreService.updateGenreByName(any(UUID.class), any(GenreRequest.class)))
         .thenReturn(response);
 

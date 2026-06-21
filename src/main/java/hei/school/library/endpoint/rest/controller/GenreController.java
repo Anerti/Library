@@ -25,7 +25,7 @@ public class GenreController {
   public ResponseEntity<?> create(@RequestBody GenreRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(genreService.createGenreByName(request));
   }
-  
+
   @PatchMapping("/{genreId}")
   public ResponseEntity<?> update(@PathVariable UUID genreId, @RequestBody GenreRequest request) {
     return ResponseEntity.status(HttpStatus.OK)
