@@ -3,6 +3,7 @@ package hei.school.library.endpoint.rest.controller;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.SaleRequest;
 import hei.school.library.dto.SaleResponse;
+import hei.school.library.dto.SaleUpdateRequest;
 import hei.school.library.entity.enums.SaleStatus;
 import hei.school.library.service.SaleService;
 import java.time.Instant;
@@ -42,5 +43,14 @@ public class SaleController {
   public ResponseEntity<SaleResponse> create(
       @PathVariable UUID libraryId, @RequestBody SaleRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(saleService.create(libraryId, request));
+  }
+
+  @PatchMapping("/{saleId}")
+  public ResponseEntity<SaleResponse> update(
+      @PathVariable UUID libraryId,
+      @PathVariable UUID saleId,
+      @RequestBody SaleUpdateRequest request) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(saleService.update(libraryId, saleId, request));
   }
 }
