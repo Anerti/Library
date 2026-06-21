@@ -13,10 +13,10 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
   @Query(
       value =
           """
-          INSERT INTO genre (id, name, created_at, updated_at)
-          VALUES (gen_random_uuid(), :name, NOW(), NOW())
+          INSERT INTO genre (id, name)
+          VALUES (gen_random_uuid(), :name)
           ON CONFLICT (name) DO NOTHING
-          returning id, name, created_at, updated_at
+          returning id, name
           """,
       nativeQuery = true)
   Optional<Genre> insertGenreIgnoreConflict(@Param("name") String name);
@@ -34,9 +34,9 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
       value =
           """
           UPDATE genre
-          SET name = :name, updated_at = NOW()
+          SET name = :name
           WHERE id = :id
-          RETURNING id, name, created_at, updated_at
+          RETURNING id, name
           """,
       nativeQuery = true)
   Optional<Genre> updateGenreName(@Param("id") UUID id, @Param("name") String name);

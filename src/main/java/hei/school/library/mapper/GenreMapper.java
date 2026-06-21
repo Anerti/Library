@@ -15,12 +15,7 @@ public class GenreMapper {
     if (genre == null) {
       return null;
     }
-    return GenreResponse.builder()
-        .id(genre.getId())
-        .name(genre.getName())
-        .createdAt(genre.getCreatedAt())
-        .updatedAt(genre.getUpdatedAt())
-        .build();
+    return GenreResponse.builder().id(genre.getId()).name(genre.getName()).build();
   }
 
   public PageResponse<GenreResponse> toPageResponse(Page<Genre> page, int pageNum, int pageSize) {
