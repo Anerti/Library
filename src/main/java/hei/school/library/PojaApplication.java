@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @SpringBootApplication
 @PojaGenerated
-@EnableJpaAuditing
 public class PojaApplication {
 
   public static void main(String[] args) {

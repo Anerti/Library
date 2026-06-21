@@ -34,6 +34,3 @@ public class ArrivalItemController {
     return ResponseEntity.noContent().build();
   }
 }
-
-/*
- * il faut maintenant test les controller avec WebMvc, MockMvc, MockBean, perform etc, on commençant par, */
