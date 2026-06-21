@@ -1,6 +1,7 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.BookCopy;
+import hei.school.library.entity.enums.BookCopyFormat;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -53,4 +54,17 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, UUID> {
       @Param("libraryId") UUID libraryId,
       @Param("bookId") UUID bookId,
       @Param("pageNumber") Integer pageNumber);
+
+  @Query(
+      """
+      SELECT COUNT(bc) FROM BookCopy bc
+      WHERE bc.book.id = :bookId
+      AND bc.status = 'AVAILABLE'
+      AND (:format IS NULL OR bc.format = :format)
+      AND (:libraryId IS NULL OR bc.library.id = :libraryId)
+      """)
+  long countAvailableStock(
+      @Param("bookId") UUID bookId,
+      @Param("format") BookCopyFormat format,
+      @Param("libraryId") UUID libraryId);
 }
