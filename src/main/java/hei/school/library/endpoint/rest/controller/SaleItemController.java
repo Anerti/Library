@@ -27,4 +27,10 @@ public class SaleItemController {
       @PathVariable UUID saleId, @RequestBody SaleItemRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(saleItemService.create(saleId, request));
   }
+
+  @DeleteMapping("/{bookCopyId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID saleId, @PathVariable UUID bookCopyId) {
+    saleItemService.delete(saleId, bookCopyId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
 }

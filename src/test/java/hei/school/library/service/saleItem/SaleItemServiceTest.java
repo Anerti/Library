@@ -137,4 +137,25 @@ class SaleItemServiceTest {
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("price is required.");
   }
+
+  @Test
+  @DisplayName("delete: should delete when sale item exists")
+  void delete_shouldDelete_whenExists() {
+    when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
+    when(saleItemRepository.delete(saleId, bookCopyId)).thenReturn(Optional.of(bookCopyId));
+
+    saleItemService.delete(saleId, bookCopyId);
+
+    verify(saleItemRepository).delete(saleId, bookCopyId);
+  }
+
+  @Test
+  @DisplayName("delete: should throw NotFoundException when sale item not found")
+  void delete_shouldThrow_whenNotFound() {
+    when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
+    when(saleItemRepository.delete(saleId, bookCopyId)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> saleItemService.delete(saleId, bookCopyId))
+        .isInstanceOf(NotFoundException.class);
+  }
 }

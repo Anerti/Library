@@ -30,4 +30,14 @@ public interface SaleItemRepository extends JpaRepository<SaleItem, UUID> {
       @Param("saleId") UUID saleId,
       @Param("quantity") Integer quantity,
       @Param("price") BigDecimal price);
+
+  @Query(
+      value =
+          """
+          DELETE FROM sale_book_copy
+          WHERE sale_id = :saleId AND book_copy_id = :bookCopyId
+          RETURNING book_copy_id
+          """,
+      nativeQuery = true)
+  Optional<UUID> delete(@Param("saleId") UUID saleId, @Param("bookCopyId") UUID bookCopyId);
 }
