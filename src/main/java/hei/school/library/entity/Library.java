@@ -30,7 +30,7 @@ public class Library {
   @Column(nullable = false, length = 30)
   private String phone;
 
-  @Column(nullable = false, length = 100)
+  @Column(nullable = false, unique = true, length = 100)
   private String email;
 
   @Column(nullable = false, length = 100)

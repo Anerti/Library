@@ -23,7 +23,10 @@ public class DataValidator {
   private static final Pattern VALID_PHONE_PATTERN = Pattern.compile("^[0-9 +]{7,30}$");
 
   public void validateString(String fieldName, String value) {
-    if (value != null && !value.isBlank() && !SAFE_STRING.matcher(value).matches()) {
+    if (value == null || value.isBlank()) {
+      throw new UnprocessableEntityException(fieldName + " is required.");
+    }
+    if (!SAFE_STRING.matcher(value).matches()) {
       throw new UnprocessableEntityException(
           String.format(
               "Field '%s' contains invalid characters. Only letters (a-z, A-Z), digits (0-9), and @"
@@ -53,7 +56,11 @@ public class DataValidator {
   }
 
   public void validatePhone(String phone) {
-    if (phone != null && !phone.isBlank() && !VALID_PHONE_PATTERN.matcher(phone).matches()) {
+    if (phone == null || phone.isBlank()) {
+      throw new UnprocessableEntityException("Phone number is required.");
+    }
+
+    if (!VALID_PHONE_PATTERN.matcher(phone).matches()) {
       throw new UnprocessableEntityException(
           String.format(
               "Invalid phone format: '%s'. Only +, digits, spaces, hyphens and parentheses are"

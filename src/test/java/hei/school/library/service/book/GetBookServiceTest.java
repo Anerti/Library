@@ -40,12 +40,12 @@ class GetBookServiceTest {
 
   private Book bookWithAuthorsAndGenres;
   private Book bookWithoutRelations;
+  @Mock private DataValidator dataValidator;
 
   @BeforeEach
   void setUp() {
     bookService =
-        new BookService(
-            bookRepository, new BookMapper(), new DataValidator(), new PaginationMapper());
+        new BookService(bookRepository, new BookMapper(), dataValidator, new PaginationMapper());
 
     Author author =
         Author.builder()
