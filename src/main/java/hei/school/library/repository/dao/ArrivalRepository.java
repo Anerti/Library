@@ -15,9 +15,12 @@ import org.springframework.stereotype.Repository;
 public interface ArrivalRepository extends JpaRepository<Arrival, UUID> {
 
   @Query(
-      "SELECT a FROM Arrival a WHERE a.library.id = :libraryId "
-          + "AND (:from IS NULL OR a.arrivalDate >= :from) "
-          + "AND (:to IS NULL OR a.arrivalDate <= :to)")
+      """
+      SELECT a FROM Arrival a
+      WHERE a.library.id = :libraryId
+      AND (CAST(:from AS localdatetime) IS NULL OR a.arrivalDate >= :from)
+      AND (CAST(:to AS localdatetime) IS NULL OR a.arrivalDate <= :to)
+      """)
   Page<Arrival> findByLibraryIdAndDateRange(
       @Param("libraryId") UUID libraryId,
       @Param("from") LocalDateTime from,
