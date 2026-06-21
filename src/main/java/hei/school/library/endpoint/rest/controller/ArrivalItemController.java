@@ -27,4 +27,10 @@ public class ArrivalItemController {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(arrivalItemService.create(arrivalId, request));
   }
+
+  @DeleteMapping("/{bookCopyId}")
+  public ResponseEntity<Void> delete(@PathVariable UUID arrivalId, @PathVariable UUID bookCopyId) {
+    arrivalItemService.delete(arrivalId, bookCopyId);
+    return ResponseEntity.noContent().build();
+  }
 }
