@@ -3,7 +3,6 @@ package hei.school.library.entity;
 import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Builder
 @Getter
@@ -11,7 +10,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "genre")
 public class Genre {
 

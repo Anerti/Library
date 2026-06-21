@@ -3,6 +3,7 @@ package hei.school.library.dto;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -10,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Setter
-public class AuthorReponse {
+@Getter
+public class GenreSummary {
   private UUID id;
-  private String firstName;
-  private String lastName;
+  private String name;
 }

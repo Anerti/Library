@@ -1,6 +1,8 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.Customer;
+import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,4 +33,55 @@ WHERE (:search IS NULL OR :search = ''
           """,
       nativeQuery = true)
   Page<Customer> findBySearch(@Param("search") String search, Pageable pageable);
+
+  @Query(
+      value =
+          """
+          UPDATE customer
+          SET
+            last_name = COALESCE(:lastName, last_name),
+            first_name = COALESCE(:firstName, first_name),
+            birth_date = COALESCE(:birthDate, birth_date),
+            email = COALESCE(:email, email),
+            phone = COALESCE(:phone, phone),
+            updated_at = NOW()
+          WHERE id = :id
+          RETURNING id, last_name, first_name, birth_date, email, phone, created_at, updated_at
+          """,
+      nativeQuery = true)
+  Optional<Customer> patch(
+      @Param("id") UUID id,
+      @Param("lastName") String lastName,
+      @Param("firstName") String firstName,
+      @Param("birthDate") LocalDate birthDate,
+      @Param("email") String email,
+      @Param("phone") String phone);
+
+  @Query(
+      value =
+          """
+          INSERT INTO customer (last_name, first_name, birth_date, email, phone)
+          VALUES (:lastName, :firstName, :birthDate, :email, :phone)
+          ON CONFLICT (email) DO NOTHING
+          RETURNING id, last_name, first_name, birth_date, email, phone, created_at, updated_at
+          """,
+      nativeQuery = true)
+  Optional<Customer> create(
+      @Param("lastName") String lastName,
+      @Param("firstName") String firstName,
+      @Param("birthDate") LocalDate birthDate,
+      @Param("email") String email,
+      @Param("phone") String phone);
+
+  @Query(value = "SELECT * FROM customer WHERE email = :email", nativeQuery = true)
+  Optional<Customer> findByEmail(@Param("email") String email);
+
+  @Query(
+      value =
+          """
+          DELETE FROM customer WHERE id = :id
+          RETURNING id
+          """,
+      nativeQuery = true)
+  Optional<UUID> delete(@Param("id") UUID id);
 }

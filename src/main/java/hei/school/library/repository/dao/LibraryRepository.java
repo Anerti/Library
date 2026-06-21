@@ -24,4 +24,19 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
           """,
       nativeQuery = true)
   Optional<Page<Library>> searchLibraries(@Param("search") String search, Pageable pageable);
+
+  @Query(
+      value =
+          """
+          INSERT INTO library (id, name, phone, email, address)
+          VALUES (gen_random_uuid(), :name, :phone, :email, :address)
+          ON CONFLICT (email) DO NOTHING
+          returning id, name, phone, email, address
+          """,
+      nativeQuery = true)
+  Optional<Library> insertLibraryIgnoreConflict(
+      @Param("name") String name,
+      @Param("phone") String phone,
+      @Param("email") String email,
+      @Param("address") String address);
 }
