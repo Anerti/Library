@@ -60,8 +60,8 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, UUID> {
       SELECT COUNT(bc) FROM BookCopy bc
       WHERE bc.book.id = :bookId
       AND bc.status = 'AVAILABLE'
-      AND (:format IS NULL OR bc.format = :format)
-      AND (:libraryId IS NULL OR bc.library.id = :libraryId)
+      AND (CAST(:format AS string) IS NULL OR bc.format = :format)
+      AND (CAST(:libraryId AS string) IS NULL OR bc.library.id = :libraryId)
       """)
   long countAvailableStock(
       @Param("bookId") UUID bookId,
