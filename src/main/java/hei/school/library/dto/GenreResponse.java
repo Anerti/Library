@@ -1,6 +1,5 @@
 package hei.school.library.dto;
 
-import java.time.Instant;
 import java.util.UUID;
 import lombok.*;
 
@@ -11,7 +10,5 @@ import lombok.*;
 @NoArgsConstructor
 public class GenreResponse {
   private UUID id;
-  private Instant createdAt;
-  private Instant updatedAt;
   private String name;
 }
