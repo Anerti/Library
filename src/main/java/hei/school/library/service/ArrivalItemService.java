@@ -57,4 +57,19 @@ public class ArrivalItemService {
 
     return arrivalItemMapper.toResponse(arrivalItemRepository.save(item));
   }
+
+  public void delete(UUID arrivalId, UUID bookCopyId) {
+    ArrivalItem item =
+        arrivalItemRepository
+            .findByArrivalIdAndBookCopyId(arrivalId, bookCopyId)
+            .orElseThrow(
+                () ->
+                    new NotFoundException(
+                        "ArrivalItem not found for arrival "
+                            + arrivalId
+                            + " and bookCopy "
+                            + bookCopyId));
+
+    arrivalItemRepository.delete(item);
+  }
 }
