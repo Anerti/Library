@@ -1,5 +1,6 @@
 package hei.school.library.endpoint.rest.controller;
 
+import hei.school.library.dto.SaleItemRequest;
 import hei.school.library.dto.SaleItemResponse;
 import hei.school.library.service.SaleItemService;
 import java.util.List;
@@ -19,5 +20,11 @@ public class SaleItemController {
   @GetMapping
   public ResponseEntity<List<SaleItemResponse>> findBySaleId(@PathVariable UUID saleId) {
     return ResponseEntity.status(HttpStatus.OK).body(saleItemService.findBySaleId(saleId));
+  }
+
+  @PostMapping
+  public ResponseEntity<SaleItemResponse> create(
+      @PathVariable UUID saleId, @RequestBody SaleItemRequest request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(saleItemService.create(saleId, request));
   }
 }
