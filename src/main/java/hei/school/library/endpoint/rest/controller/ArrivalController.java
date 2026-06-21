@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/libraries/{libraryId}/arrivals")
 public class ArrivalController {
-  private ArrivalService arrivalService;
+  private final ArrivalService arrivalService;
 
   @GetMapping
   public ResponseEntity<PageResponse<ArrivalResponse>> findByLibraryId(
