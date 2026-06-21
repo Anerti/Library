@@ -1,19 +1,21 @@
 package hei.school.library.controller.genre;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.endpoint.rest.controller.GenreController;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.service.GenreService;
-import lombok.Builder;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.time.Instant;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -22,17 +24,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@WebMvcTest({GenreController.class, GlobalExceptionHandler.class})
 public class GenreControllerTest {
-    private MockMvc mockMvc;
-    private GenreService genreService;
-    private GenreController genreController;
 
-    @BeforeEach
-    void setup() {
-        this.genreService = Mockito.mock(GenreService.class);
-        this.genreController = new GenreController(this.genreService);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(this.genreController).build();
-    }
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private GenreService genreService;
 
     @Test
     void should_create_genre() throws Exception {
@@ -42,8 +44,6 @@ public class GenreControllerTest {
         GenreResponse response = GenreResponse.builder()
                 .id(id)
                 .name("Fantasy")
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
                 .build();
 
         when(genreService.createGenreByName(any(GenreRequest.class)))
@@ -61,6 +61,7 @@ public class GenreControllerTest {
                 .andExpect(jsonPath("$.name")
                         .value("Fantasy"));
     }
+
     @Test
     void should_return_conflict_when_genre_already_exists() throws Exception {
         when(genreService.createGenreByName(any(GenreRequest.class)))
@@ -76,6 +77,7 @@ public class GenreControllerTest {
                 )
                 .andExpect(status().isConflict());
     }
+
     @Test
     void should_return_unprocessable_entity_exception_when_request_is_not_valid() throws Exception {
         when(genreService.createGenreByName(any(GenreRequest.class)))

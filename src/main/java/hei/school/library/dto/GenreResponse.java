@@ -11,7 +11,5 @@ import java.util.UUID;
 @NoArgsConstructor
 public class GenreResponse {
     private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
     private String name;
 }

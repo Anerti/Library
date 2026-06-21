@@ -14,8 +14,6 @@ public class GenreMapper {
         return GenreResponse.builder()
                 .id(genre.getId())
                 .name(genre.getName())
-                .createdAt(genre.getCreatedAt())
-                .updatedAt(genre.getUpdatedAt())
                 .build();
     }
 }

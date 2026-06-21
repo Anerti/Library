@@ -47,8 +47,6 @@ public class GenreServiceTest {
         Genre genre = Genre.builder()
                 .id(id)
                 .name(genreName)
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
                 .build();
 
         GenreResponse expectedResponse = GenreResponse.builder()

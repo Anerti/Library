@@ -23,12 +23,4 @@ public class Genre {
 
     @Column(nullable = false, unique = true, length = 100)
     private String name;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Instant createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
 }
