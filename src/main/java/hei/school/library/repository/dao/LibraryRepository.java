@@ -48,7 +48,7 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
             name = COALESCE(:name, name),
             phone = COALESCE(:phone, phone),
             email = COALESCE(:email, email),
-            address = COALESCE(:address, address),
+            address = COALESCE(:address, address)
           WHERE id = :id
           RETURNING id, name, phone, email, address
           """,
