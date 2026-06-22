@@ -39,4 +39,13 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
       @Param("phone") String phone,
       @Param("email") String email,
       @Param("address") String address);
+
+  @Query(
+      value =
+          """
+          DELETE FROM library WHERE id = :id
+          RETURNING id
+          """,
+      nativeQuery = true)
+  Optional<UUID> deleteByUUId(@Param("id") UUID id);
 }

@@ -8,6 +8,7 @@ import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.entity.Library;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.LibraryMapper;
 import hei.school.library.repository.dao.LibraryRepository;
@@ -283,5 +284,27 @@ class LibraryServiceTest {
 
     assertEquals("address is required.", exception.getMessage());
     verifyNoInteractions(repository);
+  }
+
+  @Test
+  void deleteLibraryById_ShouldDeleteSuccessfully_WhenLibraryExists() {
+    UUID id = UUID.randomUUID();
+    when(repository.deleteByUUId(id)).thenReturn(Optional.of(id));
+    assertDoesNotThrow(() -> service.deleteLibraryById(id));
+    verify(repository, times(1)).deleteByUUId(id);
+  }
+
+  @Test
+  void deleteLibraryById_ShouldThrowNotFoundException_WhenLibraryDoesNotExist() {
+    UUID id = UUID.randomUUID();
+    when(repository.deleteByUUId(id)).thenReturn(Optional.empty());
+    NotFoundException exception =
+        assertThrows(
+            NotFoundException.class,
+            () -> {
+              service.deleteLibraryById(id);
+            });
+    assertEquals("Library with id " + id + " not found", exception.getMessage());
+    verify(repository, times(1)).deleteByUUId(id);
   }
 }

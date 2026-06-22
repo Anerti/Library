@@ -1,7 +1,8 @@
 package hei.school.library.controller.library;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -9,8 +10,10 @@ import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.endpoint.rest.controller.LibraryController;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.service.LibraryService;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -80,5 +83,22 @@ class LibraryControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
         .andExpect(status().isUnprocessableEntity());
+  }
+
+  @Test
+  void delete_ShouldReturnNoContent_WhenLibraryExists() throws Exception {
+    UUID libraryId = UUID.randomUUID();
+    doNothing().when(libraryService).deleteLibraryById(libraryId);
+    mockMvc.perform(delete("/libraries/" + libraryId)).andExpect(status().isNoContent());
+  }
+
+  @Test
+  void delete_ShouldReturnNotFound_WhenLibraryDoesNotExist() throws Exception {
+    UUID libraryId = UUID.randomUUID();
+    doThrow(new NotFoundException("Library with id " + libraryId + " not found"))
+        .when(libraryService)
+        .deleteLibraryById(libraryId);
+
+    mockMvc.perform(delete("/libraries/" + libraryId)).andExpect(status().isNotFound());
   }
 }
