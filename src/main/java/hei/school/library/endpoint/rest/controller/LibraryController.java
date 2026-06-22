@@ -3,6 +3,7 @@ package hei.school.library.endpoint.rest.controller;
 import hei.school.library.dto.LibraryRequest;
 import hei.school.library.service.LibraryService;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,5 +24,10 @@ public record LibraryController(LibraryService libraryService) {
   @PostMapping
   public ResponseEntity<?> create(@RequestBody LibraryRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(libraryService.createLibrary(request));
+  }
+
+  @GetMapping("/{libraryId}")
+  public ResponseEntity<?> getLibraryById(@PathVariable UUID libraryId) {
+    return ResponseEntity.ok(libraryService.getLibraryById(libraryId));
   }
 }

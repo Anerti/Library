@@ -8,6 +8,7 @@ import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.entity.Library;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.LibraryMapper;
 import hei.school.library.repository.dao.LibraryRepository;
@@ -283,5 +284,41 @@ class LibraryServiceTest {
 
     assertEquals("address is required.", exception.getMessage());
     verifyNoInteractions(repository);
+  }
+
+  @Test
+  void getLibraryById_ShouldReturnLibraryResponse_WhenLibraryExists() {
+    UUID id = UUID.randomUUID();
+    Library mockLibrary = new Library();
+    LibraryResponse mockResponse = LibraryResponse.builder().id(id).name("Ma Bibliothèque").build();
+
+    when(repository.findById(id)).thenReturn(Optional.of(mockLibrary));
+    when(mapper.toResponse(mockLibrary)).thenReturn(mockResponse);
+
+    LibraryResponse result = service.getLibraryById(id);
+
+    assertNotNull(result);
+    assertEquals(id, result.getId());
+    assertEquals("Ma Bibliothèque", result.getName());
+
+    verify(repository, times(1)).findById(id);
+    verify(mapper, times(1)).toResponse(mockLibrary);
+  }
+
+  @Test
+  void getLibraryById_ShouldThrowNotFoundException_WhenLibraryDoesNotExist() {
+    UUID id = UUID.randomUUID();
+    when(repository.findById(id)).thenReturn(Optional.empty());
+
+    NotFoundException exception =
+        assertThrows(
+            NotFoundException.class,
+            () -> {
+              service.getLibraryById(id);
+            });
+
+    assertEquals("The requested resource was not found", exception.getMessage());
+    verify(repository, times(1)).findById(id);
+    verifyNoInteractions(mapper);
   }
 }

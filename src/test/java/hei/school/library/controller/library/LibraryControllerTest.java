@@ -2,37 +2,38 @@ package hei.school.library.controller.library;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.endpoint.rest.controller.LibraryController;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.GlobalExceptionHandler;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.service.LibraryService;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
+@WebMvcTest({LibraryController.class, GlobalExceptionHandler.class})
 class LibraryControllerTest {
+  @Autowired private MockMvc mockMvc;
+  @Autowired private ObjectMapper objectMapper;
 
-  private MockMvc mockMvc;
-  private ObjectMapper objectMapper = new ObjectMapper();
-  private LibraryController libraryController;
-
-  private LibraryService libraryService;
+  @MockBean private LibraryService libraryService;
 
   @BeforeEach
-  void setup() {
-    this.libraryService = Mockito.mock(LibraryService.class);
-    this.libraryController = new LibraryController(this.libraryService);
-    this.mockMvc = MockMvcBuilders.standaloneSetup(this.libraryController).build();
-  }
+  void setup() {}
 
   @Test
   void should_create_library() throws Exception {
@@ -80,5 +81,35 @@ class LibraryControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
         .andExpect(status().isUnprocessableEntity());
+  }
+
+  @Test
+  void getLibraryById_ShouldReturnOkAndResponse_WhenLibraryExists() throws Exception {
+    UUID libraryId = UUID.randomUUID();
+    LibraryResponse response =
+        LibraryResponse.builder()
+            .id(libraryId)
+            .name("Bibliothèque Centrale")
+            .email("contact@biblio.com")
+            .build();
+
+    when(libraryService.getLibraryById(libraryId)).thenReturn(response);
+    mockMvc
+        .perform(get("/libraries/" + libraryId).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(libraryId.toString()))
+        .andExpect(jsonPath("$.name").value("Bibliothèque Centrale"))
+        .andExpect(jsonPath("$.email").value("contact@biblio.com"));
+  }
+
+  @Test
+  void getLibraryById_ShouldReturnNotFound_WhenLibraryDoesNotExist() throws Exception {
+    UUID libraryId = UUID.randomUUID();
+    when(libraryService.getLibraryById(libraryId))
+        .thenThrow(new NotFoundException("The requested resource was not found"));
+
+    mockMvc
+        .perform(get("/libraries/" + libraryId).contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
   }
 }
