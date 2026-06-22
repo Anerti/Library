@@ -16,6 +16,7 @@ import hei.school.library.repository.dao.BookCopyRepository;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.service.BookCopyService;
+import hei.school.library.validator.BookCopyValidator;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.*;
@@ -29,6 +30,7 @@ public class PatchBookCopyServiceTest {
   @Mock private BookCopyRepository bookCopyRepository;
   @Mock private BookRepository bookRepository;
   @Mock private LibraryRepository libraryRepository;
+  @Mock private BookCopyValidator bookCopyValidator;
   @Mock private BookCopyMapper bookCopyMapper;
   @Mock private PaginationMapper paginationMapper;
 
@@ -88,6 +90,10 @@ public class PatchBookCopyServiceTest {
   @DisplayName("update : throw BadRequestException if all fields are null")
   void update_shouldThrow_whenAllFieldsNull() {
     BookCopyUpdateRequest request = new BookCopyUpdateRequest(null, null, null, null);
+
+    doThrow(new BadRequestException("At least one field is required"))
+        .when(bookCopyValidator)
+        .validateUpdate(request);
 
     assertThatThrownBy(() -> bookCopyService.update(libraryId, copyId, request))
         .isInstanceOf(BadRequestException.class);

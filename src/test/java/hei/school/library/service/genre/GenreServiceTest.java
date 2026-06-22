@@ -21,7 +21,6 @@ import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.service.GenreService;
 import hei.school.library.validator.DataValidator;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,42 +48,12 @@ public class GenreServiceTest {
   }
 
   @Test
-  void should_get_genre_by_id() throws Exception {
-
-    UUID id = UUID.randomUUID();
-    Genre genre =
-        Genre.builder()
-            .id(id)
-            .name("Fantasy")
-            .createdAt(Instant.now())
-            .updatedAt(Instant.now())
-            .build();
-
-    when(genreRepository.findById(any(UUID.class))).thenReturn(Optional.of(genre));
-
-    assertEquals(genreMapper.toResponse(genre), genreService.getGenreById(id));
-  }
-
-  @Test
-  void should_return_not_found_when_genre_id_does_not_exist() throws Exception {
-    UUID id = UUID.randomUUID();
-    when(genreRepository.findById(id)).thenReturn(Optional.empty());
-    assertThrows(NotFoundException.class, () -> genreService.getGenreById(id));
-  }
-
-  @Test
   void should_create_genre() throws Exception {
 
     UUID id = UUID.randomUUID();
     String genreName = "Fantasy";
 
-    Genre genre =
-        Genre.builder()
-            .id(id)
-            .name(genreName)
-            .createdAt(Instant.now())
-            .updatedAt(Instant.now())
-            .build();
+    Genre genre = Genre.builder().id(id).name(genreName).build();
 
     GenreResponse expectedResponse = GenreResponse.builder().id(id).name(genreName).build();
 

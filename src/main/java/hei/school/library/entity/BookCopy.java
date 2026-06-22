@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "book_copy")
@@ -26,7 +28,8 @@ public class BookCopy {
   private Double price;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  @Column(nullable = false, columnDefinition = "book_copy_format")
   private BookCopyFormat format;
 
   @ManyToOne
@@ -38,7 +41,8 @@ public class BookCopy {
   private Book book;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+  @Column(nullable = false, columnDefinition = "book_copy_status")
   @Builder.Default
   private BookCopyStatus status = BookCopyStatus.AVAILABLE;
 

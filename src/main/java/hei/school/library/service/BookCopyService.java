@@ -4,13 +4,13 @@ import hei.school.library.dto.*;
 import hei.school.library.entity.BookCopy;
 import hei.school.library.entity.enums.BookCopyFormat;
 import hei.school.library.entity.enums.BookCopyStatus;
-import hei.school.library.exception.BadRequestException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookCopyMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookCopyRepository;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.repository.dao.LibraryRepository;
+import hei.school.library.validator.BookCopyValidator;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,7 @@ public class BookCopyService {
   private final BookCopyRepository bookCopyRepository;
   private final BookRepository bookRepository;
   private final LibraryRepository libraryRepository;
+  private final BookCopyValidator bookCopyValidator;
   private final BookCopyMapper bookCopyMapper;
   private final PaginationMapper paginationMapper;
 
@@ -70,6 +71,8 @@ public class BookCopyService {
   }
 
   public BookCopyResponse create(UUID libraryId, BookCopyRequest request) {
+    bookCopyValidator.validateCreate(request);
+
     if (!libraryRepository.existsById(libraryId)) {
       throw new NotFoundException("Library with id " + libraryId + " not found");
     }
@@ -89,12 +92,7 @@ public class BookCopyService {
   }
 
   public BookCopyResponse update(UUID libraryId, UUID copyId, BookCopyUpdateRequest request) {
-    if (request.getPrice() == null
-        && request.getFormat() == null
-        && request.getStatus() == null
-        && request.getPageNumber() == null) {
-      throw new BadRequestException("At least one field is required");
-    }
+    bookCopyValidator.validateUpdate(request);
 
     BookCopy bookCopy =
         bookCopyRepository
@@ -117,5 +115,15 @@ public class BookCopyService {
       throw new NotFoundException("BookCopy with id " + copyId + " not found");
     }
     bookCopyRepository.deleteById(copyId);
+  }
+
+  public long getStock(UUID bookId, BookCopyFormat format, UUID libraryId) {
+    if (!bookRepository.existsById(bookId)) {
+      throw new NotFoundException("Book with id " + bookId + " not found");
+    }
+    if (libraryId != null && !libraryRepository.existsById(libraryId)) {
+      throw new NotFoundException("Library with id " + libraryId + " not found");
+    }
+    return bookCopyRepository.countAvailableStock(bookId, format, libraryId);
   }
 }
