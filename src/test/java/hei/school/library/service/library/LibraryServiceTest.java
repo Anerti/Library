@@ -295,13 +295,13 @@ class LibraryServiceTest {
     LibraryResponse mockResponse = LibraryResponse.builder().name("Biblio").build();
 
     when(repository.patch(
-            request.getName(), request.getPhone(), request.getEmail(), request.getAddress()))
+            id, request.getName(), request.getPhone(), request.getEmail(), request.getAddress()))
         .thenReturn(Optional.of(mockLibrary));
     when(mapper.toResponse(mockLibrary)).thenReturn(mockResponse);
     LibraryResponse result = service.updateLibrary(id, request);
     assertNotNull(result);
     assertEquals("Biblio", result.getName());
-    verify(repository, times(1)).patch(any(), any(), any(), any());
+    verify(repository, times(1)).patch(any(), any(), any(), any(), any());
     verify(mapper, times(1)).toResponse(mockLibrary);
   }
 
@@ -311,7 +311,7 @@ class LibraryServiceTest {
     LibraryRequest request =
         new LibraryRequest("Biblio", "+33123456789", "test@test.com", "123-Street");
 
-    when(repository.patch(any(), any(), any(), any())).thenReturn(Optional.empty());
+    when(repository.patch(any(), any(), any(), any(), any())).thenReturn(Optional.empty());
 
     assertThrows(NotFoundException.class, () -> service.updateLibrary(id, request));
   }
