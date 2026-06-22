@@ -15,6 +15,7 @@ import hei.school.library.repository.dao.BookCopyRepository;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.service.BookCopyService;
+import hei.school.library.validator.BookCopyValidator;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.*;
@@ -29,6 +30,7 @@ public class PostBookCopyServiceTest {
   @Mock private BookRepository bookRepository;
   @Mock private LibraryRepository libraryRepository;
   @Mock private BookCopyMapper bookCopyMapper;
+  @Mock private BookCopyValidator bookCopyValidator;
   @Mock private PaginationMapper paginationMapper;
 
   @InjectMocks private BookCopyService bookCopyService;
