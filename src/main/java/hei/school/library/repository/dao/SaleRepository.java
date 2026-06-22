@@ -17,21 +17,21 @@ public interface SaleRepository extends JpaRepository<Sale, UUID> {
   @Query(
       value =
           """
-          SELECT * FROM sale
+          SELECT id, sale_date, status, customer_id, library_id, expiration_date, created_at FROM sale
           WHERE library_id = :libraryId
-            AND (:status IS NULL OR status = :status)
-            AND (:customerId IS NULL OR customer_id = :customerId)
-            AND (:from IS NULL OR sale_date >= :from)
-            AND (:to IS NULL OR sale_date <= :to)
+          AND (:status IS NULL OR status = CAST(:status AS sale_status))
+          AND (CAST(:customerId AS uuid) IS NULL OR customer_id = CAST(:customerId AS uuid))
+          AND (CAST(:from AS timestamp) IS NULL OR sale_date >= CAST(:from AS timestamp))
+          AND (CAST(:to AS timestamp) IS NULL OR sale_date <= CAST(:to AS timestamp))
           """,
       countQuery =
           """
-          SELECT COUNT(*) FROM sale
+          SELECT COUNT(id) FROM sale
           WHERE library_id = :libraryId
-            AND (:status IS NULL OR status = :status)
-            AND (:customerId IS NULL OR customer_id = :customerId)
-            AND (:from IS NULL OR sale_date >= :from)
-            AND (:to IS NULL OR sale_date <= :to)
+          AND (:status IS NULL OR status = CAST(:status AS sale_status))
+          AND (CAST(:customerId AS uuid) IS NULL OR customer_id = CAST(:customerId AS uuid))
+          AND (CAST(:from AS timestamp) IS NULL OR sale_date >= CAST(:from AS timestamp))
+          AND (CAST(:to AS timestamp) IS NULL OR sale_date <= CAST(:to AS timestamp))
           """,
       nativeQuery = true)
   Page<Sale> findByLibraryId(
@@ -46,8 +46,8 @@ public interface SaleRepository extends JpaRepository<Sale, UUID> {
       value =
           """
           INSERT INTO sale (sale_date, status, customer_id, library_id, expiration_date)
-          VALUES (:saleDate, :status, :customerId, :libraryId, :expirationDate)
-          RETURNING *
+          VALUES (:saleDate, CAST(:status AS sale_status), :customerId, :libraryId, :expirationDate)
+          RETURNING id, sale_date, status, customer_id, library_id, expiration_date, created_at
           """,
       nativeQuery = true)
   Optional<Sale> create(
