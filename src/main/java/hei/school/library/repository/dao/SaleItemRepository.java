@@ -29,7 +29,7 @@ public interface SaleItemRepository extends JpaRepository<SaleItem, UUID> {
           INSERT INTO sale_book_copy (book_copy_id, sale_id, quantity, price)
           VALUES (:bookCopyId, :saleId, :quantity, :price)
           ON CONFLICT (book_copy_id, sale_id) DO NOTHING
-          RETURNING *
+          RETURNING id, book_copy_id, sale_id, quantity, price, created_at
           """,
       nativeQuery = true)
   Optional<SaleItem> create(
