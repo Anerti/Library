@@ -54,6 +54,7 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
           """,
       nativeQuery = true)
   Optional<Library> patch(
+      @Param("id") UUID id,
       @Param("name") String name,
       @Param("phone") String phone,
       @Param("email") String email,

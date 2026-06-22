@@ -84,7 +84,8 @@ public class LibraryService {
     dataValidator.validatePhone(request.getPhone());
     return mapper.toResponse(
         repository
-            .patch(request.getName(), request.getPhone(), request.getEmail(), request.getAddress())
+            .patch(
+                id, request.getName(), request.getPhone(), request.getEmail(), request.getAddress())
             .orElseThrow(() -> new NotFoundException("Library with id " + id + " not found")));
   }
 }
