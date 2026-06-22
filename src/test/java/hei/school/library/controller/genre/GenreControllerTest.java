@@ -10,34 +10,33 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.endpoint.rest.controller.GenreController;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.service.GenreService;
-import java.time.Instant;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+@WebMvcTest({GenreController.class, GlobalExceptionHandler.class})
 public class GenreControllerTest {
-  private MockMvc mockMvc;
-  private GenreService genreService;
-  private GenreController genreController;
 
-  @BeforeEach
-  void setup() {
-    this.genreService = Mockito.mock(GenreService.class);
-    this.genreController = new GenreController(this.genreService);
-    this.mockMvc = MockMvcBuilders.standaloneSetup(this.genreController).build();
-  }
+  @Autowired private MockMvc mockMvc;
+
+  @Autowired private ObjectMapper objectMapper;
+
+  @MockBean private GenreService genreService;
 
   @Test
   void should_get_genre_by_id() throws Exception {
@@ -47,8 +46,6 @@ public class GenreControllerTest {
     GenreResponse response = new GenreResponse();
     response.setId(id);
     response.setName("Fantasy");
-    response.setCreatedAt(Instant.now());
-    response.setUpdatedAt(Instant.now());
 
     when(genreService.getGenreById(id)).thenReturn(response);
 
@@ -72,13 +69,7 @@ public class GenreControllerTest {
 
     UUID id = UUID.randomUUID();
 
-    GenreResponse response =
-        GenreResponse.builder()
-            .id(id)
-            .name("Fantasy")
-            .createdAt(Instant.now())
-            .updatedAt(Instant.now())
-            .build();
+    GenreResponse response = GenreResponse.builder().id(id).name("Fantasy").build();
 
     when(genreService.createGenreByName(any(GenreRequest.class))).thenReturn(response);
 
@@ -165,9 +156,6 @@ public class GenreControllerTest {
 
     GenreResponse response = new GenreResponse();
     response.setId(id);
-    response.setName("Fantasy");
-    response.setCreatedAt(Instant.now());
-    response.setUpdatedAt(Instant.now());
 
     Mockito.doNothing().when(genreService).deleteGenreById(id);
 
@@ -192,8 +180,6 @@ public class GenreControllerTest {
     GenreResponse response = new GenreResponse();
     response.setId(id);
     response.setName("Fantasy");
-    response.setCreatedAt(Instant.now());
-    response.setUpdatedAt(Instant.now());
 
     when(genreService.updateGenreByName(any(UUID.class), any(GenreRequest.class)))
         .thenReturn(response);
