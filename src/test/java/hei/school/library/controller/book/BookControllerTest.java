@@ -18,27 +18,18 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+@WebMvcTest({BookController.class, GlobalExceptionHandler.class})
 public class BookControllerTest {
 
-  private MockMvc mockMvc;
-  private BookService bookService;
-
-  @BeforeEach
-  void setup() {
-    this.bookService = Mockito.mock(BookService.class);
-    BookController bookController = new BookController(this.bookService);
-    this.mockMvc =
-        MockMvcBuilders.standaloneSetup(bookController)
-            .setControllerAdvice(new GlobalExceptionHandler())
-            .build();
-  }
+  @Autowired private MockMvc mockMvc;
+  @MockBean private BookService bookService;
 
   @Test
   void should_list_books_with_pagination() throws Exception {
