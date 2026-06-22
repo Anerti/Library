@@ -1,8 +1,11 @@
 package hei.school.library.controller.library;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import hei.school.library.dto.LibraryRequest;
@@ -11,6 +14,7 @@ import hei.school.library.endpoint.rest.controller.LibraryController;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.service.LibraryService;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -79,6 +83,41 @@ class LibraryControllerTest {
             post("/libraries")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
+        .andExpect(status().isUnprocessableEntity());
+  }
+
+  @Test
+  void update_ShouldReturnOk_WhenRequestIsValid() throws Exception {
+    UUID libraryId = UUID.randomUUID();
+    LibraryRequest request =
+        new LibraryRequest(
+            "Grande Bibliothèque", "0102030405", "info@biblio.com", "12 Rue de Paris");
+    LibraryResponse response =
+        LibraryResponse.builder().id(libraryId).name("Grande Bibliothèque").build();
+
+    when(libraryService.updateLibrary(eq(libraryId), any(LibraryRequest.class)))
+        .thenReturn(response);
+    mockMvc
+        .perform(
+            patch("/libraries/" + libraryId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("Grande Bibliothèque"));
+  }
+
+  @Test
+  void update_ShouldReturnUnprocessableEntity_WhenValidationFails() throws Exception {
+    UUID libraryId = UUID.randomUUID();
+    LibraryRequest request = new LibraryRequest("", "invalid-phone", "bad-email", "address");
+
+    when(libraryService.updateLibrary(eq(libraryId), any(LibraryRequest.class)))
+        .thenThrow(new UnprocessableEntityException("name is required."));
+    mockMvc
+        .perform(
+            patch("/libraries/" + libraryId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isUnprocessableEntity());
   }
 }

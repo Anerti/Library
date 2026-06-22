@@ -39,4 +39,23 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
       @Param("phone") String phone,
       @Param("email") String email,
       @Param("address") String address);
+
+  @Query(
+      value =
+          """
+          UPDATE library
+          SET
+            name = COALESCE(:name, name),
+            phone = COALESCE(:phone, phone),
+            email = COALESCE(:email, email),
+            address = COALESCE(:address, address),
+          WHERE id = :id
+          RETURNING id, name, phone, email, address
+          """,
+      nativeQuery = true)
+  Optional<Library> patch(
+      @Param("name") String name,
+      @Param("phone") String phone,
+      @Param("email") String email,
+      @Param("address") String address);
 }

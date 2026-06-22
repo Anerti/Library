@@ -10,6 +10,7 @@ import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.validator.DataValidator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -73,5 +74,17 @@ public class LibraryService {
                 () ->
                     new ConflictException(
                         "Library with email " + request.getEmail() + " already exists")));
+  }
+
+  @Transactional
+  public LibraryResponse updateLibrary(UUID id, LibraryRequest request) {
+    dataValidator.validateString("address", request.getAddress());
+    dataValidator.validateName("name", request.getName());
+    dataValidator.validateEmail(request.getEmail());
+    dataValidator.validatePhone(request.getPhone());
+    return mapper.toResponse(
+        repository
+            .patch(request.getName(), request.getPhone(), request.getEmail(), request.getAddress())
+            .orElseThrow(() -> new NotFoundException("Library with id " + id + " not found")));
   }
 }

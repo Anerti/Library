@@ -8,6 +8,7 @@ import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.entity.Library;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.LibraryMapper;
 import hei.school.library.repository.dao.LibraryRepository;
@@ -282,6 +283,100 @@ class LibraryServiceTest {
         assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
 
     assertEquals("address is required.", exception.getMessage());
+    verifyNoInteractions(repository);
+  }
+
+  @Test
+  void updateLibrary_ShouldReturnResponse_WhenLibraryExistsAndValid() {
+    UUID id = UUID.randomUUID();
+    LibraryRequest request =
+        new LibraryRequest("Biblio", "+33123456789", "test@test.com", "123-Street_Paris");
+    Library mockLibrary = new Library();
+    LibraryResponse mockResponse = LibraryResponse.builder().name("Biblio").build();
+
+    when(repository.patch(
+            request.getName(), request.getPhone(), request.getEmail(), request.getAddress()))
+        .thenReturn(Optional.of(mockLibrary));
+    when(mapper.toResponse(mockLibrary)).thenReturn(mockResponse);
+    LibraryResponse result = service.updateLibrary(id, request);
+    assertNotNull(result);
+    assertEquals("Biblio", result.getName());
+    verify(repository, times(1)).patch(any(), any(), any(), any());
+    verify(mapper, times(1)).toResponse(mockLibrary);
+  }
+
+  @Test
+  void updateLibrary_ShouldThrowNotFoundException_WhenLibraryDoesNotExistInDb() {
+    UUID id = UUID.randomUUID();
+    LibraryRequest request =
+        new LibraryRequest("Biblio", "+33123456789", "test@test.com", "123-Street");
+
+    when(repository.patch(any(), any(), any(), any())).thenReturn(Optional.empty());
+
+    assertThrows(NotFoundException.class, () -> service.updateLibrary(id, request));
+  }
+
+  @Test
+  void updateLibrary_ShouldThrowUnprocessableEntity_WhenAddressIsInvalid() {
+    UUID id = UUID.randomUUID();
+    LibraryRequest request =
+        new LibraryRequest("Biblio", "+33123456789", "test@test.com", "123 Rue #4");
+
+    UnprocessableEntityException exception =
+        assertThrows(UnprocessableEntityException.class, () -> service.updateLibrary(id, request));
+
+    assertTrue(exception.getMessage().contains("invalid characters"));
+    verifyNoInteractions(repository);
+  }
+
+  @Test
+  void updateLibrary_ShouldThrowUnprocessableEntity_WhenNameIsEmpty() {
+    UUID id = UUID.randomUUID();
+    LibraryRequest request = new LibraryRequest("", "+33123456789", "test@test.com", "123 Street");
+
+    UnprocessableEntityException exception =
+        assertThrows(UnprocessableEntityException.class, () -> service.updateLibrary(id, request));
+
+    assertEquals("name is required.", exception.getMessage());
+    verifyNoInteractions(repository);
+  }
+
+  @Test
+  void updateLibrary_ShouldThrowUnprocessableEntity_WhenNameContainsDigits() {
+    UUID id = UUID.randomUUID();
+    LibraryRequest request =
+        new LibraryRequest("Biblio123", "+33123456789", "test@test.com", "123 Street");
+
+    UnprocessableEntityException exception =
+        assertThrows(UnprocessableEntityException.class, () -> service.updateLibrary(id, request));
+
+    assertTrue(exception.getMessage().contains("forbidden characters"));
+    verifyNoInteractions(repository);
+  }
+
+  @Test
+  void updateLibrary_ShouldThrowUnprocessableEntity_WhenEmailFormatIsInvalid() {
+    UUID id = UUID.randomUUID();
+    LibraryRequest request =
+        new LibraryRequest("Biblio", "+33123456789", "invalid-email-format", "123 Street");
+
+    UnprocessableEntityException exception =
+        assertThrows(UnprocessableEntityException.class, () -> service.updateLibrary(id, request));
+
+    assertTrue(exception.getMessage().contains("Invalid email format"));
+    verifyNoInteractions(repository);
+  }
+
+  @Test
+  void updateLibrary_ShouldThrowUnprocessableEntity_WhenPhoneFormatIsInvalid() {
+    UUID id = UUID.randomUUID();
+    LibraryRequest request =
+        new LibraryRequest("Biblio", "01-23-ABC-45", "test@test.com", "123 Street");
+
+    UnprocessableEntityException exception =
+        assertThrows(UnprocessableEntityException.class, () -> service.updateLibrary(id, request));
+
+    assertTrue(exception.getMessage().contains("Invalid phone format"));
     verifyNoInteractions(repository);
   }
 }
