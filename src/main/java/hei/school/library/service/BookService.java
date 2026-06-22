@@ -72,7 +72,9 @@ public class BookService {
   @Transactional(readOnly = true)
   public PageResponse<BookResponse> listBooks(
       String search, String isbn, String authorLastName, String genreName, int page, int size) {
-    dataValidator.validateString("search", search);
+    if (search != null) {
+      dataValidator.validateString("search", search);
+    }
 
     Pageable pageable = PageRequest.of(page - 1, size);
 
