@@ -55,4 +55,18 @@ public class SaleItemService {
                             + " already exists in sale "
                             + saleId)));
   }
+
+  @Transactional
+  public void delete(UUID saleId, UUID bookCopyId) {
+    saleRepository
+        .findById(saleId)
+        .orElseThrow(() -> new NotFoundException("Sale " + saleId + " not found"));
+
+    saleItemRepository
+        .delete(saleId, bookCopyId)
+        .orElseThrow(
+            () ->
+                new NotFoundException(
+                    "SaleItem with bookCopyId " + bookCopyId + " not found in sale " + saleId));
+  }
 }
