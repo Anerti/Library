@@ -56,7 +56,7 @@ public class GenreService {
   public void deleteGenreById(UUID id) {
     genreRepository
         .deleteByUUId(id)
-        .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found"));
+        .orElseThrow(() -> new NotFoundException(String.format("Genre %s not found", id)));
   }
 
   @Transactional
