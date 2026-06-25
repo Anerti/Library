@@ -15,4 +15,5 @@ INSERT INTO library (id, name, phone, email, address) VALUES
     ('b9deef47-28fc-415a-b859-580446374f2a', 'Bibliothèque du Jardin',       '+261 20 55 667 88', 'jardin@biblio.mg',              'Parc de la Coulée Verte'),
     ('a22daec1-0460-4397-b255-e10889521618', 'Knowledge Hub',               '+261 33 88 990 01', 'hub@knowledge.org',             'Rue de la Science'),
     ('79928633-dc65-4d58-acec-dac19cd5e975', 'Center for Reading',           '+261 34 99 001 22', 'reading@center.mg',             'Boulevard de l''Europe'),
-    ('a31a79cd-dbe7-40f9-a821-cbddd5cd892f', 'Réseau des Bibliothèques',    '+261 32 77 889 00', 'reseau@biblio-network.mg',      'Réseau Tana Est');
+    ('a31a79cd-dbe7-40f9-a821-cbddd5cd892f', 'Réseau des Bibliothèques',    '+261 32 77 889 00', 'reseau@biblio-network.mg',      'Réseau Tana Est')
+ON CONFLICT DO NOTHING;
