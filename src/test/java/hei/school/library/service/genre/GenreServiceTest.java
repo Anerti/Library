@@ -22,6 +22,7 @@ import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.service.GenreService;
 import hei.school.library.validator.DataValidator;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -206,6 +208,22 @@ class GenreServiceTest {
 
     assertThatThrownBy(() -> genreService.updateGenreByName(id, request))
         .isInstanceOf(NotFoundException.class);
+
+    verify(genreRepository).updateGenreName(id, request.getName());
+  }
+
+  @Test
+  @DisplayName("update: should throw ConflictException on duplicate name")
+  void should_return_conflict_when_name_already_exists() {
+    UUID id = UUID.randomUUID();
+    GenreRequest request = GenreRequest.builder().name("Fantasy").build();
+    when(genreRepository.updateGenreName(id, request.getName()))
+        .thenThrow(
+            new DataIntegrityViolationException(
+                "duplicate key", new SQLException("unique violation", "23505")));
+
+    assertThatThrownBy(() -> genreService.updateGenreByName(id, request))
+        .isInstanceOf(ConflictException.class);
 
     verify(genreRepository).updateGenreName(id, request.getName());
   }

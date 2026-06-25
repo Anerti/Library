@@ -212,4 +212,18 @@ class GenreControllerTest {
                 .content(objectMapper.writeValueAsString(new GenreRequest("Action"))))
         .andExpect(status().isNotFound());
   }
+
+  @Test
+  @DisplayName("patch /genres/{id}: should return 409 on duplicate name")
+  void should_return_conflict_when_name_already_exists() throws Exception {
+    when(genreService.updateGenreByName(any(UUID.class), any(GenreRequest.class)))
+        .thenThrow(new ConflictException("Genre Fantasy already exists."));
+
+    mockMvc
+        .perform(
+            patch("/genres/{id}", genreId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new GenreRequest("Fantasy"))))
+        .andExpect(status().isConflict());
+  }
 }

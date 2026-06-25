@@ -8,8 +8,10 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.GenreMapper;
 import hei.school.library.repository.dao.GenreRepository;
 import hei.school.library.validator.DataValidator;
+import java.sql.SQLException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ public class GenreService {
   private final GenreRepository genreRepository;
   private final GenreMapper genreMapper;
   private final DataValidator dataValidator;
+  private static final String SQL_STATE_VIOLATION = "23505";
 
   @Transactional(readOnly = true)
   public GenreResponse getGenreById(UUID id) {
@@ -61,10 +64,20 @@ public class GenreService {
 
   @Transactional
   public GenreResponse updateGenreByName(UUID id, GenreRequest request) {
+    dataValidator.checkNull("name", request.getName());
     dataValidator.validateName("name", request.getName());
-    return genreMapper.toResponse(
-        genreRepository
-            .updateGenreName(id, request.getName())
-            .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found")));
+
+    try {
+      return genreMapper.toResponse(
+          genreRepository
+              .updateGenreName(id, request.getName())
+              .orElseThrow(() -> new NotFoundException("Genre with id " + id + " not found")));
+    } catch (DataIntegrityViolationException e) {
+      if (e.getRootCause() instanceof SQLException sqlEx
+          && SQL_STATE_VIOLATION.equals(sqlEx.getSQLState())) {
+        throw new ConflictException("Genre " + request.getName() + " already exists.");
+      }
+      throw e;
+    }
   }
 }
