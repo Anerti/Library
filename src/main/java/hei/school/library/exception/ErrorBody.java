@@ -9,9 +9,9 @@ import lombok.Value;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorBody {
+  int status;
   String error;
   String message;
-  int status;
   @Builder.Default
   Instant timestamp = Instant.now();
 }

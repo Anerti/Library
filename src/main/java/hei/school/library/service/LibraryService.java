@@ -43,7 +43,7 @@ public class LibraryService {
 
     return LibraryListResponse
             .builder()
-            .data(data)
+            .data(data.isEmpty() ? null : data)
             .meta(meta)
             .build();
   }
