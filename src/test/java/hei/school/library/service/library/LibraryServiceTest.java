@@ -44,7 +44,9 @@ class LibraryServiceTest {
     paginationMapper = new PaginationMapper();
     dataValidator = new DataValidator();
     libraryValidator = new LibraryValidator(dataValidator);
-    service = new LibraryService(repository, dataValidator, libraryMapper, paginationMapper, libraryValidator);
+    service =
+        new LibraryService(
+            repository, dataValidator, libraryMapper, paginationMapper, libraryValidator);
   }
 
   @Test
@@ -289,7 +291,8 @@ class LibraryServiceTest {
   }
 
   @Test
-  void createLibrary_should_throw_UnprocessableEntityException_when_address_has_invalid_characters() {
+  void
+      createLibrary_should_throw_UnprocessableEntityException_when_address_has_invalid_characters() {
     LibraryRequest badRequest = new LibraryRequest();
     badRequest.setName("Librairie Generale");
     badRequest.setEmail("contact@library.com");
