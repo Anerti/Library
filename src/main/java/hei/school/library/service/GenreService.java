@@ -3,7 +3,6 @@ package hei.school.library.service;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
 import hei.school.library.dto.PageResponse;
-import hei.school.library.entity.Genre;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.GenreMapper;
@@ -24,11 +23,10 @@ public class GenreService {
 
   @Transactional(readOnly = true)
   public GenreResponse getGenreById(UUID id) {
-    Genre genre =
+    return genreMapper.toResponse(
         genreRepository
             .findById(id)
-            .orElseThrow(() -> new NotFoundException("The requested resource was not found"));
-    return genreMapper.toResponse(genre);
+            .orElseThrow(() -> new NotFoundException(String.format("Genre %s not found", id))));
   }
 
   @Transactional

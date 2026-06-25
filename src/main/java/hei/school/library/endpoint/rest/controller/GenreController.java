@@ -17,8 +17,8 @@ public class GenreController {
   private final GenreService genreService;
 
   @GetMapping("/{genreId}")
-  public ResponseEntity<?> getGenreById(@PathVariable UUID genreId) {
-    return ResponseEntity.ok(genreService.getGenreById(genreId));
+  public ResponseEntity<GenreResponse> getGenreById(@PathVariable UUID genreId) {
+    return ResponseEntity.status(HttpStatus.OK).body(genreService.getGenreById(genreId));
   }
 
   @PostMapping
