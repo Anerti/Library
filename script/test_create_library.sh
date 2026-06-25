@@ -9,8 +9,8 @@ echo "── 2) 201 — POST /libraries (another valid)  →  201 / different da
 curlie POST "http://localhost:8080/libraries" name="Parc Library" phone="+261 34 98 765 43" email="parc-create@test.mg" address="Parc de la Lecture"
 echo
 
-echo "── 3) 409 — POST /libraries (duplicate email)  →  409 / already exists"
-curlie POST "http://localhost:8080/libraries" name="Central Library" phone="+261 33 44 55 77" email="tech@library.com" address="Main Street"
+echo "── 3) 409 — POST /libraries (duplicate email from test 1)  →  409 / already exists"
+curlie POST "http://localhost:8080/libraries" name="Central Library" phone="+261 33 44 55 77" email="test-create@test.mg" address="Main Street"
 echo
 
 echo "── 4) 422 — POST /libraries (name blank)  →  422 / name is required and cannot be blank"

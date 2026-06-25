@@ -24,13 +24,15 @@ public class DataValidator {
 
   public void checkNull(String fieldName, Object value) {
     if (value == null || value.toString().isBlank()) {
-      throw new UnprocessableEntityException(String.format("%s is required and cannot be blank.", fieldName));
+      throw new UnprocessableEntityException(
+          String.format("%s is required and cannot be blank.", fieldName));
     }
   }
 
   public void checkStringLength(String fieldName, String value, int length) {
     if (value.length() > length) {
-      throw new UnprocessableEntityException(String.format("%s cannot be longer than %s characters.", fieldName, length));
+      throw new UnprocessableEntityException(
+          String.format("%s cannot be longer than %s characters.", fieldName, length));
     }
   }
 
@@ -50,14 +52,13 @@ public class DataValidator {
 
       if (!ALLOWED_EMAIL_CHAR.matcher(email).matches()) {
         throw new UnprocessableEntityException(
-                String.format(
-                        "Invalid input for email: '%s' only a-zA-Z0-9@_.- characters are allowed.", email));
+            String.format(
+                "Invalid input for email: '%s' only a-zA-Z0-9@_.- characters are allowed.", email));
       }
 
       if (!VALID_EMAIL_PATTERN.matcher(email).matches()) {
         throw new UnprocessableEntityException(String.format("Invalid email format: '%s'", email));
       }
-
     }
   }
 
@@ -67,10 +68,10 @@ public class DataValidator {
 
       if (!VALID_PHONE_PATTERN.matcher(phone).matches()) {
         throw new UnprocessableEntityException(
-                String.format(
-                        "Invalid phone format: '%s'. Only +, digits, spaces, hyphens and parentheses are"
-                                + " allowed.",
-                        phone));
+            String.format(
+                "Invalid phone format: '%s'. Only +, digits, spaces, hyphens and parentheses are"
+                    + " allowed.",
+                phone));
       }
     }
   }
