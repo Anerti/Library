@@ -6,12 +6,14 @@ import hei.school.library.dto.LibraryResponse;
 import hei.school.library.dto.PaginationDto;
 import hei.school.library.entity.Library;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.LibraryMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.validator.DataValidator;
 import hei.school.library.validator.LibraryValidator;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -56,5 +58,10 @@ public class LibraryService {
                         String.format(
                             "Library with this email %s, phone %s, or address %s already exists",
                             request.getEmail(), request.getPhone(), request.getAddress()))));
+  }
+
+  @Transactional
+  public void deleteLibrary(UUID id) {
+    repository.deleteByIdAndReturn(id).orElseThrow(() -> new NotFoundException("Library", id));
   }
 }
