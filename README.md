@@ -1,16 +1,17 @@
 # Library (library-962dc383)
 
-Spring Boot 3 backend, deployed on AWS Lambda.
+Spring Boot 3 backend déployé sur AWS Lambda.
+API de gestion de bibliothèque — succursales, catalogue, clients, ventes, réceptions de stock.
 
-## Prerequisites
+## Prérequis
 
 - Java 21
 - PostgreSQL 14+
-- Gradle (or use `./gradlew`)
+- Gradle (ou utiliser `./gradlew`)
 
-## Setup
+## Configuration
 
-### 1. Configure `.env`
+### 1. Fichier `.env`
 
 ```bash
 PGHOST=localhost
@@ -20,36 +21,41 @@ PGPASSWORD=postgres
 PGSSLMODE=disable
 ```
 
-> `.env` is gitignored — safe to put real credentials here.
+> `.env` est gitignoré — vous pouvez y mettre vos vrais identifiants.
 
 ### 2. Build & test
 
 ```bash
-./gradlew build -x test   # compile only
-./gradlew test            # full test suite (TestContainers spins up Postgres automatically)
-./gradlew bootRun         # start on http://localhost:8080
+./gradlew build -x test   # compilation uniquement
+./gradlew test            # tests unitaires + intégration (TestContainers spin up Postgres auto)
+./gradlew bootRun         # démarre sur http://localhost:8080
 ```
 
 ## Endpoints
 
-47 endpoints — spec complète au format OpenAPI 3.0.3 dans `doc/openapi.yml`.
+50 endpoints — spec OpenAPI 3.0.3 dans `doc/openapi.yml` (27 paths).
 
-Principaux groupes :
-- **Libraries** — CRUD succursales
-- **Books** — catalogue, auteurs, genres
-- **Customers** — clients
-- **Book Copies** — exemplaires par librairie
-- **Arrivals** — réceptions de stock
-- **Sales** — ventes et articles vendus
+Groupes principaux :
 
-Tous les endpoints retournent des réponses paginées (listes) avec des exemples inline.
+| Groupe | Description |
+|---|---|
+| **Libraries** | CRUD succursales + recherche |
+| **Books** | Catalogue — CRUD, filtre par auteur, genre |
+| **Authors** | CRUD auteurs |
+| **Genres** | CRUD genres |
+| **Customers** | CRUD clients |
+| **Book Copies** | Exemplaires par librairie + statut + stock |
+| **Arrivals** | Réceptions de stock + lignes d'arrivage |
+| **Sales** | Ventes et articles vendus |
 
 > `GET /ping` — health check
-> `GET /health/email` — SES email status
+> `GET /health/email` — statut email SES
+
+Tous les endpoints retournent des réponses paginées (listes) avec `PageResponse<data>` + `PaginationDto` en meta.
 
 ## Stack
 
-Java 21 · Spring Boot 3.2.2 · PostgreSQL · AWS Lambda/SQS/SES · Gradle 8.5 · Lombok · TestContainers · JaCoCo
+Java 21 · Spring Boot 3.2.2 · PostgreSQL · AWS Lambda/SQS/SES · Gradle 8.5 · Lombok · TestContainers · JaCoCo · GitHub Actions
 
 ## Architecture
 
@@ -59,14 +65,18 @@ Controller (DTO) → Service (validation + orchestration) → Repository (entit�
                                                           Mapper → DTO
 ```
 
-- **Repository** : exécute les queries natives (`@Query`), retourne des entités
-- **Service** : valide via `DataValidator`, orchestre, mappe entité → DTO via le Mapper
+- **Repository** : JPA `@Query` natives, retourne des entités, INSERT RETURNING pattern
+- **Service** : valide via `DataValidator` + validators domaine, orchestre, mappe entité → DTO
 - **Controller** : reçoit/renvoie des DTOs, aucun traitement métier
 
 ## Validation
 
-Les règles métier sont centralisées dans `DataValidator` (package `validator`) — appelées dans le service, pas d'annotations JSR-380 sur les DTOs.
+Validation centralisée dans `DataValidator` (email, phone, ISBN, safe strings) + validateurs par domaine (`AuthorValidator`, `BookCopyValidator`, `SaleValidator`, etc.). Appelée dans le service — pas d'annotations JSR-380 sur les DTOs.
+
+## Gestion des exceptions
+
+Hiérarchie standardisée : `NotFoundException` (404), `BadRequestException` (400), `UnprocessableEntityException` (422), `ConflictException` (409). Toutes gérées par `GlobalExceptionHandler` (`@RestControllerAdvice`) qui retourne des JSON `ErrorBody`.
 
 ---
 
-*POJA-generated — [hei.school](https://hei.school)*
+*Projet généré via POJA — [hei.school](https://hei.school)*
