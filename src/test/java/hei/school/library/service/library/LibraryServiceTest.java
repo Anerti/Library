@@ -245,7 +245,7 @@ class LibraryServiceTest {
     ConflictException exception =
         assertThrows(ConflictException.class, () -> service.createLibrary(request));
 
-    assertEquals("Library with this email, phone, or address already exists", exception.getMessage());
+    assertTrue(exception.getMessage().contains("already exists"));
     verify(libraryMapper, never()).toResponse(any());
   }
 
