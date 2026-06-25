@@ -22,8 +22,16 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
             OR email ILIKE '%' || :search || '%'
             OR address ILIKE '%' || :search || '%')
           """,
+      countQuery =
+          """
+          SELECT COUNT(id) FROM library
+          WHERE (:search IS NULL OR :search = ''
+            OR name ILIKE '%' || :search || '%'
+            OR email ILIKE '%' || :search || '%'
+            OR address ILIKE '%' || :search || '%')
+          """,
       nativeQuery = true)
-  Optional<Page<Library>> searchLibraries(@Param("search") String search, Pageable pageable);
+  Page<Library> searchLibraries(@Param("search") String search, Pageable pageable);
 
   @Query(
       value =
