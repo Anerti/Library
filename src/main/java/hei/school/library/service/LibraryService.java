@@ -12,6 +12,8 @@ import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.validator.DataValidator;
 import java.util.List;
+
+import hei.school.library.validator.LibraryValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +28,7 @@ public class LibraryService {
   private final DataValidator dataValidator;
   private final LibraryMapper libraryMapper;
   private final PaginationMapper paginationMapper;
+  private final LibraryValidator libraryValidator;
 
   @Transactional(readOnly = true)
   public LibraryListResponse listLibraries(String search, int page, int size) {
@@ -43,13 +46,7 @@ public class LibraryService {
 
   @Transactional
   public LibraryResponse createLibrary(LibraryRequest request) {
-    if (request.getAddress() == null || request.getAddress().isBlank()) {
-      throw new UnprocessableEntityException("address is required.");
-    }
-    dataValidator.validateString("address", request.getAddress());
-    dataValidator.validateName("name", request.getName());
-    dataValidator.validateEmail(request.getEmail());
-    dataValidator.validatePhone(request.getPhone());
+    libraryValidator.validateCreation(request);
 
     return libraryMapper.toResponse(
         repository
@@ -58,6 +55,9 @@ public class LibraryService {
             .orElseThrow(
                 () ->
                     new ConflictException(
-                        "Library with email " + request.getEmail() + " already exists")));
+                            String.format("Library with email %s already exists", request.getEmail())
+                    )
+            )
+    );
   }
 }

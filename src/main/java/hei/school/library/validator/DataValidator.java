@@ -15,7 +15,7 @@ public class DataValidator {
 
   private static final Pattern SAFE_STRING = Pattern.compile("^[a-zA-Z0-9@'éèê ._+\\-]*$");
   private final Pattern SAFE_STRING_BOOK_NAME = Pattern.compile("^[a-zA-Z0-9' éèê-]+$");
-  private static final Pattern SAFE_NAME_STRING = Pattern.compile("^[a-zA-Z' ]+$");
+  private static final Pattern SAFE_NAME_STRING = Pattern.compile("^[a-zA-Zéèê' -]+$");
   private static final Pattern VALID_EMAIL_PATTERN =
       Pattern.compile("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z]+){1,2}$");
   private static final Pattern ALLOWED_EMAIL_CHAR = Pattern.compile("^[a-zA-Z0-9.@_-]+$");
@@ -54,7 +54,7 @@ public class DataValidator {
 
   public void validatePhone(String phone) {
     if (phone == null || phone.isBlank()) {
-      throw new UnprocessableEntityException("Phone number is required.");
+      throw new UnprocessableEntityException("Phone number is required and cannot be blank.");
     }
 
     if (!VALID_PHONE_PATTERN.matcher(phone).matches()) {
@@ -124,7 +124,7 @@ public class DataValidator {
       throw new UnprocessableEntityException(
           String.format(
               "%s field contain forbidden characters. "
-                  + "Only letters (a-z, A-Z) and space are allowed.",
+                  + "Only letters (a-z, A-Z, éèê), hyphen and space are allowed.",
               fieldName));
     }
   }
