@@ -1,13 +1,14 @@
 package hei.school.library.service.genre;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import hei.school.library.dto.GenreRequest;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -35,7 +37,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
-public class GenreServiceTest {
+class GenreServiceTest {
   @Mock private GenreRepository genreRepository;
   @Mock private DataValidator dataValidator;
   @Mock private GenreMapper genreMapper;
@@ -48,6 +50,7 @@ public class GenreServiceTest {
   }
 
   @Test
+  @DisplayName("getById: should return genre DTO when found")
   void should_get_genre_by_id() {
     UUID id = UUID.randomUUID();
     String name = "Fantasy";
@@ -59,12 +62,13 @@ public class GenreServiceTest {
     when(genreMapper.toResponse(genre)).thenReturn(expectedResponse);
 
     GenreResponse actualResponse = genreService.getGenreById(id);
-    assertEquals(expectedResponse, actualResponse);
-    verify(genreRepository, times(1)).findById(id);
-    verify(genreMapper, times(1)).toResponse(genre);
+    assertThat(actualResponse).isEqualTo(expectedResponse);
+    verify(genreRepository).findById(id);
+    verify(genreMapper).toResponse(genre);
   }
 
   @Test
+  @DisplayName("getById: should throw NotFoundException when absent")
   void should_return_not_found_when_genre_id_does_not_exist() {
     UUID id = UUID.randomUUID();
     when(genreRepository.findById(id)).thenReturn(Optional.empty());
@@ -75,13 +79,12 @@ public class GenreServiceTest {
   }
 
   @Test
-  void should_create_genre() throws Exception {
-
+  @DisplayName("create: should save and return DTO")
+  void should_create_genre() {
     UUID id = UUID.randomUUID();
     String genreName = "Fantasy";
 
     Genre genre = Genre.builder().id(id).name(genreName).build();
-
     GenreResponse expectedResponse = GenreResponse.builder().id(id).name(genreName).build();
 
     when(genreRepository.insertGenreIgnoreConflict(genreName)).thenReturn(Optional.of(genre));
@@ -89,28 +92,37 @@ public class GenreServiceTest {
 
     GenreResponse actualResponse =
         genreService.createGenreByName(GenreRequest.builder().name(genreName).build());
-    assertEquals(expectedResponse, actualResponse);
+
+    assertThat(actualResponse).isEqualTo(expectedResponse);
+    verify(dataValidator).checkNull("name", genreName);
+    verify(dataValidator).validateName("name", genreName);
+    verify(genreRepository).insertGenreIgnoreConflict(genreName);
+    verify(genreMapper).toResponse(genre);
   }
 
   @Test
-  void should_return_conflict_when_genre_already_exists() throws Exception {
+  @DisplayName("create: should throw ConflictException when duplicate name")
+  void should_return_conflict_when_genre_already_exists() {
     String genreName = "Fantasy";
     when(genreRepository.insertGenreIgnoreConflict(genreName)).thenReturn(Optional.empty());
-    assertThrows(
-        ConflictException.class,
-        () -> genreService.createGenreByName(GenreRequest.builder().name(genreName).build()));
+
+    assertThatThrownBy(
+            () -> genreService.createGenreByName(GenreRequest.builder().name(genreName).build()))
+        .isInstanceOf(ConflictException.class);
   }
 
   @Test
-  void should_return_unprocessable_entity_exception_when_request_is_not_valid() throws Exception {
+  @DisplayName("create: should throw UnprocessableEntityException when name is null")
+  void should_return_unprocessable_entity_exception_when_request_is_not_valid() {
     doThrow(UnprocessableEntityException.class).when(dataValidator).validateName("name", null);
 
-    assertThrows(
-        UnprocessableEntityException.class,
-        () -> genreService.createGenreByName(GenreRequest.builder().name(null).build()));
+    assertThatThrownBy(
+            () -> genreService.createGenreByName(GenreRequest.builder().name(null).build()))
+        .isInstanceOf(UnprocessableEntityException.class);
   }
 
   @Test
+  @DisplayName("findAll: should return all genres when search is null or blank")
   void should_return_all_genres_when_search_is_null_or_empty() {
     int page = 1;
     int size = 10;
@@ -122,14 +134,17 @@ public class GenreServiceTest {
 
     when(genreRepository.findAll(pageable)).thenReturn(genrePage);
     when(genreMapper.toPageResponse(genrePage, page, size)).thenReturn(expectedResponse);
+
     PageResponse<GenreResponse> actualResponse = genreService.findAll(null, page, size);
-    assertNotNull(actualResponse);
-    verify(genreRepository, times(1)).findAll(pageable);
+
+    assertThat(actualResponse).isNotNull();
+    verify(genreRepository).findAll(pageable);
     verify(genreRepository, never()).findBySearch(anyString(), any());
-    verify(genreMapper, times(1)).toPageResponse(genrePage, page, size);
+    verify(genreMapper).toPageResponse(genrePage, page, size);
   }
 
   @Test
+  @DisplayName("findAll: should filter genres when search is provided")
   void should_return_filtered_genres_when_search_is_provided() {
     String search = "Fan";
     int page = 1;
@@ -142,15 +157,18 @@ public class GenreServiceTest {
     PageResponse<GenreResponse> expectedResponse = new PageResponse<>();
     when(genreRepository.findBySearch(eq(search), eq(pageable))).thenReturn(genrePage);
     when(genreMapper.toPageResponse(genrePage, page, size)).thenReturn(expectedResponse);
+
     PageResponse<GenreResponse> actualResponse = genreService.findAll(search, page, size);
-    assertNotNull(actualResponse);
-    verify(genreRepository, times(1)).findBySearch(eq(search), eq(pageable));
+
+    assertThat(actualResponse).isNotNull();
+    verify(genreRepository).findBySearch(eq(search), eq(pageable));
     verify(genreRepository, never()).findAll(any(Pageable.class));
-    verify(genreMapper, times(1)).toPageResponse(genrePage, page, size);
+    verify(genreMapper).toPageResponse(genrePage, page, size);
   }
 
   @Test
-  void should_update_genre_by_id() throws Exception {
+  @DisplayName("update: should update and return DTO")
+  void should_update_genre_by_id() {
     UUID id = UUID.randomUUID();
     String newName = "Action";
 
@@ -164,20 +182,24 @@ public class GenreServiceTest {
     GenreResponse expectedResponse = new GenreResponse();
     expectedResponse.setId(id);
     expectedResponse.setName(newName);
+
     doNothing().when(dataValidator).validateName("name", newName);
     when(genreRepository.updateGenreName(id, newName)).thenReturn(Optional.of(updatedGenreFromDb));
     when(genreMapper.toResponse(updatedGenreFromDb)).thenReturn(expectedResponse);
+
     GenreResponse actualResponse = genreService.updateGenreByName(id, request);
-    assertNotNull(actualResponse);
-    assertEquals(newName, actualResponse.getName());
-    assertEquals(id, actualResponse.getId());
-    verify(dataValidator, times(1)).validateName("name", newName);
-    verify(genreRepository, times(1)).updateGenreName(id, newName);
-    verify(genreMapper, times(1)).toResponse(updatedGenreFromDb);
+
+    assertThat(actualResponse).isNotNull();
+    assertThat(actualResponse.getName()).isEqualTo(newName);
+    assertThat(actualResponse.getId()).isEqualTo(id);
+    verify(dataValidator).validateName("name", newName);
+    verify(genreRepository).updateGenreName(id, newName);
+    verify(genreMapper).toResponse(updatedGenreFromDb);
   }
 
   @Test
-  void should_return_not_found_when_genre_id_does_not_exist_on_updating() throws Exception {
+  @DisplayName("update: should throw NotFoundException when absent")
+  void should_return_not_found_when_genre_id_does_not_exist_on_updating() {
     UUID id = UUID.randomUUID();
     GenreRequest request = GenreRequest.builder().name("Fantasy").build();
     when(genreRepository.updateGenreName(id, request.getName())).thenReturn(Optional.empty());
@@ -189,17 +211,19 @@ public class GenreServiceTest {
   }
 
   @Test
-  void should_delete_genre_by_id() throws Exception {
-
+  @DisplayName("delete: should delete by id")
+  void should_delete_genre_by_id() {
     UUID id = UUID.randomUUID();
     when(genreRepository.deleteByUUId(id)).thenReturn(Optional.of(id));
+
     genreService.deleteGenreById(id);
 
-    verify(genreRepository, times(1)).deleteByUUId(id);
+    verify(genreRepository).deleteByUUId(id);
   }
 
   @Test
-  void should_return_not_found_when_genre_id_does_not_exist_on_deleting() throws Exception {
+  @DisplayName("delete: should throw NotFoundException when absent")
+  void should_return_not_found_when_genre_id_does_not_exist_on_deleting() {
     UUID id = UUID.randomUUID();
     when(genreRepository.deleteByUUId(id)).thenReturn(Optional.empty());
 
