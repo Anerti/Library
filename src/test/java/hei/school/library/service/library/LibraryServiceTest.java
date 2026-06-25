@@ -9,6 +9,7 @@ import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.entity.Library;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.LibraryMapper;
 import hei.school.library.mapper.PaginationMapper;
@@ -302,6 +303,28 @@ class LibraryServiceTest {
     assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
 
     verifyNoInteractions(repository);
+  }
+
+  @Test
+  void should_delete_library_when_id_exists() {
+    UUID id = UUID.randomUUID();
+    when(repository.deleteByIdAndReturn(id)).thenReturn(Optional.of(id));
+
+    service.deleteLibrary(id);
+
+    verify(repository).deleteByIdAndReturn(id);
+  }
+
+  @Test
+  void should_throw_not_found_when_deleting_non_existent_library() {
+    UUID id = UUID.randomUUID();
+    when(repository.deleteByIdAndReturn(id)).thenReturn(Optional.empty());
+
+    NotFoundException exception =
+        assertThrows(NotFoundException.class, () -> service.deleteLibrary(id));
+
+    assertTrue(exception.getMessage().contains("not found"));
+    verify(repository).deleteByIdAndReturn(id);
   }
 
   private static void assertSuccess(LibraryListResponse result, int page, int size, long total) {

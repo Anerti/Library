@@ -1,6 +1,8 @@
 package hei.school.library.controller.library;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,6 +12,7 @@ import hei.school.library.dto.LibraryResponse;
 import hei.school.library.dto.PaginationDto;
 import hei.school.library.endpoint.rest.controller.LibraryController;
 import hei.school.library.exception.GlobalExceptionHandler;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.service.LibraryService;
 import java.util.List;
 import java.util.UUID;
@@ -122,5 +125,26 @@ class LibraryControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data").isEmpty())
         .andExpect(jsonPath("$.meta.total").value(0));
+  }
+
+  @Test
+  void should_return_204_when_deleting_existing_library() throws Exception {
+    UUID id = UUID.randomUUID();
+
+    mockMvc
+        .perform(delete("/libraries/{libraryId}", id).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
+  void should_return_404_when_deleting_non_existent_library() throws Exception {
+    UUID id = UUID.randomUUID();
+    doThrow(new NotFoundException("Library", id)).when(libraryService).deleteLibrary(id);
+
+    mockMvc
+        .perform(delete("/libraries/{libraryId}", id).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.error").value("NOT_FOUND"))
+        .andExpect(jsonPath("$.message").value("Library not found with id: " + id));
   }
 }
