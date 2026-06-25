@@ -11,10 +11,17 @@
             "id": "eb6a18216dd7185d",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
-              "icon": "lucide-file",
-              "title": "New tab"
+              "type": "canvas",
+              "state": {
+                "file": "library-mcd.canvas",
+                "viewState": {
+                  "x": -1144.5683969381175,
+                  "y": -256.5079100822723,
+                  "zoom": -1.0102844378402507
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "library-mcd"
             }
           }
         ]
@@ -176,6 +183,6 @@
       "bases:Create new base": false
     }
   },
-  "active": "eb6a18216dd7185d",
+  "active": "a6d77f2d240cbe0f",
   "lastOpenFiles": []
 }
