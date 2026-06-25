@@ -48,6 +48,34 @@ public class GenreServiceTest {
   }
 
   @Test
+  void should_get_genre_by_id() {
+    UUID id = UUID.randomUUID();
+    String name = "Fantasy";
+
+    Genre genre = Genre.builder().id(id).name(name).build();
+    GenreResponse expectedResponse = GenreResponse.builder().id(id).name(name).build();
+
+    when(genreRepository.findById(id)).thenReturn(Optional.of(genre));
+    when(genreMapper.toResponse(genre)).thenReturn(expectedResponse);
+
+    GenreResponse actualResponse = genreService.getGenreById(id);
+    assertEquals(expectedResponse, actualResponse);
+    verify(genreRepository, times(1)).findById(id);
+    verify(genreMapper, times(1)).toResponse(genre);
+  }
+
+  @Test
+  void should_return_not_found_when_genre_id_does_not_exist() {
+    UUID id = UUID.randomUUID();
+    when(genreRepository.findById(id)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> genreService.getGenreById(id))
+        .isInstanceOf(NotFoundException.class);
+    verify(genreRepository).findById(id);
+    verify(genreMapper, never()).toResponse(any());
+  }
+
+  @Test
   void should_create_genre() throws Exception {
 
     UUID id = UUID.randomUUID();

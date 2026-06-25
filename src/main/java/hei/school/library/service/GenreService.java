@@ -24,11 +24,10 @@ public class GenreService {
 
   @Transactional(readOnly = true)
   public GenreResponse getGenreById(UUID id) {
-    Genre genre =
-        genreRepository
+    return genreMapper.toResponse(genreRepository
             .findById(id)
-            .orElseThrow(() -> new NotFoundException("The requested resource was not found"));
-    return genreMapper.toResponse(genre);
+            .orElseThrow(() -> new NotFoundException(String.format("Genre %s not found", id)))
+    );
   }
 
   @Transactional
