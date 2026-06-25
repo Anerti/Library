@@ -41,7 +41,7 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
           INSERT INTO library (name, phone, email, address)
           VALUES (:name, :phone, :email, :address)
           ON CONFLICT (email) DO NOTHING
-          RETURNING name, phone, email, address
+          RETURNING id, name, phone, email, address
           """,
       nativeQuery = true)
   Optional<Library> insertLibraryIgnoreConflict(
