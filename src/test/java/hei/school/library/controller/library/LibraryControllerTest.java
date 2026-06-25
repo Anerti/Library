@@ -112,16 +112,13 @@ class LibraryControllerTest {
   void should_return_empty_list_when_no_libraries() throws Exception {
     PaginationDto meta = PaginationDto.builder().page(1).size(20).total(0).build();
 
-    LibraryListResponse response =
-        LibraryListResponse.builder().data(List.of()).meta(meta).build();
+    LibraryListResponse response = LibraryListResponse.builder().data(List.of()).meta(meta).build();
 
     when(libraryService.listLibraries("nonexistent", 1, 20)).thenReturn(response);
 
     mockMvc
         .perform(
-            get("/libraries")
-                .param("search", "nonexistent")
-                .accept(MediaType.APPLICATION_JSON))
+            get("/libraries").param("search", "nonexistent").accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data").isEmpty())
         .andExpect(jsonPath("$.meta.total").value(0));

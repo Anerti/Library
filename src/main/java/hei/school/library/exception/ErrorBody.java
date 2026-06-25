@@ -12,6 +12,5 @@ public class ErrorBody {
   int status;
   String error;
   String message;
-  @Builder.Default
-  Instant timestamp = Instant.now();
+  @Builder.Default Instant timestamp = Instant.now();
 }

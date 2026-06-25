@@ -27,7 +27,8 @@ public class LibraryController {
       @RequestParam(value = "page", defaultValue = "1") int page,
       @RequestParam(value = "size", defaultValue = "20") int size) {
 
-    return ResponseEntity.status(HttpStatus.OK).body(libraryService.listLibraries(search, page, size));
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(libraryService.listLibraries(search, page, size));
   }
 
   @PostMapping

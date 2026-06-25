@@ -31,21 +31,14 @@ public class LibraryService {
   public LibraryListResponse listLibraries(String search, int page, int size) {
     dataValidator.validateString("search", search);
 
-    Page<Library> libraryPage =
-        repository.searchLibraries(search, PageRequest.of(page - 1, size));
+    Page<Library> libraryPage = repository.searchLibraries(search, PageRequest.of(page - 1, size));
 
-    List<LibraryResponse> data = libraryPage.getContent()
-            .stream()
-            .map(libraryMapper::toResponse)
-            .toList();
+    List<LibraryResponse> data =
+        libraryPage.getContent().stream().map(libraryMapper::toResponse).toList();
 
     PaginationDto meta = paginationMapper.toPaginationDto(libraryPage, page, size);
 
-    return LibraryListResponse
-            .builder()
-            .data(data.isEmpty() ? null : data)
-            .meta(meta)
-            .build();
+    return LibraryListResponse.builder().data(data.isEmpty() ? null : data).meta(meta).build();
   }
 
   @Transactional

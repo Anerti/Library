@@ -94,8 +94,7 @@ class LibraryServiceTest {
     LibraryResponse dto = aLibraryResponse(lib);
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries("St. Martin's", PageRequest.of(0, 20)))
-        .thenReturn(page);
+    when(repository.searchLibraries("St. Martin's", PageRequest.of(0, 20))).thenReturn(page);
     when(libraryMapper.toResponse(lib)).thenReturn(dto);
 
     LibraryListResponse result = service.listLibraries("St. Martin's", 1, 20);
@@ -149,8 +148,7 @@ class LibraryServiceTest {
   void should_return_empty_data_when_no_results() {
     Page<Library> page = new PageImpl<>(List.of());
 
-    when(repository.searchLibraries("nonexistent", PageRequest.of(0, 20)))
-        .thenReturn(page);
+    when(repository.searchLibraries("nonexistent", PageRequest.of(0, 20))).thenReturn(page);
 
     LibraryListResponse result = service.listLibraries("nonexistent", 1, 20);
 
