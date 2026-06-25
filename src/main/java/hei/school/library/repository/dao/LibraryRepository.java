@@ -38,10 +38,10 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
   @Query(
       value =
           """
-          INSERT INTO library (id, name, phone, email, address)
-          VALUES (gen_random_uuid(), :name, :phone, :email, :address)
-          ON CONFLICT (email) DO NOTHING
-          returning id, name, phone, email, address
+          INSERT INTO library (name, phone, email, address)
+          VALUES (:name, :phone, :email, :address)
+          ON CONFLICT DO NOTHING
+          RETURNING id, name, phone, email, address
           """,
       nativeQuery = true)
   Optional<Library> insertLibraryIgnoreConflict(

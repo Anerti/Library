@@ -15,12 +15,26 @@ public class DataValidator {
 
   private static final Pattern SAFE_STRING = Pattern.compile("^[a-zA-Z0-9@'éèê ._+\\-]*$");
   private final Pattern SAFE_STRING_BOOK_NAME = Pattern.compile("^[a-zA-Z0-9' éèê-]+$");
-  private static final Pattern SAFE_NAME_STRING = Pattern.compile("^[a-zA-Z' ]+$");
+  private static final Pattern SAFE_NAME_STRING = Pattern.compile("^[a-zA-Zéèê' -]+$");
   private static final Pattern VALID_EMAIL_PATTERN =
       Pattern.compile("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z]+){1,2}$");
   private static final Pattern ALLOWED_EMAIL_CHAR = Pattern.compile("^[a-zA-Z0-9.@_-]+$");
   private static final Pattern SAFE_ISBN = Pattern.compile("^[0-9Xx-]{10,}$");
   private static final Pattern VALID_PHONE_PATTERN = Pattern.compile("^[0-9 +]{7,30}$");
+
+  public void checkNull(String fieldName, Object value) {
+    if (value == null || value.toString().isBlank()) {
+      throw new UnprocessableEntityException(
+          String.format("%s is required and cannot be blank.", fieldName));
+    }
+  }
+
+  public void checkStringLength(String fieldName, String value, int length) {
+    if (value.length() > length) {
+      throw new UnprocessableEntityException(
+          String.format("%s cannot be longer than %s characters.", fieldName, length));
+    }
+  }
 
   public void validateString(String fieldName, String value) {
     if (value != null && !value.isBlank() && !SAFE_STRING.matcher(value).matches()) {
@@ -33,36 +47,32 @@ public class DataValidator {
   }
 
   public void validateEmail(String email) {
-    if (email == null || email.isBlank()) {
-      throw new UnprocessableEntityException("email is required.");
-    }
+    if (email != null && !email.isBlank()) {
+      checkStringLength("email", email, 100);
 
-    if (email.length() > 100) {
-      throw new UnprocessableEntityException("email cannot be longer than 100 characters.");
-    }
+      if (!ALLOWED_EMAIL_CHAR.matcher(email).matches()) {
+        throw new UnprocessableEntityException(
+            String.format(
+                "Invalid input for email: '%s' only a-zA-Z0-9@_.- characters are allowed.", email));
+      }
 
-    if (!ALLOWED_EMAIL_CHAR.matcher(email).matches()) {
-      throw new UnprocessableEntityException(
-          String.format(
-              "Invalid input for email: '%s' only a-zA-Z0-9@_.- characters are allowed.", email));
-    }
-
-    if (!VALID_EMAIL_PATTERN.matcher(email).matches()) {
-      throw new UnprocessableEntityException(String.format("Invalid email format: '%s'", email));
+      if (!VALID_EMAIL_PATTERN.matcher(email).matches()) {
+        throw new UnprocessableEntityException(String.format("Invalid email format: '%s'", email));
+      }
     }
   }
 
   public void validatePhone(String phone) {
-    if (phone == null || phone.isBlank()) {
-      throw new UnprocessableEntityException("Phone number is required.");
-    }
+    if (phone != null && !phone.isBlank()) {
+      checkStringLength("phone", phone, 30);
 
-    if (!VALID_PHONE_PATTERN.matcher(phone).matches()) {
-      throw new UnprocessableEntityException(
-          String.format(
-              "Invalid phone format: '%s'. Only +, digits, spaces, hyphens and parentheses are"
-                  + " allowed.",
-              phone));
+      if (!VALID_PHONE_PATTERN.matcher(phone).matches()) {
+        throw new UnprocessableEntityException(
+            String.format(
+                "Invalid phone format: '%s'. Only +, digits, spaces, hyphens and parentheses are"
+                    + " allowed.",
+                phone));
+      }
     }
   }
 
@@ -124,7 +134,7 @@ public class DataValidator {
       throw new UnprocessableEntityException(
           String.format(
               "%s field contain forbidden characters. "
-                  + "Only letters (a-z, A-Z) and space are allowed.",
+                  + "Only letters (a-z, A-Z, éèê), hyphen and space are allowed.",
               fieldName));
     }
   }

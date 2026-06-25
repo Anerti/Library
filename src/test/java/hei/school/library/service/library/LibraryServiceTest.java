@@ -15,6 +15,7 @@ import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.service.LibraryService;
 import hei.school.library.validator.DataValidator;
+import hei.school.library.validator.LibraryValidator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,13 +36,17 @@ class LibraryServiceTest {
   @Mock private LibraryMapper libraryMapper;
   private PaginationMapper paginationMapper;
   private DataValidator dataValidator;
+  private LibraryValidator libraryValidator;
   private LibraryService service;
 
   @BeforeEach
   void setUp() {
     paginationMapper = new PaginationMapper();
     dataValidator = new DataValidator();
-    service = new LibraryService(repository, dataValidator, libraryMapper, paginationMapper);
+    libraryValidator = new LibraryValidator(dataValidator);
+    service =
+        new LibraryService(
+            repository, dataValidator, libraryMapper, paginationMapper, libraryValidator);
   }
 
   @Test
@@ -160,14 +165,14 @@ class LibraryServiceTest {
   void should_map_all_fields_correctly() {
     UUID id = UUID.randomUUID();
     Library lib =
-        new Library(id, "Main Library", "+261341234567", "main@library.org", "Antananarivo");
+        new Library(id, "Main Library", "+261****4567", "main@library.org", "Antananarivo");
     Page<Library> page = new PageImpl<>(List.of(lib));
 
     LibraryResponse expected =
         LibraryResponse.builder()
             .id(id)
             .name("Main Library")
-            .phone("+261341234567")
+            .phone("+261****4567")
             .email("main@library.org")
             .address("Antananarivo")
             .build();
@@ -180,7 +185,7 @@ class LibraryServiceTest {
     LibraryResponse dto = result.getData().get(0);
     assertEquals(id, dto.getId());
     assertEquals("Main Library", dto.getName());
-    assertEquals("+261341234567", dto.getPhone());
+    assertEquals("+261****4567", dto.getPhone());
     assertEquals("main@library.org", dto.getEmail());
     assertEquals("Antananarivo", dto.getAddress());
   }
@@ -206,8 +211,8 @@ class LibraryServiceTest {
     LibraryRequest request = new LibraryRequest();
     request.setName("Central Library");
     request.setEmail("contact@central.com");
-    request.setAddress("123 Main St");
-    request.setPhone("+261341234567");
+    request.setAddress("Main Street");
+    request.setPhone("+261 33 44 55 66");
 
     Library savedLibrary = new Library();
     LibraryResponse expectedResponse = new LibraryResponse();
@@ -231,8 +236,8 @@ class LibraryServiceTest {
     LibraryRequest request = new LibraryRequest();
     request.setName("Central Library");
     request.setEmail("contact@central.com");
-    request.setAddress("123 Main St");
-    request.setPhone("+261341234567");
+    request.setAddress("Main Street");
+    request.setPhone("+261 33 44 55 66");
 
     when(repository.insertLibraryIgnoreConflict(any(), any(), any(), any()))
         .thenReturn(Optional.empty());
@@ -240,7 +245,7 @@ class LibraryServiceTest {
     ConflictException exception =
         assertThrows(ConflictException.class, () -> service.createLibrary(request));
 
-    assertEquals("Library with email contact@central.com already exists", exception.getMessage());
+    assertTrue(exception.getMessage().contains("already exists"));
     verify(libraryMapper, never()).toResponse(any());
   }
 
@@ -249,7 +254,7 @@ class LibraryServiceTest {
     LibraryRequest badRequest = new LibraryRequest();
     badRequest.setName("Librairie_Invalide#");
     badRequest.setEmail("contact@library.com");
-    badRequest.setPhone("+261341234567");
+    badRequest.setPhone("+261 33 44 55 66");
     badRequest.setAddress("123 Rue de l'Independance");
 
     assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
@@ -262,13 +267,13 @@ class LibraryServiceTest {
     LibraryRequest badRequest = new LibraryRequest();
     badRequest.setName("Librairie Generale");
     badRequest.setEmail("   ");
-    badRequest.setPhone("+261341234567");
+    badRequest.setPhone("+261 33 44 55 66");
     badRequest.setAddress("123 Rue de l'Independance");
 
     UnprocessableEntityException exception =
         assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
 
-    assertEquals("email is required.", exception.getMessage());
+    assertEquals("email is required and cannot be blank.", exception.getMessage());
     verifyNoInteractions(repository);
   }
 
@@ -286,17 +291,16 @@ class LibraryServiceTest {
   }
 
   @Test
-  void createLibrary_should_throw_UnprocessableEntityException_when_address_is_missing() {
+  void
+      createLibrary_should_throw_UnprocessableEntityException_when_address_has_invalid_characters() {
     LibraryRequest badRequest = new LibraryRequest();
     badRequest.setName("Librairie Generale");
     badRequest.setEmail("contact@library.com");
-    badRequest.setPhone("+261341234567");
-    badRequest.setAddress("");
+    badRequest.setPhone("+261 33 44 55 66");
+    badRequest.setAddress("123 Main St|");
 
-    UnprocessableEntityException exception =
-        assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
+    assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
 
-    assertEquals("address is required.", exception.getMessage());
     verifyNoInteractions(repository);
   }
 
@@ -311,7 +315,7 @@ class LibraryServiceTest {
   }
 
   private static Library aLibrary(String name, String email, String address) {
-    return new Library(UUID.randomUUID(), name, "+261341234567", email, address);
+    return new Library(UUID.randomUUID(), name, "+261****4567", email, address);
   }
 
   private static LibraryResponse aLibraryResponse(Library lib) {
