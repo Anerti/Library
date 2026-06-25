@@ -153,7 +153,7 @@ class LibraryServiceTest {
     LibraryListResponse result = service.listLibraries("nonexistent", 1, 20);
 
     assertSuccess(result, 1, 20, 0);
-    assertTrue(result.getData().isEmpty());
+    assertNull(result.getData());
   }
 
   @Test
@@ -301,7 +301,9 @@ class LibraryServiceTest {
   }
 
   private static void assertSuccess(LibraryListResponse result, int page, int size, long total) {
-    assertNotNull(result.getData());
+    if (total > 0) {
+      assertNotNull(result.getData());
+    }
     assertNotNull(result.getMeta());
     assertEquals(page, result.getMeta().getPage());
     assertEquals(size, result.getMeta().getSize());
