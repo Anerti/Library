@@ -62,8 +62,6 @@ public class LibraryService {
 
   @Transactional
   public void deleteLibrary(UUID id) {
-    repository
-        .deleteByIdAndReturn(id)
-        .orElseThrow(() -> new NotFoundException("Library", id));
+    repository.deleteByIdAndReturn(id).orElseThrow(() -> new NotFoundException("Library", id));
   }
 }
