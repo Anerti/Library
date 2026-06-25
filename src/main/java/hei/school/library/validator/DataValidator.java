@@ -113,6 +113,10 @@ public class DataValidator {
     }
 
     validateIsbn(request.getIsbn());
+
+    if (request.getPublisher() == null || request.getPublisher().isBlank()) {
+      throw new UnprocessableEntityException("publisher is required.");
+    }
     validateName("publisher", request.getPublisher());
 
     if (request.getPublishedAt() == null) {
