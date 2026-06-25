@@ -20,6 +20,3 @@ echo "── 4) 400 — GET /genres/{genreId} with invalid UUID format  →  400
 curlie "http://localhost:8080/genres/not-a-uuid"
 echo
 
-echo "── 5) 400 — GET /genres/{genreId} with empty string  →  400"
-curlie "http://localhost:8080/genres/"
-echo

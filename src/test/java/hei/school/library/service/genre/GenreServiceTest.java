@@ -69,8 +69,7 @@ public class GenreServiceTest {
     UUID id = UUID.randomUUID();
     when(genreRepository.findById(id)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> genreService.getGenreById(id))
-        .isInstanceOf(NotFoundException.class);
+    assertThatThrownBy(() -> genreService.getGenreById(id)).isInstanceOf(NotFoundException.class);
     verify(genreRepository).findById(id);
     verify(genreMapper, never()).toResponse(any());
   }
