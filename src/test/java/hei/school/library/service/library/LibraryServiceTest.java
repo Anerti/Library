@@ -245,7 +245,7 @@ class LibraryServiceTest {
     ConflictException exception =
         assertThrows(ConflictException.class, () -> service.createLibrary(request));
 
-    assertEquals("Library with email contact@central.com already exists", exception.getMessage());
+    assertEquals("Library with this email, phone, or address already exists", exception.getMessage());
     verify(libraryMapper, never()).toResponse(any());
   }
 
@@ -273,7 +273,7 @@ class LibraryServiceTest {
     UnprocessableEntityException exception =
         assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
 
-    assertEquals("email is required.", exception.getMessage());
+    assertEquals("email is required and cannot be blank.", exception.getMessage());
     verifyNoInteractions(repository);
   }
 

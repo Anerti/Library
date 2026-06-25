@@ -52,8 +52,7 @@ public class LibraryService {
                 request.getName(), request.getPhone(), request.getEmail(), request.getAddress())
             .orElseThrow(
                 () ->
-                    new ConflictException(
-                        String.format(
-                            "Library with email %s already exists", request.getEmail()))));
+                    new ConflictException(String.format(
+                        "Library with this email %s, phone %s, or address %s already exists", request.getEmail(), request.getPhone(), request.getAddress()))));
   }
 }

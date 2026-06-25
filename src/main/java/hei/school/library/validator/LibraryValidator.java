@@ -16,6 +16,7 @@ public class LibraryValidator {
     dataValidator.checkNull("phone", request.getPhone());
     dataValidator.validatePhone(request.getPhone());
 
+    dataValidator.checkNull("email", request.getEmail());
     dataValidator.validateEmail(request.getEmail());
 
     dataValidator.checkNull("address", request.getAddress());
