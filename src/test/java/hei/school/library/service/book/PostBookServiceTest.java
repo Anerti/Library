@@ -253,7 +253,7 @@ class PostBookServiceTest {
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessage(
-            "publisher field contain forbidden characters. Only letters (a-z, A-Z, éèê), hyphen and space are"
-                + " allowed.");
+            "publisher field contain forbidden characters. Only letters (a-z, A-Z, éèê), hyphen and"
+                + " space are allowed.");
   }
 }
