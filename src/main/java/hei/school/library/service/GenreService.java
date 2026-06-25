@@ -31,13 +31,14 @@ public class GenreService {
 
   @Transactional
   public GenreResponse createGenreByName(GenreRequest request) {
+    dataValidator.checkNull("name", request.getName());
     dataValidator.validateName("name", request.getName());
 
     return genreMapper.toResponse(
         genreRepository
             .insertGenreIgnoreConflict(request.getName())
             .orElseThrow(
-                () -> new ConflictException("Genre " + request.getName() + " already exists")));
+                () -> new ConflictException(String.format("Genre %s already exists.", request.getName()))));
   }
 
   @Transactional(readOnly = true)

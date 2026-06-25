@@ -22,7 +22,7 @@ public class GenreController {
   }
 
   @PostMapping
-  public ResponseEntity<?> create(@RequestBody GenreRequest request) {
+  public ResponseEntity<GenreResponse> create(@RequestBody GenreRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(genreService.createGenreByName(request));
   }
 

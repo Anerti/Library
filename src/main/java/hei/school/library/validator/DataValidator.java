@@ -121,21 +121,16 @@ public class DataValidator {
   }
 
   public void validateName(String fieldName, String value) {
-    if (value == null || value.isBlank()) {
-      throw new UnprocessableEntityException(String.format("%s is required.", fieldName));
-    }
+    if (value != null && !value.isBlank()) {
+      checkStringLength("name", value, 100);
 
-    if (value.length() > 100) {
-      throw new UnprocessableEntityException(
-          String.format("%s cannot be longer than 100 characters.", fieldName));
-    }
-
-    if (!SAFE_NAME_STRING.matcher(value).matches()) {
-      throw new UnprocessableEntityException(
-          String.format(
-              "%s field contain forbidden characters. "
-                  + "Only letters (a-z, A-Z, éèê), hyphen and space are allowed.",
-              fieldName));
+      if (!SAFE_NAME_STRING.matcher(value).matches()) {
+        throw new UnprocessableEntityException(
+                String.format(
+                        "%s field contain forbidden characters. "
+                                + "Only letters (a-z, A-Z, éèê), hyphen and space are allowed.",
+                        fieldName));
+      }
     }
   }
 
