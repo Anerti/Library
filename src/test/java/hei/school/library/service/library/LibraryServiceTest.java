@@ -333,7 +333,8 @@ class LibraryServiceTest {
     NotFoundException exception =
         assertThrows(NotFoundException.class, () -> service.getLibrary(id));
 
-    assertTrue(exception.getMessage().contains("not found with id"));
+    assertTrue(exception.getMessage().contains("not found."),
+        "Expected message to contain 'not found.'. Actual: '" + exception.getMessage() + "'");
     verify(repository).findById(id);
     verifyNoInteractions(libraryMapper);
   }

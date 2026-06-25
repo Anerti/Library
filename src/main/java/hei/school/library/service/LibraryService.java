@@ -5,6 +5,7 @@ import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.dto.PaginationDto;
 import hei.school.library.entity.Library;
+import hei.school.library.exception.BadRequestException;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.LibraryMapper;
@@ -63,11 +64,11 @@ public class LibraryService {
   @Transactional(readOnly = true)
   public LibraryResponse getLibrary(UUID id) {
     return libraryMapper.toResponse(
-        repository.findById(id).orElseThrow(() -> new NotFoundException("Library", id)));
+        repository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Library %s not found.", id))));
   }
 
   @Transactional
   public void deleteLibrary(UUID id) {
-    repository.deleteByIdAndReturn(id).orElseThrow(() -> new NotFoundException("Library", id));
+    repository.deleteByIdAndReturn(id).orElseThrow(() -> new NotFoundException(String.format("Library %s not found.", id)));
   }
 }

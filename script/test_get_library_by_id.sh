@@ -23,7 +23,7 @@ curlie "http://localhost:8080/libraries/00000000-0000-0000-0000-000000000000"
 echo
 
 echo "── 5) 404 — GET /libraries/{libraryId} with random UUID  →  404"
-curlie "http://localhost:8080/libraries/a1111111-b222-4333-c444-e555555555555"
+curlie "http://localhost:8080/libraries/a1111111-b222-4333-c444-e55555555555"
 echo
 
 echo "── 6) 400 — GET /libraries/{libraryId} with invalid UUID format  →  400"

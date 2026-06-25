@@ -6,6 +6,7 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -82,6 +83,18 @@ public class GlobalExceptionHandler {
             ErrorBody.builder()
                 .error("BAD_REQUEST")
                 .message("Invalid parameter: " + ex.getPropertyName())
+                .status(status.value())
+                .build());
+  }
+
+  @ExceptionHandler(MissingPathVariableException.class)
+  public ResponseEntity<ErrorBody> handleMissingPathVariable(MissingPathVariableException ex) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    return ResponseEntity.status(status)
+        .body(
+            ErrorBody.builder()
+                .error("BAD_REQUEST")
+                .message("Missing or invalid path variable: " + ex.getVariableName())
                 .status(status.value())
                 .build());
   }
