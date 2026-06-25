@@ -974,7 +974,7 @@ paths:
           schema:
             type: string
             maxLength: 100
-          description: Free-text search on name, email, or address
+          description: Free-text search on name, email, phone, or address
         - name: page
           in: query
           schema:

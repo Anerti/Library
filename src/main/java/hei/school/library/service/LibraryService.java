@@ -6,6 +6,7 @@ import hei.school.library.dto.LibraryResponse;
 import hei.school.library.dto.PaginationDto;
 import hei.school.library.entity.Library;
 import hei.school.library.exception.ConflictException;
+import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.LibraryMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.LibraryRepository;
@@ -49,6 +50,9 @@ public class LibraryService {
 
   @Transactional
   public LibraryResponse createLibrary(LibraryRequest request) {
+    if (request.getAddress() == null || request.getAddress().isBlank()) {
+      throw new UnprocessableEntityException("address is required.");
+    }
     dataValidator.validateString("address", request.getAddress());
     dataValidator.validateName("name", request.getName());
     dataValidator.validateEmail(request.getEmail());

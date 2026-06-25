@@ -104,6 +104,21 @@ class LibraryServiceTest {
   }
 
   @Test
+  void should_search_by_phone_number() {
+    Library lib = aLibrary("Lib A", "a@mail.com", "123 Street");
+    LibraryResponse dto = aLibraryResponse(lib);
+    Page<Library> page = new PageImpl<>(List.of(lib));
+
+    when(repository.searchLibraries("+261", PageRequest.of(0, 20))).thenReturn(page);
+    when(libraryMapper.toResponse(lib)).thenReturn(dto);
+
+    LibraryListResponse result = service.listLibraries("+261", 1, 20);
+
+    assertSuccess(result, 1, 20, 1);
+    assertTrue(result.getData().get(0).getPhone().startsWith("+261"));
+  }
+
+  @Test
   void should_throw_when_search_contains_invalid_characters() {
     UnprocessableEntityException ex =
         assertThrows(

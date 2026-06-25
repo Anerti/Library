@@ -20,6 +20,7 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
           WHERE (:search IS NULL OR :search = ''
             OR name ILIKE '%' || :search || '%'
             OR email ILIKE '%' || :search || '%'
+            OR phone ILIKE '%' || :search || '%'
             OR address ILIKE '%' || :search || '%')
           """,
       countQuery =
@@ -28,6 +29,7 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
           WHERE (:search IS NULL OR :search = ''
             OR name ILIKE '%' || :search || '%'
             OR email ILIKE '%' || :search || '%'
+            OR phone ILIKE '%' || :search || '%'
             OR address ILIKE '%' || :search || '%')
           """,
       nativeQuery = true)
