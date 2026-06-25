@@ -126,10 +126,10 @@ public class DataValidator {
 
       if (!SAFE_NAME_STRING.matcher(value).matches()) {
         throw new UnprocessableEntityException(
-                String.format(
-                        "%s field contain forbidden characters. "
-                                + "Only letters (a-z, A-Z, éèê), hyphen and space are allowed.",
-                        fieldName));
+            String.format(
+                "%s field contain forbidden characters. "
+                    + "Only letters (a-z, A-Z, éèê), hyphen and space are allowed.",
+                fieldName));
       }
     }
   }

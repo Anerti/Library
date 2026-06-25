@@ -38,7 +38,9 @@ public class GenreService {
         genreRepository
             .insertGenreIgnoreConflict(request.getName())
             .orElseThrow(
-                () -> new ConflictException(String.format("Genre %s already exists.", request.getName()))));
+                () ->
+                    new ConflictException(
+                        String.format("Genre %s already exists.", request.getName()))));
   }
 
   @Transactional(readOnly = true)
