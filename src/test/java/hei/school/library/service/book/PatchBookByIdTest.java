@@ -210,7 +210,7 @@ class PatchBookByIdTest {
     assertThatThrownBy(() -> bookService.updateBook(bookId, request))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessage(
-            "title field contain forbidden characters. Only letters (a-z, A-Z) and space are"
+            "title field contain forbidden characters. Only letters (a-z, A-Z, éèê), hyphen and space are"
                 + " allowed.");
   }
 
@@ -251,7 +251,7 @@ class PatchBookByIdTest {
     assertThatThrownBy(() -> bookService.updateBook(bookId, request))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessage(
-            "publisher field contain forbidden characters. Only letters (a-z, A-Z) and space are"
+            "publisher field contain forbidden characters. Only letters (a-z, A-Z, éèê), hyphen and space are"
                 + " allowed.");
   }
 }
