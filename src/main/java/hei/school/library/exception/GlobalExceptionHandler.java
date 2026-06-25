@@ -1,7 +1,5 @@
 package hei.school.library.exception;
 
-import java.time.Instant;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
@@ -17,54 +15,99 @@ public class GlobalExceptionHandler {
   private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
   @ExceptionHandler(NotFoundException.class)
-  public ResponseEntity<Map<String, Object>> handleNotFound(NotFoundException ex) {
-    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(errorBody("NOT_FOUND", ex.getMessage()));
+  public ResponseEntity<ErrorBody> handleNotFound(NotFoundException ex) {
+    HttpStatus status = HttpStatus.NOT_FOUND;
+    return ResponseEntity.status(status)
+        .body(
+            ErrorBody.builder()
+                .error("NOT_FOUND")
+                .message(ex.getMessage())
+                .status(status.value())
+                .build());
   }
 
   @ExceptionHandler(BadRequestException.class)
-  public ResponseEntity<Map<String, Object>> handleBadRequest(BadRequestException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(errorBody("BAD_REQUEST", ex.getMessage()));
+  public ResponseEntity<ErrorBody> handleBadRequest(BadRequestException ex) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    return ResponseEntity.status(status)
+        .body(
+            ErrorBody.builder()
+                .error("BAD_REQUEST")
+                .message(ex.getMessage())
+                .status(status.value())
+                .build());
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
-    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-        .body(errorBody("UNPROCESSABLE_ENTITY", "Invalid request: " + ex.getMessage()));
+  public ResponseEntity<ErrorBody> handleValidation(MethodArgumentNotValidException ex) {
+    HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+    return ResponseEntity.status(status)
+        .body(
+            ErrorBody.builder()
+                .error("UNPROCESSABLE_ENTITY")
+                .message("Invalid request: " + ex.getMessage())
+                .status(status.value())
+                .build());
   }
 
   @ExceptionHandler(UnprocessableEntityException.class)
-  public ResponseEntity<Map<String, Object>> handleUnprocessable(UnprocessableEntityException ex) {
-    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-        .body(errorBody("UNPROCESSABLE_ENTITY", ex.getMessage()));
+  public ResponseEntity<ErrorBody> handleUnprocessable(UnprocessableEntityException ex) {
+    HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
+    return ResponseEntity.status(status)
+        .body(
+            ErrorBody.builder()
+                .error("UNPROCESSABLE_ENTITY")
+                .message(ex.getMessage())
+                .status(status.value())
+                .build());
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<Map<String, Object>> handleBadArgument(IllegalArgumentException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(errorBody("BAD_REQUEST", ex.getMessage()));
+  public ResponseEntity<ErrorBody> handleBadArgument(IllegalArgumentException ex) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    return ResponseEntity.status(status)
+        .body(
+            ErrorBody.builder()
+                .error("BAD_REQUEST")
+                .message(ex.getMessage())
+                .status(status.value())
+                .build());
   }
 
   @ExceptionHandler(TypeMismatchException.class)
-  public ResponseEntity<Map<String, Object>> handleTypeMismatch(TypeMismatchException ex) {
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(errorBody("BAD_REQUEST", "Invalid parameter: " + ex.getPropertyName()));
+  public ResponseEntity<ErrorBody> handleTypeMismatch(TypeMismatchException ex) {
+    HttpStatus status = HttpStatus.BAD_REQUEST;
+    return ResponseEntity.status(status)
+        .body(
+            ErrorBody.builder()
+                .error("BAD_REQUEST")
+                .message("Invalid parameter: " + ex.getPropertyName())
+                .status(status.value())
+                .build());
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<Map<String, Object>> handleGeneral(Exception ex) {
+  public ResponseEntity<ErrorBody> handleGeneral(Exception ex) {
+    HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
     log.error("Unhandled exception", ex);
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(errorBody("INTERNAL_ERROR", "Something went wrong"));
+    return ResponseEntity.status(status)
+        .body(
+            ErrorBody.builder()
+                .error("INTERNAL_ERROR")
+                .message("Something went wrong")
+                .status(status.value())
+                .build());
   }
 
   @ExceptionHandler(ConflictException.class)
-  public ResponseEntity<Map<String, Object>> handleConflict(ConflictException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody("CONFLICT", ex.getMessage()));
-  }
-
-  private static Map<String, Object> errorBody(String code, String message) {
-    return Map.of("error", code, "message", message, "timestamp", Instant.now().toString());
+  public ResponseEntity<ErrorBody> handleConflict(ConflictException ex) {
+    HttpStatus status = HttpStatus.CONFLICT;
+    return ResponseEntity.status(status)
+        .body(
+            ErrorBody.builder()
+                .error("CONFLICT")
+                .message(ex.getMessage())
+                .status(status.value())
+                .build());
   }
 }

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DataValidator {
 
-  private static final Pattern SAFE_STRING = Pattern.compile("^[a-zA-Z0-9@' ._-]*$");
+  private static final Pattern SAFE_STRING = Pattern.compile("^[a-zA-Z0-9@'éèê ._+\\-]*$");
   private final Pattern SAFE_STRING_BOOK_NAME = Pattern.compile("^[a-zA-Z0-9' éèê-]+$");
   private static final Pattern SAFE_NAME_STRING = Pattern.compile("^[a-zA-Z' ]+$");
   private static final Pattern VALID_EMAIL_PATTERN =
@@ -23,14 +23,11 @@ public class DataValidator {
   private static final Pattern VALID_PHONE_PATTERN = Pattern.compile("^[0-9 +]{7,30}$");
 
   public void validateString(String fieldName, String value) {
-    if (value == null || value.isBlank()) {
-      throw new UnprocessableEntityException(fieldName + " is required.");
-    }
-    if (!SAFE_STRING.matcher(value).matches()) {
+    if (value != null && !value.isBlank() && !SAFE_STRING.matcher(value).matches()) {
       throw new UnprocessableEntityException(
           String.format(
-              "Field '%s' contains invalid characters. Only letters (a-z, A-Z), digits (0-9), and @"
-                  + " ' . - _ are allowed.",
+              "Field '%s' contains invalid characters. Only letters (a-z, A-Z), digits (0-9),"
+                  + " spaces, and @ ('.-_) are allowed.",
               fieldName));
     }
   }

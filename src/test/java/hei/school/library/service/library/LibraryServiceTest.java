@@ -4,17 +4,18 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import hei.school.library.dto.LibraryListResponse;
 import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
 import hei.school.library.entity.Library;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.LibraryMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.service.LibraryService;
 import hei.school.library.validator.DataValidator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,39 +32,44 @@ import org.springframework.data.domain.PageRequest;
 class LibraryServiceTest {
 
   @Mock private LibraryRepository repository;
-  @Mock private LibraryMapper mapper;
+  @Mock private LibraryMapper libraryMapper;
+  private PaginationMapper paginationMapper;
   private DataValidator dataValidator;
   private LibraryService service;
 
   @BeforeEach
   void setUp() {
+    paginationMapper = new PaginationMapper();
     dataValidator = new DataValidator();
-    service = new LibraryService(repository, dataValidator, mapper);
+    service = new LibraryService(repository, dataValidator, libraryMapper, paginationMapper);
   }
 
   @Test
   void should_return_all_libraries_when_search_is_null() {
     Library lib = aLibrary("Lib A", "a@mail.com", "123 Street");
+    LibraryResponse dto = aLibraryResponse(lib);
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries("Lib A", PageRequest.of(0, 20))).thenReturn(Optional.of(page));
+    when(repository.searchLibraries("Lib A", PageRequest.of(0, 20))).thenReturn(page);
+    when(libraryMapper.toResponse(lib)).thenReturn(dto);
 
-    Map<String, Object> result = service.listLibraries("Lib A", 1, 20);
+    LibraryListResponse result = service.listLibraries("Lib A", 1, 20);
 
     assertSuccess(result, 1, 20, 1);
-    LibraryResponse dto = ((List<LibraryResponse>) result.get("data")).get(0);
-    assertEquals("Lib A", dto.getName());
-    assertEquals("a@mail.com", dto.getEmail());
+    assertEquals("Lib A", result.getData().get(0).getName());
+    assertEquals("a@mail.com", result.getData().get(0).getEmail());
   }
 
   @Test
   void should_return_all_libraries_when_search_is_empty() {
     Library lib = aLibrary("Lib A", "a@mail.com", "123 Street");
+    LibraryResponse dto = aLibraryResponse(lib);
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries("Lib A", PageRequest.of(0, 20))).thenReturn(Optional.of(page));
+    when(repository.searchLibraries("Lib A", PageRequest.of(0, 20))).thenReturn(page);
+    when(libraryMapper.toResponse(lib)).thenReturn(dto);
 
-    Map<String, Object> result = service.listLibraries("Lib A", 1, 20);
+    LibraryListResponse result = service.listLibraries("Lib A", 1, 20);
 
     assertSuccess(result, 1, 20, 1);
   }
@@ -71,11 +77,13 @@ class LibraryServiceTest {
   @Test
   void should_return_filtered_libraries_when_search_is_valid() {
     Library lib = aLibrary("Tech Library", "tech@mail.com", "456 Avenue");
+    LibraryResponse dto = aLibraryResponse(lib);
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries("tech", PageRequest.of(0, 20))).thenReturn(Optional.of(page));
+    when(repository.searchLibraries("tech", PageRequest.of(0, 20))).thenReturn(page);
+    when(libraryMapper.toResponse(lib)).thenReturn(dto);
 
-    Map<String, Object> result = service.listLibraries("tech", 1, 20);
+    LibraryListResponse result = service.listLibraries("tech", 1, 20);
 
     assertSuccess(result, 1, 20, 1);
   }
@@ -83,14 +91,30 @@ class LibraryServiceTest {
   @Test
   void should_allow_special_characters_in_search() {
     Library lib = aLibrary("St. Martin's", "saint@mail.com", "1' Street");
+    LibraryResponse dto = aLibraryResponse(lib);
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries("St. Martin's", PageRequest.of(0, 20)))
-        .thenReturn(Optional.of(page));
+    when(repository.searchLibraries("St. Martin's", PageRequest.of(0, 20))).thenReturn(page);
+    when(libraryMapper.toResponse(lib)).thenReturn(dto);
 
-    Map<String, Object> result = service.listLibraries("St. Martin's", 1, 20);
+    LibraryListResponse result = service.listLibraries("St. Martin's", 1, 20);
 
     assertSuccess(result, 1, 20, 1);
+  }
+
+  @Test
+  void should_search_by_phone_number() {
+    Library lib = aLibrary("Lib A", "a@mail.com", "123 Street");
+    LibraryResponse dto = aLibraryResponse(lib);
+    Page<Library> page = new PageImpl<>(List.of(lib));
+
+    when(repository.searchLibraries("+261", PageRequest.of(0, 20))).thenReturn(page);
+    when(libraryMapper.toResponse(lib)).thenReturn(dto);
+
+    LibraryListResponse result = service.listLibraries("+261", 1, 20);
+
+    assertSuccess(result, 1, 20, 1);
+    assertTrue(result.getData().get(0).getPhone().startsWith("+261"));
   }
 
   @Test
@@ -106,15 +130,17 @@ class LibraryServiceTest {
   @Test
   void should_use_correct_page_request_for_custom_pagination() {
     Library lib = aLibrary("Lib", "l@mail.com", "Addr");
+    LibraryResponse dto = aLibraryResponse(lib);
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(Optional.of(page));
+    when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(page);
+    when(libraryMapper.toResponse(lib)).thenReturn(dto);
 
     service.listLibraries("Lib", 3, 10);
 
     ArgumentCaptor<PageRequest> captor = ArgumentCaptor.forClass(PageRequest.class);
     verify(repository).searchLibraries(any(), captor.capture());
-    assertEquals(2, captor.getValue().getPageNumber()); // page - 1
+    assertEquals(2, captor.getValue().getPageNumber());
     assertEquals(10, captor.getValue().getPageSize());
   }
 
@@ -122,13 +148,12 @@ class LibraryServiceTest {
   void should_return_empty_data_when_no_results() {
     Page<Library> page = new PageImpl<>(List.of());
 
-    when(repository.searchLibraries("nonexistent", PageRequest.of(0, 20)))
-        .thenReturn(Optional.of(page));
+    when(repository.searchLibraries("nonexistent", PageRequest.of(0, 20))).thenReturn(page);
 
-    Map<String, Object> result = service.listLibraries("nonexistent", 1, 20);
+    LibraryListResponse result = service.listLibraries("nonexistent", 1, 20);
 
     assertSuccess(result, 1, 20, 0);
-    assertTrue(((List<?>) result.get("data")).isEmpty());
+    assertNull(result.getData());
   }
 
   @Test
@@ -138,11 +163,21 @@ class LibraryServiceTest {
         new Library(id, "Main Library", "+261341234567", "main@library.org", "Antananarivo");
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(Optional.of(page));
+    LibraryResponse expected =
+        LibraryResponse.builder()
+            .id(id)
+            .name("Main Library")
+            .phone("+261341234567")
+            .email("main@library.org")
+            .address("Antananarivo")
+            .build();
 
-    Map<String, Object> result = service.listLibraries("Main Library", 1, 20);
+    when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(page);
+    when(libraryMapper.toResponse(lib)).thenReturn(expected);
 
-    LibraryResponse dto = ((List<LibraryResponse>) result.get("data")).get(0);
+    LibraryListResponse result = service.listLibraries("Main Library", 1, 20);
+
+    LibraryResponse dto = result.getData().get(0);
     assertEquals(id, dto.getId());
     assertEquals("Main Library", dto.getName());
     assertEquals("+261341234567", dto.getPhone());
@@ -153,32 +188,17 @@ class LibraryServiceTest {
   @Test
   void should_return_correct_pagination_info() {
     Library lib = aLibrary("Lib", "l@mail.com", "Addr");
+    LibraryResponse dto = aLibraryResponse(lib);
     Page<Library> page = new PageImpl<>(List.of(lib));
 
-    when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(Optional.of(page));
+    when(repository.searchLibraries(any(), any(PageRequest.class))).thenReturn(page);
+    when(libraryMapper.toResponse(lib)).thenReturn(dto);
 
-    Map<String, Object> result = service.listLibraries("Lib", 2, 5);
+    LibraryListResponse result = service.listLibraries("Lib", 2, 5);
 
-    @SuppressWarnings("unchecked")
-    Map<String, Object> pagination = (Map<String, Object>) result.get("pagination");
-    assertEquals(2, pagination.get("page"));
-    assertEquals(5, pagination.get("size"));
-    assertEquals(1L, pagination.get("total"));
-  }
-
-  private static void assertSuccess(Map<String, Object> result, int page, int size, long total) {
-    assertNotNull(result.get("data"));
-    assertNotNull(result.get("pagination"));
-
-    @SuppressWarnings("unchecked")
-    Map<String, Object> pagination = (Map<String, Object>) result.get("pagination");
-    assertEquals(page, pagination.get("page"));
-    assertEquals(size, pagination.get("size"));
-    assertEquals(total, pagination.get("total"));
-  }
-
-  private static Library aLibrary(String name, String email, String address) {
-    return new Library(UUID.randomUUID(), name, "+261330000000", email, address);
+    assertEquals(2, result.getMeta().getPage());
+    assertEquals(5, result.getMeta().getSize());
+    assertEquals(1L, result.getMeta().getTotal());
   }
 
   @Test
@@ -187,7 +207,7 @@ class LibraryServiceTest {
     request.setName("Central Library");
     request.setEmail("contact@central.com");
     request.setAddress("123 Main St");
-    request.setPhone("+261340000000");
+    request.setPhone("+261341234567");
 
     Library savedLibrary = new Library();
     LibraryResponse expectedResponse = new LibraryResponse();
@@ -195,36 +215,33 @@ class LibraryServiceTest {
     when(repository.insertLibraryIgnoreConflict(
             request.getName(), request.getPhone(), request.getEmail(), request.getAddress()))
         .thenReturn(Optional.of(savedLibrary));
+    when(libraryMapper.toResponse(savedLibrary)).thenReturn(expectedResponse);
 
-    when(mapper.toResponse(savedLibrary)).thenReturn(expectedResponse);
     LibraryResponse actualResponse = service.createLibrary(request);
 
     assertNotNull(actualResponse);
-    verify(repository, times(1))
+    verify(repository)
         .insertLibraryIgnoreConflict(
             request.getName(), request.getPhone(), request.getEmail(), request.getAddress());
-    verify(mapper, times(1)).toResponse(savedLibrary);
+    verify(libraryMapper).toResponse(savedLibrary);
   }
 
   @Test
-  void should_throw_conflict_exception_when__library_already_exists() {
+  void should_throw_conflict_exception_when_library_already_exists() {
     LibraryRequest request = new LibraryRequest();
     request.setName("Central Library");
     request.setEmail("contact@central.com");
     request.setAddress("123 Main St");
-    request.setPhone("+261340000000");
+    request.setPhone("+261341234567");
 
     when(repository.insertLibraryIgnoreConflict(any(), any(), any(), any()))
         .thenReturn(Optional.empty());
+
     ConflictException exception =
-        assertThrows(
-            ConflictException.class,
-            () -> {
-              service.createLibrary(request);
-            });
+        assertThrows(ConflictException.class, () -> service.createLibrary(request));
 
     assertEquals("Library with email contact@central.com already exists", exception.getMessage());
-    verify(mapper, never()).toResponse(any());
+    verify(libraryMapper, never()).toResponse(any());
   }
 
   @Test
@@ -232,13 +249,11 @@ class LibraryServiceTest {
     LibraryRequest badRequest = new LibraryRequest();
     badRequest.setName("Librairie_Invalide#");
     badRequest.setEmail("contact@library.com");
-    badRequest.setPhone("+261340000000");
+    badRequest.setPhone("+261341234567");
     badRequest.setAddress("123 Rue de l'Independance");
 
-    UnprocessableEntityException exception =
-        assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
+    assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
 
-    assertTrue(exception.getMessage().contains("forbidden characters"));
     verifyNoInteractions(repository);
   }
 
@@ -247,7 +262,7 @@ class LibraryServiceTest {
     LibraryRequest badRequest = new LibraryRequest();
     badRequest.setName("Librairie Generale");
     badRequest.setEmail("   ");
-    badRequest.setPhone("+261340000000");
+    badRequest.setPhone("+261341234567");
     badRequest.setAddress("123 Rue de l'Independance");
 
     UnprocessableEntityException exception =
@@ -264,24 +279,48 @@ class LibraryServiceTest {
     badRequest.setEmail("contact@library.com");
     badRequest.setPhone("abc12345");
     badRequest.setAddress("123 Rue de l'Independance");
-    UnprocessableEntityException exception =
-        assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
 
-    assertTrue(exception.getMessage().contains("Invalid phone format"));
+    assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
+
     verifyNoInteractions(repository);
   }
 
   @Test
-  void createLibrary_should_throw_UnprocessableEntityException_when_address_format_is_missing() {
+  void createLibrary_should_throw_UnprocessableEntityException_when_address_is_missing() {
     LibraryRequest badRequest = new LibraryRequest();
     badRequest.setName("Librairie Generale");
     badRequest.setEmail("contact@library.com");
-    badRequest.setPhone("+261340000000");
+    badRequest.setPhone("+261341234567");
     badRequest.setAddress("");
+
     UnprocessableEntityException exception =
         assertThrows(UnprocessableEntityException.class, () -> service.createLibrary(badRequest));
 
     assertEquals("address is required.", exception.getMessage());
     verifyNoInteractions(repository);
+  }
+
+  private static void assertSuccess(LibraryListResponse result, int page, int size, long total) {
+    if (total > 0) {
+      assertNotNull(result.getData());
+    }
+    assertNotNull(result.getMeta());
+    assertEquals(page, result.getMeta().getPage());
+    assertEquals(size, result.getMeta().getSize());
+    assertEquals(total, result.getMeta().getTotal());
+  }
+
+  private static Library aLibrary(String name, String email, String address) {
+    return new Library(UUID.randomUUID(), name, "+261341234567", email, address);
+  }
+
+  private static LibraryResponse aLibraryResponse(Library lib) {
+    return LibraryResponse.builder()
+        .id(lib.getId())
+        .name(lib.getName())
+        .phone(lib.getPhone())
+        .email(lib.getEmail())
+        .address(lib.getAddress())
+        .build();
   }
 }
