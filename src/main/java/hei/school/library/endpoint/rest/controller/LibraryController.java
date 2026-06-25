@@ -34,6 +34,11 @@ public class LibraryController {
         .body(libraryService.listLibraries(search, page, size));
   }
 
+  @GetMapping("/{libraryId}")
+  public ResponseEntity<LibraryResponse> getById(@PathVariable UUID libraryId) {
+    return ResponseEntity.status(HttpStatus.OK).body(libraryService.getLibrary(libraryId));
+  }
+
   @PostMapping
   public ResponseEntity<LibraryResponse> create(@RequestBody LibraryRequest request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(libraryService.createLibrary(request));

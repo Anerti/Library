@@ -60,8 +60,18 @@ public class LibraryService {
                             request.getEmail(), request.getPhone(), request.getAddress()))));
   }
 
+  @Transactional(readOnly = true)
+  public LibraryResponse getLibrary(UUID id) {
+    return libraryMapper.toResponse(
+        repository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException(String.format("Library %s not found.", id))));
+  }
+
   @Transactional
   public void deleteLibrary(UUID id) {
-    repository.deleteByIdAndReturn(id).orElseThrow(() -> new NotFoundException("Library", id));
+    repository
+        .deleteByIdAndReturn(id)
+        .orElseThrow(() -> new NotFoundException(String.format("Library %s not found.", id)));
   }
 }
