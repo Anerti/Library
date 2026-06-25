@@ -999,13 +999,13 @@ paths:
                 type: object
                 required:
                   - data
-                  - pagination
+                  - meta
                 properties:
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/LibraryResponse'
-                  pagination:
+                  meta:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
@@ -1015,13 +1015,15 @@ paths:
                     phone: +261 34 12 345 67
                     email: contact@librairie-generale.mg
                     address: "15 Avenue de l'Indépendance, Antananarivo"
-                pagination:
+                meta:
                   page: 1
                   size: 20
                   total: 1
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
 
     post:
       operationId: createLibrary
