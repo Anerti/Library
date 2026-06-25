@@ -308,8 +308,13 @@ class LibraryServiceTest {
   @Test
   void should_return_library_when_id_exists() {
     UUID id = UUID.randomUUID();
-    Library lib = new Library(id, "Librairie Générale", "+261 34 12 345 67",
-        "contact@librairie-generale.mg", "15 Avenue de l'Indépendance, Antananarivo");
+    Library lib =
+        new Library(
+            id,
+            "Librairie Générale",
+            "+261 34 12 345 67",
+            "contact@librairie-generale.mg",
+            "15 Avenue de l'Indépendance, Antananarivo");
     LibraryResponse expected = aLibraryResponse(lib);
 
     when(repository.findById(id)).thenReturn(Optional.of(lib));
@@ -333,7 +338,8 @@ class LibraryServiceTest {
     NotFoundException exception =
         assertThrows(NotFoundException.class, () -> service.getLibrary(id));
 
-    assertTrue(exception.getMessage().contains("not found."),
+    assertTrue(
+        exception.getMessage().contains("not found."),
         "Expected message to contain 'not found.'. Actual: '" + exception.getMessage() + "'");
     verify(repository).findById(id);
     verifyNoInteractions(libraryMapper);
