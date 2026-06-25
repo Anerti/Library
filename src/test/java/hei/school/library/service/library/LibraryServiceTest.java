@@ -306,6 +306,39 @@ class LibraryServiceTest {
   }
 
   @Test
+  void should_return_library_when_id_exists() {
+    UUID id = UUID.randomUUID();
+    Library lib = new Library(id, "Librairie Générale", "+261 34 12 345 67",
+        "contact@librairie-generale.mg", "15 Avenue de l'Indépendance, Antananarivo");
+    LibraryResponse expected = aLibraryResponse(lib);
+
+    when(repository.findById(id)).thenReturn(Optional.of(lib));
+    when(libraryMapper.toResponse(lib)).thenReturn(expected);
+
+    LibraryResponse actual = service.getLibrary(id);
+
+    assertNotNull(actual);
+    assertEquals(id, actual.getId());
+    assertEquals("Librairie Générale", actual.getName());
+    assertEquals("contact@librairie-generale.mg", actual.getEmail());
+    verify(repository).findById(id);
+    verify(libraryMapper).toResponse(lib);
+  }
+
+  @Test
+  void should_throw_not_found_when_id_does_not_exist() {
+    UUID id = UUID.randomUUID();
+    when(repository.findById(id)).thenReturn(Optional.empty());
+
+    NotFoundException exception =
+        assertThrows(NotFoundException.class, () -> service.getLibrary(id));
+
+    assertTrue(exception.getMessage().contains("not found with id"));
+    verify(repository).findById(id);
+    verifyNoInteractions(libraryMapper);
+  }
+
+  @Test
   void should_delete_library_when_id_exists() {
     UUID id = UUID.randomUUID();
     when(repository.deleteByIdAndReturn(id)).thenReturn(Optional.of(id));

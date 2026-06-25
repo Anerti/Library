@@ -128,6 +128,42 @@ class LibraryControllerTest {
   }
 
   @Test
+  void should_return_200_when_library_exists() throws Exception {
+    UUID id = UUID.randomUUID();
+    LibraryResponse library =
+        LibraryResponse.builder()
+            .id(id)
+            .name("Librairie Générale")
+            .phone("+261 34 12 345 67")
+            .email("contact@librairie-generale.mg")
+            .address("15 Avenue de l'Indépendance, Antananarivo")
+            .build();
+
+    when(libraryService.getLibrary(id)).thenReturn(library);
+
+    mockMvc
+        .perform(get("/libraries/{libraryId}", id).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(id.toString()))
+        .andExpect(jsonPath("$.name").value("Librairie Générale"))
+        .andExpect(jsonPath("$.phone").value("+261 34 12 345 67"))
+        .andExpect(jsonPath("$.email").value("contact@librairie-generale.mg"))
+        .andExpect(jsonPath("$.address").value("15 Avenue de l'Indépendance, Antananarivo"));
+  }
+
+  @Test
+  void should_return_404_when_library_not_found() throws Exception {
+    UUID id = UUID.randomUUID();
+    when(libraryService.getLibrary(id)).thenThrow(new NotFoundException("Library", id));
+
+    mockMvc
+        .perform(get("/libraries/{libraryId}", id).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.error").value("NOT_FOUND"))
+        .andExpect(jsonPath("$.message").value("Library not found with id: " + id));
+  }
+
+  @Test
   void should_return_204_when_deleting_existing_library() throws Exception {
     UUID id = UUID.randomUUID();
 
