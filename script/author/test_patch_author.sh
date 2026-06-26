@@ -32,35 +32,39 @@ echo "── 6) 400 — PATCH /authors/{id} (invalid UUID)  →  400 / bad reque
 curlie PATCH "http://localhost:8080/authors/not-a-uuid" firstName="Irrelevant"
 echo
 
-echo "── 7) 422 — PATCH /authors/{id} (both names null — empty body)  →  422 / required"
+echo "── 7) 400 — PATCH /authors/{id} (no body)  →  400 / missing body"
 curlie PATCH "http://localhost:8080/authors/${SUCCESS_ID}"
 echo
 
-echo "── 8) 422 — PATCH /authors/{id} (firstName blank)  →  422 / required and cannot be blank"
+echo "── 8) 422 — PATCH /authors/{id} (both names null — empty object)  →  422 / required"
+echo '{}' | curlie PATCH "http://localhost:8080/authors/${SUCCESS_ID}"
+echo
+
+echo "── 9) 422 — PATCH /authors/{id} (firstName blank)  →  422 / required and cannot be blank"
 curlie PATCH "http://localhost:8080/authors/${SUCCESS_ID}" firstName="" lastName="Orwell"
 echo
 
-echo "── 9) 422 — PATCH /authors/{id} (lastName blank)  →  422 / required and cannot be blank"
+echo "── 10) 422 — PATCH /authors/{id} (lastName blank)  →  422 / required and cannot be blank"
 curlie PATCH "http://localhost:8080/authors/${OTHER_ID}" firstName="Jane" lastName=""
 echo
 
-echo "── 10) 422 — PATCH /authors/{id} (firstName with digits)  →  422 / forbidden characters"
+echo "── 11) 422 — PATCH /authors/{id} (firstName with digits)  →  422 / forbidden characters"
 curlie PATCH "http://localhost:8080/authors/${SUCCESS_ID}" firstName="George2" lastName="Orwell"
 echo
 
-echo "── 11) 422 — PATCH /authors/{id} (lastName with underscore)  →  422 / forbidden characters"
+echo "── 12) 422 — PATCH /authors/{id} (lastName with underscore)  →  422 / forbidden characters"
 curlie PATCH "http://localhost:8080/authors/${SUCCESS_ID}" firstName="George" lastName="Or_well"
 echo
 
-echo "── 12) 422 — PATCH /authors/{id} (firstName too long)  →  422 / longer than 100 chars"
+echo "── 13) 422 — PATCH /authors/{id} (firstName too long)  →  422 / longer than 100 chars"
 curlie PATCH "http://localhost:8080/authors/${SUCCESS_ID}" firstName="ThisFirstNameIsDefinitelyWayTooRidiculouslyLongForAnAuthorBecauseTheMaximumAllowedLengthIsOneHundredCharactersAndThisExceedsThat" lastName="Orwell"
 echo
 
-echo "── 13) 422 — PATCH /authors/{id} (lastName too long)  →  422 / longer than 100 chars"
+echo "── 14) 422 — PATCH /authors/{id} (lastName too long)  →  422 / longer than 100 chars"
 curlie PATCH "http://localhost:8080/authors/${SUCCESS_ID}" firstName="George" lastName="ThisLastNameIsDefinitelyWayTooRidiculouslyLongForAnAuthorBecauseTheMaximumAllowedLengthIsOneHundredCharactersAndThisExceedsThat"
 echo
 
-echo "── 14) 409 — PATCH /authors/{id} (name already exists)  →  409 / already exists"
+echo "── 15) 409 — PATCH /authors/{id} (name already exists)  →  409 / already exists"
 # First create an author to collide with
 curlie POST "http://localhost:8080/authors" firstName="George" lastName="Orwell"
 echo
