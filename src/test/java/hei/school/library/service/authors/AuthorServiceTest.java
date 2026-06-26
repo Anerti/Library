@@ -69,8 +69,7 @@ public class AuthorServiceTest {
 
     when(authorRepository.create("Jean", "Paul")).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> authorService.create(request))
-        .isInstanceOf(ConflictException.class);
+    assertThatThrownBy(() -> authorService.create(request)).isInstanceOf(ConflictException.class);
 
     verify(authorValidator).validateCreation(request);
   }
