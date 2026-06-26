@@ -40,7 +40,7 @@ public class AuthorService {
     return authorRepository
         .findById(id)
         .map(authorMapper::toResponse)
-        .orElseThrow(() -> new NotFoundException("Author " + id + " not found"));
+        .orElseThrow(() -> new NotFoundException(String.format("Author %s not found.", id)));
   }
 
   @Transactional
