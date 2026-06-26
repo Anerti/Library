@@ -59,3 +59,11 @@ echo
 echo "── 13) 422 — PATCH /authors/{id} (lastName too long)  →  422 / longer than 100 chars"
 curlie PATCH "http://localhost:8080/authors/${SUCCESS_ID}" firstName="George" lastName="ThisLastNameIsDefinitelyWayTooRidiculouslyLongForAnAuthorBecauseTheMaximumAllowedLengthIsOneHundredCharactersAndThisExceedsThat"
 echo
+
+echo "── 14) 409 — PATCH /authors/{id} (name already exists)  →  409 / already exists"
+# First create an author to collide with
+curlie POST "http://localhost:8080/authors" firstName="George" lastName="Orwell"
+echo
+# Then patch Jane Austen to the same name → conflict
+curlie PATCH "http://localhost:8080/authors/${OTHER_ID}" firstName="George" lastName="Orwell"
+echo
