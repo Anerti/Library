@@ -13,9 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hei.school.library.dto.GenreListResponse;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
-import hei.school.library.dto.PageResponse;
 import hei.school.library.endpoint.rest.controller.GenreController;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.GlobalExceptionHandler;
@@ -134,9 +134,9 @@ class GenreControllerTest {
     String search = "Fantasy";
     int page = 1;
     int size = 20;
-    PageResponse<GenreResponse> mockPageResponse = new PageResponse<>();
+    GenreListResponse mockResponse = new GenreListResponse();
 
-    when(genreService.findAll(search, page, size)).thenReturn(mockPageResponse);
+    when(genreService.findAll(search, page, size)).thenReturn(mockResponse);
 
     mockMvc
         .perform(
@@ -152,9 +152,9 @@ class GenreControllerTest {
   @Test
   @DisplayName("get /genres: should use defaults when no params")
   void should_use_default_pagination_parameters_when_not_provided() throws Exception {
-    PageResponse<GenreResponse> mockPageResponse = new PageResponse<>();
+    GenreListResponse mockResponse = new GenreListResponse();
 
-    when(genreService.findAll(null, 1, 20)).thenReturn(mockPageResponse);
+    when(genreService.findAll(null, 1, 20)).thenReturn(mockResponse);
 
     mockMvc.perform(get("/genres")).andExpect(status().isOk());
 

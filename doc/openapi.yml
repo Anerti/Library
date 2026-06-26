@@ -1623,13 +1623,13 @@ paths:
                 type: object
                 required:
                   - data
-                  - pagination
+                  - meta
                 properties:
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/GenreResponse'
-                  pagination:
+                  meta:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
@@ -1638,7 +1638,7 @@ paths:
                     name: Fiction
                     createdAt: "2026-06-01T10:30:00Z"
                     updatedAt: "2026-06-01T10:30:00Z"
-                pagination:
+                meta:
                   page: 1
                   size: 20
                   total: 1
