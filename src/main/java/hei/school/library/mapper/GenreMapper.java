@@ -1,7 +1,7 @@
 package hei.school.library.mapper;
 
+import hei.school.library.dto.GenreListResponse;
 import hei.school.library.dto.GenreResponse;
-import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.PaginationDto;
 import hei.school.library.entity.Genre;
 import lombok.Builder;
@@ -18,10 +18,13 @@ public class GenreMapper {
     return GenreResponse.builder().id(genre.getId()).name(genre.getName()).build();
   }
 
-  public PageResponse<GenreResponse> toPageResponse(Page<Genre> page, int pageNum, int pageSize) {
-    return PageResponse.<GenreResponse>builder()
-        .data(page.getContent().stream().map(this::toResponse).toList())
-        .pagination(
+  public GenreListResponse toPageResponse(Page<Genre> page, int pageNum, int pageSize) {
+    return GenreListResponse.builder()
+        .data(
+            page.getContent().stream().map(this::toResponse).toList().isEmpty()
+                ? null
+                : page.getContent().stream().map(this::toResponse).toList())
+        .meta(
             PaginationDto.builder()
                 .page(pageNum)
                 .size(pageSize)

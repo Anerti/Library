@@ -11,9 +11,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import hei.school.library.dto.GenreListResponse;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
-import hei.school.library.dto.PageResponse;
 import hei.school.library.entity.Genre;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
@@ -132,12 +132,12 @@ class GenreServiceTest {
     List<Genre> genreList = List.of(new Genre(), new Genre());
     Page<Genre> genrePage = new PageImpl<>(genreList, pageable, genreList.size());
 
-    PageResponse<GenreResponse> expectedResponse = new PageResponse<>();
+    GenreListResponse expectedResponse = new GenreListResponse();
 
     when(genreRepository.findAll(pageable)).thenReturn(genrePage);
     when(genreMapper.toPageResponse(genrePage, page, size)).thenReturn(expectedResponse);
 
-    PageResponse<GenreResponse> actualResponse = genreService.findAll(null, page, size);
+    GenreListResponse actualResponse = genreService.findAll(null, page, size);
 
     assertThat(actualResponse).isNotNull();
     verify(genreRepository).findAll(pageable);
@@ -156,11 +156,11 @@ class GenreServiceTest {
     List<Genre> genreList = List.of(new Genre());
     Page<Genre> genrePage = new PageImpl<>(genreList, pageable, genreList.size());
 
-    PageResponse<GenreResponse> expectedResponse = new PageResponse<>();
+    GenreListResponse expectedResponse = new GenreListResponse();
     when(genreRepository.findBySearch(eq(search), eq(pageable))).thenReturn(genrePage);
     when(genreMapper.toPageResponse(genrePage, page, size)).thenReturn(expectedResponse);
 
-    PageResponse<GenreResponse> actualResponse = genreService.findAll(search, page, size);
+    GenreListResponse actualResponse = genreService.findAll(search, page, size);
 
     assertThat(actualResponse).isNotNull();
     verify(genreRepository).findBySearch(eq(search), eq(pageable));

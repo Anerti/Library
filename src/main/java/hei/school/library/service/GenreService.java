@@ -1,8 +1,8 @@
 package hei.school.library.service;
 
+import hei.school.library.dto.GenreListResponse;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
-import hei.school.library.dto.PageResponse;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.GenreMapper;
@@ -47,7 +47,9 @@ public class GenreService {
   }
 
   @Transactional(readOnly = true)
-  public PageResponse<GenreResponse> findAll(String search, int page, int size) {
+  public GenreListResponse findAll(String search, int page, int size) {
+    dataValidator.validateString("search", search);
+
     PageRequest pageable = PageRequest.of(page - 1, size);
 
     return (search == null || search.isBlank())

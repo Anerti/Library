@@ -1,8 +1,8 @@
 package hei.school.library.endpoint.rest.controller;
 
+import hei.school.library.dto.GenreListResponse;
 import hei.school.library.dto.GenreRequest;
 import hei.school.library.dto.GenreResponse;
-import hei.school.library.dto.PageResponse;
 import hei.school.library.service.GenreService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class GenreController {
   }
 
   @GetMapping
-  public ResponseEntity<PageResponse<GenreResponse>> findAll(
+  public ResponseEntity<GenreListResponse> findAll(
       @RequestParam(required = false) String search,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
