@@ -44,7 +44,7 @@ public interface GenreRepository extends JpaRepository<Genre, UUID> {
   @Query(
       value =
           """
-          SELECT id, name, created_at, updated_at FROM genre
+          SELECT id, name FROM genre
           WHERE (:search IS NULL OR :search = ''
              OR name ILIKE '%' || :search || '%')
           """,
