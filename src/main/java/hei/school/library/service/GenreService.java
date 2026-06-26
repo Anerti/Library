@@ -48,6 +48,8 @@ public class GenreService {
 
   @Transactional(readOnly = true)
   public GenreListResponse findAll(String search, int page, int size) {
+    dataValidator.validateString("search", search);
+
     PageRequest pageable = PageRequest.of(page - 1, size);
 
     return (search == null || search.isBlank())
