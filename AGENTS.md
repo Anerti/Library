@@ -6,7 +6,7 @@
 - **Build:** Gradle 8.5
 - **Database:** PostgreSQL (via RDS, `sslmode=require`)
 - **Cloud:** AWS Lambda (deployed as `springboot3` container), SQS, EventBridge, SES
-- **API:** OpenAPI 3.0.3 (hand-authored, 27 paths, 50 ops)
+- **API:** OpenAPI 3.0.3 (hand-authored, 27 paths, 58 ops)
 - **Codegen:** `org.openapi.generator` 7.7.0 (generates Spring server stubs from spec)
 - **Test:** JUnit 5 + TestContainers 2.0.2 + JUnit Pioneer + MockMvc
 - **Coverage:** JaCoCo 0.8.11 (line coverage ≥ 0%, reports to XML + HTML)
@@ -20,6 +20,7 @@ Library/
 ├── settings.gradle              # rootProject.name = 'library-962dc383'
 ├── format.sh                    # Code formatter
 ├── .env                         # DB creds (PGHOST, PGDATABASE, PGUSER, PGPASSWORD, PGSSLMODE)
+├── banner.txt                   # Spring Boot ASCII art banner
 ├── .github/workflows/
 │   ├── ci.yml                   # test + format on every push/PR
 │   ├── cd-compute.yml           # deploy to AWS Lambda via Poja API (preprod/prod)
@@ -32,6 +33,20 @@ Library/
     │   ├── PojaApplication.java             # @SpringBootApplication entry
     │   ├── PojaGenerated.java               # Marker annotation (generated code)
     │   ├── dto/                             # Request/Response DTOs (Lombok builders)
+    │   │   ├── ArrivalItemRequest/Response.java
+    │   │   ├── ArrivalRequest/Response.java
+    │   │   ├── AuthorListResponse.java
+    │   │   ├── AuthorRequest/Response/UpdateRequest.java
+    │   │   ├── BookCopyRequest/Response/UpdateRequest.java
+    │   │   ├── BookRequest/Response/UpdateRequest.java
+    │   │   ├── CustomerRequest/Response/UpdateRequest.java
+    │   │   ├── GenreListResponse.java
+    │   │   ├── GenreRequest/Response/Summary.java
+    │   │   ├── LibraryListResponse.java
+    │   │   ├── LibraryRequest/Response.java
+    │   │   ├── PageResponse.java + PaginationDto.java
+    │   │   ├── SaleItemRequest/Response.java
+    │   │   ├── SaleRequest/Response/UpdateRequest.java
     │   ├── endpoint/
     │   │   ├── EndpointConf.java
     │   │   ├── RequestLoggerConfigurer.java
@@ -135,15 +150,48 @@ Library/
         │   └── library/LibraryControllerTest.java
         └── service/                         # Service layer tests (mocked repos, no Spring context)
             ├── arrivalItem/
+            │   ├── DeleteArrivalItemServiceTest.java
+            │   ├── GetArrivalItemServiceTest.java
+            │   └── PostArrivalItemServiceTest.java
             ├── arrivals/
+            │   ├── ArrivalFindByIdServiceTest.java
+            │   ├── ArrivalFindByLibraryIdServiceTest.java
+            │   └── PostArrivalServiceTest.java
             ├── authors/
+            │   ├── AuthorServiceTest.java
+            │   ├── DeleteAuthorsByIdServiceTest.java
+            │   ├── GetAuthorsByIdServiceTest.java
+            │   ├── GetAuthorsServiceTest.java
+            │   └── PostAuthorsServiceTest.java
             ├── book/
+            │   ├── DeleteBookByIdServiceTest.java
+            │   ├── GetBookByIdServiceTest.java
+            │   ├── GetBookServiceTest.java
+            │   ├── PatchBookByIdTest.java
+            │   └── PostBookServiceTest.java
             ├── bookCopy/
+            │   ├── DeleteBookCopyServiceTest.java
+            │   ├── GetBookCopyByIdServiceTest.java
+            │   ├── GetBookCopyServiceTest.java
+            │   ├── GetStockBookCopyServiceTest.java
+            │   ├── PatchBookCopyServiceTest.java
+            │   └── PostBookCopyServiceTest.java
             ├── customer/
+            │   ├── DeleteCustomersByIdServiceTest.java
+            │   ├── GetCustomersByIdServiceTest.java
+            │   ├── GetCustomersServiceTest.java
+            │   ├── PatchCustomersServiceTest.java
+            │   └── PostCustomersServiceTest.java
             ├── genre/
+            │   ├── GenreServiceTest.java
             ├── library/
+            │   ├── LibraryServiceTest.java
             ├── sale/
+            │   ├── GetSalesServiceTest.java
+            │   ├── PatchSalesServiceTest.java
+            │   └── PostSalesServiceTest.java
             └── saleItem/
+                ├── SaleItemServiceTest.java
 ```
 
 ## Common commands
@@ -173,7 +221,7 @@ Library/
 - **Generated code exclusion:** `**/gen/**` is excluded from JaCoCo coverage.
 - **Parallel tests:** `maxParallelForks = CPU/2` (set in `build.gradle`).
 - **DB schema:** Hibernate `ddl-auto=validate` — schema is managed externally (Flyway-like via POJA pipeline), not by JPA auto-DDL.
-- **OpenAPI:** Hand-authored spec at `doc/openapi.yml` (3.0.3, 27 paths, 50 ops). API base `/api/v1`. No auth required yet.
+- **OpenAPI:** Hand-authored spec at `doc/openapi.yml` (3.0.3, 27 paths, 58 ops). API base `/api/v1`. No auth required yet.
 - **Lombok:** Used everywhere (builders, getters, setters, constructors).
 - **AWS Lambda:** Deployed as a Lambda container (`springboot3` container type). `LambdaHandler` is the entry point. Deployment via Poja API.
 - **Mail:** Uses AWS SES via Jakarta Mail. Configured in `EmailConf`.

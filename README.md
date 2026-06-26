@@ -33,7 +33,7 @@ PGSSLMODE=disable
 
 ## Endpoints
 
-50 endpoints — spec OpenAPI 3.0.3 dans `doc/openapi.yml` (27 paths).
+58 endpoints — spec OpenAPI 3.0.3 dans `doc/openapi.yml` (27 paths).
 
 Groupes principaux :
 
