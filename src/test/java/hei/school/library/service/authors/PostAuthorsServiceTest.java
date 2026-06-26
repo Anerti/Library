@@ -74,8 +74,10 @@ class PostAuthorsServiceTest {
   void create_shouldThrow_whenNameInvalid() {
     AuthorRequest invalidRequest = new AuthorRequest("Jean123", "Paul");
 
-    doThrow(new UnprocessableEntityException(
-            "firstName field contain forbidden characters. Only letters (a-z, A-Z, éèê), hyphen and space are allowed."))
+    doThrow(
+            new UnprocessableEntityException(
+                "firstName field contain forbidden characters. Only letters (a-z, A-Z, éèê), hyphen"
+                    + " and space are allowed."))
         .when(authorValidator)
         .validateCreation(invalidRequest);
 
