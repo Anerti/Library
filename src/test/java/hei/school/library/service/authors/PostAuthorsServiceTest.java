@@ -56,8 +56,8 @@ class PostAuthorsServiceTest {
 
     assertThat(result.getId()).isEqualTo(existingId);
     assertThat(result.getFirstName()).isEqualTo("Jean");
-    verify(dataValidator).validateName("firstName", "Jean");
-    verify(dataValidator).validateName("lastName", "Paul");
+    assertThat(result.getLastName()).isEqualTo("Paul");
+    verify(authorValidator).validateCreation(authorRequest);
   }
 
   @Test
@@ -76,10 +76,10 @@ class PostAuthorsServiceTest {
 
     doThrow(
             new UnprocessableEntityException(
-                "firstName field contain forbidden characters. Only letters (a-z, A-Z) and space"
-                    + " are allowed."))
-        .when(dataValidator)
-        .validateName("firstName", "Jean123");
+                "firstName field contain forbidden characters. Only letters (a-z, A-Z, éèê), hyphen"
+                    + " and space are allowed."))
+        .when(authorValidator)
+        .validateCreation(invalidRequest);
 
     assertThatThrownBy(() -> authorService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class);
