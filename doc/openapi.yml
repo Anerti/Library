@@ -232,12 +232,12 @@ components:
     AuthorRequest:
       type: object
       required:
+        - firstName
         - lastName
       properties:
         firstName:
           type: string
           maxLength: 100
-          nullable: true
           example: Antoine
         lastName:
           type: string
@@ -248,6 +248,7 @@ components:
       type: object
       required:
         - id
+        - firstName
         - lastName
       properties:
         id:
@@ -257,7 +258,6 @@ components:
         firstName:
           type: string
           maxLength: 100
-          nullable: true
           example: Antoine
         lastName:
           type: string
@@ -271,7 +271,6 @@ components:
         firstName:
           type: string
           maxLength: 100
-          nullable: true
           example: Antoine
         lastName:
           type: string
