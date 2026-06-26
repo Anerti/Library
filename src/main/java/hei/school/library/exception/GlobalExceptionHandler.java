@@ -114,7 +114,8 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
-  public ResponseEntity<ErrorBody> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+  public ResponseEntity<ErrorBody> handleHttpMessageNotReadable(
+      HttpMessageNotReadableException ex) {
     HttpStatus status = HttpStatus.BAD_REQUEST;
     return ResponseEntity.status(status)
         .body(

@@ -4,7 +4,6 @@ import hei.school.library.dto.AuthorListResponse;
 import hei.school.library.dto.AuthorRequest;
 import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.AuthorUpdateRequest;
-import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AuthorMapper;
@@ -71,8 +70,7 @@ public class AuthorService {
       return authorMapper.toResponse(
           authorRepository
               .update(id, authorUpdateRequest.getFirstName(), authorUpdateRequest.getLastName())
-              .orElseThrow(
-                  () -> new NotFoundException(String.format("Author %s not found.", id))));
+              .orElseThrow(() -> new NotFoundException(String.format("Author %s not found.", id))));
     } catch (DataIntegrityViolationException e) {
       if (e.getRootCause() instanceof SQLException sqlEx
           && SQL_STATE_VIOLATION.equals(sqlEx.getSQLState())) {

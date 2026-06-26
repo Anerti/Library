@@ -96,8 +96,7 @@ public class AuthorServiceTest {
   void update_shouldThrow_whenNotFound() {
     AuthorUpdateRequest updateReq = new AuthorUpdateRequest("Jean", "Paul Updated");
 
-    when(authorRepository.update(unknownId, "Jean", "Paul Updated"))
-        .thenReturn(Optional.empty());
+    when(authorRepository.update(unknownId, "Jean", "Paul Updated")).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> authorService.update(unknownId, updateReq))
         .isInstanceOf(NotFoundException.class);
