@@ -11,3 +11,10 @@ CREATE TABLE IF NOT EXISTS genre (
     name       VARCHAR(100) NOT NULL UNIQUE,
 );
 
+CREATE TABLE IF NOT EXISTS author (
+    id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    first_name VARCHAR(100) NOT NULL,
+    last_name  VARCHAR(100) NOT NULL,
+    CONSTRAINT uq_author_name UNIQUE (first_name, last_name)
+);
+
