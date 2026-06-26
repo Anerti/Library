@@ -11,8 +11,10 @@ import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.validator.AuthorValidator;
 import hei.school.library.validator.DataValidator;
+import java.sql.SQLException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,7 @@ public class AuthorService {
   private final AuthorValidator authorValidator;
   private final AuthorMapper authorMapper;
   private final DataValidator dataValidator;
+  private static final String SQL_STATE_VIOLATION = "23505";
 
   @Transactional(readOnly = true)
   public AuthorListResponse findAll(String search, int page, int size) {
@@ -62,14 +65,21 @@ public class AuthorService {
 
   @Transactional
   public AuthorResponse update(UUID id, AuthorUpdateRequest authorUpdateRequest) {
-    Author author =
-        authorRepository
-            .findById(id)
-            .orElseThrow(() -> new NotFoundException(String.format("Author %s not found.", id)));
+    authorValidator.validateUpdate(authorUpdateRequest);
 
-    authorValidator.validateUpdate(authorUpdateRequest, author);
-    
-    return authorMapper.toResponse(authorRepository.save(author));
+    try {
+      return authorMapper.toResponse(
+          authorRepository
+              .update(id, authorUpdateRequest.getFirstName(), authorUpdateRequest.getLastName())
+              .orElseThrow(
+                  () -> new NotFoundException(String.format("Author %s not found.", id))));
+    } catch (DataIntegrityViolationException e) {
+      if (e.getRootCause() instanceof SQLException sqlEx
+          && SQL_STATE_VIOLATION.equals(sqlEx.getSQLState())) {
+        throw new ConflictException("Author already exists.");
+      }
+      throw e;
+    }
   }
 
   @Transactional
