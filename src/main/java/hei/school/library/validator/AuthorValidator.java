@@ -20,13 +20,15 @@ public class AuthorValidator {
 
   public void validateUpdate(AuthorUpdateRequest request) {
     if (request.getFirstName() == null && request.getLastName() == null) {
-      throw new UnprocessableEntityException("Minimum first name or last name is required");
+      throw new UnprocessableEntityException("First name or last name is required.");
     }
-    if (request.getFirstName() != null && request.getFirstName().length() > 100) {
-      throw new UnprocessableEntityException("First name is longer than 100 characters");
+    if (request.getFirstName() != null) {
+      dataValidator.checkNull("firstName", request.getFirstName());
+      dataValidator.validateName("firstName", request.getFirstName());
     }
-    if (request.getLastName() != null && request.getLastName().length() > 100) {
-      throw new UnprocessableEntityException("Last name is longer than 100 characters");
+    if (request.getLastName() != null) {
+      dataValidator.checkNull("lastName", request.getLastName());
+      dataValidator.validateName("lastName", request.getLastName());
     }
   }
 }

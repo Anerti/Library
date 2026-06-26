@@ -45,6 +45,21 @@ public interface AuthorRepository extends JpaRepository<Author, UUID> {
   @Query(
       value =
           """
+          UPDATE author
+          SET first_name = COALESCE(:firstName, first_name),
+              last_name  = COALESCE(:lastName,  last_name)
+          WHERE id = :id
+          RETURNING id, first_name, last_name
+          """,
+      nativeQuery = true)
+  Optional<Author> update(
+      @Param("id") UUID id,
+      @Param("firstName") String firstName,
+      @Param("lastName") String lastName);
+
+  @Query(
+      value =
+          """
           DELETE FROM author WHERE id = :id
           RETURNING id
           """,

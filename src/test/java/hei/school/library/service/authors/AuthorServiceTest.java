@@ -82,8 +82,8 @@ public class AuthorServiceTest {
     Author updated =
         Author.builder().id(existingId).firstName("Jean").lastName("Paul Updated").build();
 
-    when(authorRepository.findById(existingId)).thenReturn(Optional.of(author));
-    when(authorRepository.save(any(Author.class))).thenReturn(updated);
+    when(authorRepository.update(existingId, "Jean", "Paul Updated"))
+        .thenReturn(Optional.of(updated));
 
     AuthorResponse result = authorService.update(existingId, updateReq);
 
@@ -94,11 +94,13 @@ public class AuthorServiceTest {
   @Test
   @DisplayName("update: should throw NotFoundException when absent")
   void update_shouldThrow_whenNotFound() {
-    when(authorRepository.findById(unknownId)).thenReturn(Optional.empty());
+    AuthorUpdateRequest updateReq = new AuthorUpdateRequest("Jean", "Paul Updated");
 
-    assertThatThrownBy(() -> authorService.update(unknownId, new AuthorUpdateRequest()))
+    when(authorRepository.update(unknownId, "Jean", "Paul Updated")).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> authorService.update(unknownId, updateReq))
         .isInstanceOf(NotFoundException.class);
 
-    verify(authorRepository, never()).save(any(Author.class));
+    verify(authorRepository).update(unknownId, "Jean", "Paul Updated");
   }
 }
