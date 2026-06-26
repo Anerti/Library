@@ -84,6 +84,6 @@ public class AuthorService {
   public void delete(UUID id) {
     authorRepository
         .delete(id)
-        .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
+        .orElseThrow(() -> new NotFoundException(String.format("Author %s not found.", id)));
   }
 }
