@@ -88,7 +88,7 @@ public class AuthorServiceTest {
     AuthorResponse result = authorService.update(existingId, updateReq);
 
     assertThat(result.getLastName()).isEqualTo("Paul Updated");
-    verify(authorValidator).validateUpdate(updateReq);
+    verify(authorValidator).validateUpdate(updateReq, author);
   }
 
   @Test

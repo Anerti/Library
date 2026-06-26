@@ -46,8 +46,7 @@ public class AuthorController {
   @PatchMapping("/{id}")
   public ResponseEntity<AuthorResponse> update(
       @PathVariable UUID id, @RequestBody AuthorUpdateRequest authorUpdateRequest) {
-    var author = authorService.update(id, authorUpdateRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(author);
+    return ResponseEntity.status(HttpStatus.OK).body(authorService.update(id, authorUpdateRequest));
   }
 
   @DeleteMapping("/{id}")

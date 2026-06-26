@@ -62,18 +62,13 @@ public class AuthorService {
 
   @Transactional
   public AuthorResponse update(UUID id, AuthorUpdateRequest authorUpdateRequest) {
-    authorValidator.validateUpdate(authorUpdateRequest);
     Author author =
         authorRepository
             .findById(id)
-            .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
+            .orElseThrow(() -> new NotFoundException(String.format("Author %s not found.", id)));
 
-    if (authorUpdateRequest.getFirstName() != null) {
-      author.setFirstName(authorUpdateRequest.getFirstName());
-    }
-    if (authorUpdateRequest.getLastName() != null) {
-      author.setLastName(authorUpdateRequest.getLastName());
-    }
+    authorValidator.validateUpdate(authorUpdateRequest, author);
+    
     return authorMapper.toResponse(authorRepository.save(author));
   }
 
