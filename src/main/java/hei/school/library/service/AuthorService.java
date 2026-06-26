@@ -27,6 +27,7 @@ public class AuthorService {
 
   @Transactional(readOnly = true)
   public AuthorListResponse findAll(String search, int page, int size) {
+    dataValidator.validateName("search", search);
     PageRequest pageable = PageRequest.of(page - 1, size);
 
     return (search == null || search.isBlank())
