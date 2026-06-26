@@ -1445,13 +1445,13 @@ paths:
                 type: object
                 required:
                   - data
-                  - pagination
+                  - meta
                 properties:
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/AuthorResponse'
-                  pagination:
+                  meta:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
@@ -1459,7 +1459,7 @@ paths:
                     id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
                     firstName: Antoine
                     lastName: de Saint-Exupéry
-                pagination:
+                meta:
                   page: 1
                   size: 20
                   total: 1

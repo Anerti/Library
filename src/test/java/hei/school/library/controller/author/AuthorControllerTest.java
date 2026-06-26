@@ -6,10 +6,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hei.school.library.dto.AuthorListResponse;
 import hei.school.library.dto.AuthorRequest;
 import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.AuthorUpdateRequest;
-import hei.school.library.dto.PageResponse;
 import hei.school.library.endpoint.rest.controller.AuthorController;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
@@ -46,7 +46,7 @@ public class AuthorControllerTest {
   @Test
   void should_get_all_authors_with_pagination() throws Exception {
     String search = "Camus";
-    PageResponse<AuthorResponse> mockPageResponse = new PageResponse<>();
+    AuthorListResponse mockPageResponse = new AuthorListResponse();
 
     when(authorService.findAll(search, 1, 20)).thenReturn(mockPageResponse);
 
@@ -59,7 +59,7 @@ public class AuthorControllerTest {
 
   @Test
   void should_use_default_pagination_when_not_provided() throws Exception {
-    PageResponse<AuthorResponse> mockPageResponse = new PageResponse<>();
+    AuthorListResponse mockPageResponse = new AuthorListResponse();
 
     when(authorService.findAll(null, 1, 20)).thenReturn(mockPageResponse);
 

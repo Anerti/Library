@@ -1,6 +1,9 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.*;
+import hei.school.library.dto.AuthorListResponse;
+import hei.school.library.dto.AuthorRequest;
+import hei.school.library.dto.AuthorResponse;
+import hei.school.library.dto.AuthorUpdateRequest;
 import hei.school.library.entity.Author;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
@@ -23,7 +26,7 @@ public class AuthorService {
   private final DataValidator dataValidator;
 
   @Transactional(readOnly = true)
-  public PageResponse<AuthorResponse> findAll(String search, int page, int size) {
+  public AuthorListResponse findAll(String search, int page, int size) {
     PageRequest pageable = PageRequest.of(page - 1, size);
 
     return (search == null || search.isBlank())
