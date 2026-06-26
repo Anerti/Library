@@ -20,7 +20,10 @@ public class GenreMapper {
 
   public GenreListResponse toPageResponse(Page<Genre> page, int pageNum, int pageSize) {
     return GenreListResponse.builder()
-        .data(page.getContent().stream().map(this::toResponse).toList().isEmpty() ? null : page.getContent().stream().map(this::toResponse).toList())
+        .data(
+            page.getContent().stream().map(this::toResponse).toList().isEmpty()
+                ? null
+                : page.getContent().stream().map(this::toResponse).toList())
         .meta(
             PaginationDto.builder()
                 .page(pageNum)
