@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import hei.school.library.dto.AuthorRequest;
 import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.AuthorUpdateRequest;
 import hei.school.library.entity.Author;
+import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.mapper.PaginationMapper;
@@ -44,6 +46,33 @@ public class AuthorServiceTest {
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
     author = Author.builder().id(existingId).firstName("Jean").lastName("Paul").build();
+  }
+
+  @Test
+  @DisplayName("create: should call validator and return DTO")
+  void create_shouldCallValidatorAndReturnDto() {
+    AuthorRequest request = new AuthorRequest("Jean", "Paul");
+
+    when(authorRepository.create("Jean", "Paul")).thenReturn(Optional.of(author));
+
+    AuthorResponse result = authorService.create(request);
+
+    assertThat(result.getFirstName()).isEqualTo("Jean");
+    assertThat(result.getLastName()).isEqualTo("Paul");
+    verify(authorValidator).validateCreation(request);
+  }
+
+  @Test
+  @DisplayName("create: should throw ConflictException on duplicate")
+  void create_shouldThrow_whenDuplicate() {
+    AuthorRequest request = new AuthorRequest("Jean", "Paul");
+
+    when(authorRepository.create("Jean", "Paul")).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> authorService.create(request))
+        .isInstanceOf(ConflictException.class);
+
+    verify(authorValidator).validateCreation(request);
   }
 
   @Test

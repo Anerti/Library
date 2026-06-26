@@ -45,8 +45,7 @@ public class AuthorService {
 
   @Transactional
   public AuthorResponse create(AuthorRequest authorRequest) {
-    dataValidator.validateName("firstName", authorRequest.getFirstName());
-    dataValidator.validateName("lastName", authorRequest.getLastName());
+    authorValidator.validateCreation(authorRequest);
 
     return authorMapper.toResponse(
         authorRepository
