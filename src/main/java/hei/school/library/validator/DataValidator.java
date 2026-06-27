@@ -1,6 +1,5 @@
 package hei.school.library.validator;
 
-import hei.school.library.dto.BookRequest;
 import hei.school.library.dto.BookUpdateRequest;
 import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerUpdateRequest;
@@ -15,6 +14,7 @@ public class DataValidator {
 
   private static final Pattern SAFE_STRING = Pattern.compile("^[a-zA-Z0-9@'éèê ._+\\-]*$");
   private final Pattern SAFE_STRING_BOOK_NAME = Pattern.compile("^[a-zA-Z0-9' éèê-]+$");
+  private static final Pattern SAFE_TEXT_STRING = Pattern.compile("^[a-zA-Z0-9' .,;\"!?:éêèç-]+$");
   private static final Pattern SAFE_NAME_STRING = Pattern.compile("^[a-zA-Zéèê' -]+$");
   private static final Pattern VALID_EMAIL_PATTERN =
       Pattern.compile("^[a-zA-Z0-9_.-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z]+){1,2}$");
@@ -30,7 +30,7 @@ public class DataValidator {
   }
 
   public void checkStringLength(String fieldName, String value, int length) {
-    if (value.length() > length) {
+    if (value != null && value.length() > length) {
       throw new UnprocessableEntityException(
           String.format("%s cannot be longer than %s characters.", fieldName, length));
     }
@@ -42,6 +42,22 @@ public class DataValidator {
           String.format(
               "Field '%s' contains invalid characters. Only letters (a-z, A-Z), digits (0-9),"
                   + " spaces, and @ ('.-_) are allowed.",
+              fieldName));
+    }
+  }
+
+  protected void validateBookTitle(String value) {
+    if (value != null && !value.isBlank() && !SAFE_STRING_BOOK_NAME.matcher(value).matches()) {
+      throw new UnprocessableEntityException("title contains invalid characters.");
+    }
+  }
+
+  protected void validateText(String fieldName, String value) {
+    if (value != null && !value.isBlank() && !SAFE_TEXT_STRING.matcher(value).matches()) {
+      throw new UnprocessableEntityException(
+          String.format(
+              "Field '%s' contains invalid characters. Only a-zA-Z0-9' .,;\"!?:éêè- characters are"
+                  + " allowed.",
               fieldName));
     }
   }
@@ -89,7 +105,7 @@ public class DataValidator {
     }
   }
 
-  private void validateIsbn(String isbn) {
+  public void validateIsbn(String isbn) {
     if (isbn == null || isbn.isBlank()) {
       throw new UnprocessableEntityException("isbn is required.");
     }
@@ -98,29 +114,6 @@ public class DataValidator {
     }
     if (!SAFE_ISBN.matcher(isbn).matches()) {
       throw new UnprocessableEntityException("isbn is invalid or contain Illegal characters.");
-    }
-  }
-
-  public void validateBook(BookRequest request) {
-    if (request.getTitle() == null || request.getTitle().isBlank()) {
-      throw new UnprocessableEntityException("title is required.");
-    }
-    if (request.getTitle().length() > 100) {
-      throw new UnprocessableEntityException("title cannot be longer than 100 characters.");
-    }
-    if (!SAFE_STRING_BOOK_NAME.matcher(request.getTitle()).matches()) {
-      throw new UnprocessableEntityException("title contains invalid characters.");
-    }
-
-    validateIsbn(request.getIsbn());
-
-    if (request.getPublisher() == null || request.getPublisher().isBlank()) {
-      throw new UnprocessableEntityException("publisher is required.");
-    }
-    validateName("publisher", request.getPublisher());
-
-    if (request.getPublishedAt() == null) {
-      throw new UnprocessableEntityException("publishedAt is required.");
     }
   }
 
