@@ -44,7 +44,9 @@ public class BookService {
             request.getPublishedAt())
         .map(bookMapper::toResponse)
         .orElseThrow(
-            () -> new ConflictException(String.format("Book's ISBN %s already exists.", request.getIsbn())));
+            () ->
+                new ConflictException(
+                    String.format("Book's ISBN %s already exists.", request.getIsbn())));
   }
 
   @Transactional(readOnly = true)

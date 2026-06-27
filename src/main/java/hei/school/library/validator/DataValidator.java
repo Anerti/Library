@@ -46,15 +46,19 @@ public class DataValidator {
     }
   }
 
-  protected void validateBookTitle(String value){
+  protected void validateBookTitle(String value) {
     if (value != null && !value.isBlank() && !SAFE_STRING_BOOK_NAME.matcher(value).matches()) {
       throw new UnprocessableEntityException("title contains invalid characters.");
     }
   }
 
-  protected void validateText(String fieldName, String value){
+  protected void validateText(String fieldName, String value) {
     if (value != null && !value.isBlank() && !SAFE_TEXT_STRING.matcher(value).matches()) {
-      throw new UnprocessableEntityException(String.format("Field '%s' contains invalid characters. Only a-zA-Z0-9' .,;\"!?:éêè- characters are allowed.", fieldName));
+      throw new UnprocessableEntityException(
+          String.format(
+              "Field '%s' contains invalid characters. Only a-zA-Z0-9' .,;\"!?:éêè- characters are"
+                  + " allowed.",
+              fieldName));
     }
   }
 
