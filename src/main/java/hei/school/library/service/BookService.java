@@ -11,6 +11,7 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
+import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.util.List;
 import java.util.UUID;
@@ -28,10 +29,11 @@ public class BookService {
   private final BookRepository bookRepository;
   private final BookMapper bookMapper;
   private final DataValidator dataValidator;
+  private final BookValidator bookValidator;
   private final PaginationMapper paginationMapper;
 
   public BookResponse createBook(BookRequest request) {
-    dataValidator.validateBook(request);
+    bookValidator.validateCreation(request);
 
     return bookRepository
         .create(
@@ -42,7 +44,7 @@ public class BookService {
             request.getPublishedAt())
         .map(bookMapper::toResponse)
         .orElseThrow(
-            () -> new ConflictException("Book with ISBN " + request.getIsbn() + " already exists"));
+            () -> new ConflictException(String.format("Book's ISBN %s already exists.", request.getIsbn())));
   }
 
   @Transactional(readOnly = true)

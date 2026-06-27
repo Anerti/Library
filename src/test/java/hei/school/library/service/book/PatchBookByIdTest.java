@@ -15,6 +15,7 @@ import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
+import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,7 +42,11 @@ class PatchBookByIdTest {
   void setUp() {
     bookService =
         new BookService(
-            bookRepository, new BookMapper(), new DataValidator(), new PaginationMapper());
+            bookRepository,
+            new BookMapper(),
+            new DataValidator(),
+            new BookValidator(new DataValidator()),
+            new PaginationMapper());
 
     bookId = UUID.randomUUID();
     existingBook =

@@ -14,6 +14,7 @@ import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
+import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,7 +39,11 @@ class PostBookServiceTest {
   void setUp() {
     bookService =
         new BookService(
-            bookRepository, new BookMapper(), new DataValidator(), new PaginationMapper());
+            bookRepository,
+            new BookMapper(),
+            new DataValidator(),
+            new BookValidator(new DataValidator()),
+            new PaginationMapper());
 
     validRequest =
         BookRequest.builder()
@@ -137,7 +142,7 @@ class PostBookServiceTest {
 
     assertThatThrownBy(() -> bookService.createBook(validRequest))
         .isInstanceOf(ConflictException.class)
-        .hasMessage("Book with ISBN " + validRequest.getIsbn() + " already exists");
+        .hasMessage("Book's ISBN " + validRequest.getIsbn() + " already exists.");
   }
 
   @Test
@@ -152,7 +157,7 @@ class PostBookServiceTest {
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessage("title is required.");
+        .hasMessage("title is required and cannot be blank.");
   }
 
   @Test
@@ -163,7 +168,7 @@ class PostBookServiceTest {
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessage("isbn is required.");
+        .hasMessage("isbn is required and cannot be blank.");
   }
 
   @Test
@@ -174,7 +179,7 @@ class PostBookServiceTest {
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessage("publisher is required.");
+        .hasMessage("publisher is required and cannot be blank.");
   }
 
   @Test
@@ -185,7 +190,7 @@ class PostBookServiceTest {
 
     assertThatThrownBy(() -> bookService.createBook(invalid))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessage("publishedAt is required.");
+        .hasMessage("publishedAt is required and cannot be blank.");
   }
 
   @Test
