@@ -50,7 +50,7 @@ public class BookService {
     return bookRepository
         .findById(id)
         .map(bookMapper::toResponse)
-        .orElseThrow(() -> new NotFoundException("Book not found"));
+        .orElseThrow(() -> new NotFoundException(String.format("Book %s not found", id)));
   }
 
   public BookResponse updateBook(UUID id, BookUpdateRequest request) {

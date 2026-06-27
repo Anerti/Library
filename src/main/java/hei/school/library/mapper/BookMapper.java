@@ -21,8 +21,8 @@ public class BookMapper {
         .publisher(book.getPublisher())
         .publishedAt(book.getPublishedAt())
         .createdAt(book.getCreatedAt())
-        .authors(mapAuthors(book))
-        .genres(mapGenres(book))
+        .authors(mapAuthors(book).isEmpty() ? null : mapAuthors(book))
+        .genres(mapGenres(book).isEmpty() ? null : mapGenres(book))
         .build();
   }
 

@@ -37,7 +37,7 @@ public class BookController {
 
   @GetMapping("/{id}")
   public ResponseEntity<BookResponse> getBookById(@PathVariable UUID id) {
-    return ResponseEntity.ok(bookService.getBookById(id));
+    return ResponseEntity.status(HttpStatus.OK).body(bookService.getBookById(id));
   }
 
   @PatchMapping("/{id}")
