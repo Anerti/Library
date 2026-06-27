@@ -104,8 +104,8 @@ class GetBookServiceTest {
 
     BookResponse second = result.getData().get(1);
     assertThat(second.getTitle()).isEqualTo("Les Misérables");
-    assertThat(second.getAuthors()).isEmpty();
-    assertThat(second.getGenres()).isEmpty();
+    assertThat(second.getAuthors()).isNull();
+    assertThat(second.getGenres()).isNull();
 
     verify(bookRepository)
         .searchBooks(eq(null), eq(null), eq(null), eq(null), any(PageRequest.class));

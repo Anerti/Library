@@ -83,8 +83,8 @@ class PostBookServiceTest {
     assertThat(result.getPublisher()).isEqualTo("Gallimard");
     assertThat(result.getPublishedAt()).isEqualTo(LocalDate.of(1943, 4, 6));
     assertThat(result.getCreatedAt()).isNotNull();
-    assertThat(result.getAuthors()).isEmpty();
-    assertThat(result.getGenres()).isEmpty();
+    assertThat(result.getAuthors()).isNull();
+    assertThat(result.getGenres()).isNull();
 
     verify(bookRepository)
         .create(
