@@ -131,40 +131,6 @@ public class DataValidator {
     }
   }
 
-  public void checkPatchBook(BookUpdateRequest request) {
-    if (request.getTitle() == null
-        && request.getSummary() == null
-        && request.getIsbn() == null
-        && request.getPublisher() == null
-        && request.getPublishedAt() == null) {
-      throw new UnprocessableEntityException(
-          "At least one field (title, summary, isbn, publisher, publishedAt) must be provided");
-    }
-  }
-
-  public void validatePatchBook(BookUpdateRequest request, Book book) {
-    checkPatchBook(request);
-    if (request.getTitle() != null) {
-      validateName("title", request.getTitle());
-      book.setTitle(request.getTitle());
-    }
-    if (request.getSummary() != null) {
-      validateString("summary", request.getSummary());
-      book.setSummary(request.getSummary());
-    }
-    if (request.getIsbn() != null) {
-      validateIsbn(request.getIsbn());
-      book.setIsbn(request.getIsbn());
-    }
-    if (request.getPublisher() != null) {
-      validateName("publisher", request.getPublisher());
-      book.setPublisher(request.getPublisher());
-    }
-    if (request.getPublishedAt() != null) {
-      book.setPublishedAt(request.getPublishedAt());
-    }
-  }
-
   public void validateCustomerUpdate(CustomerUpdateRequest request) {
     if (request.getLastName() == null
         && request.getFirstName() == null
