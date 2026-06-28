@@ -1,6 +1,8 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.Book;
+
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,6 +31,19 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
       @Param("isbn") String isbn,
       @Param("publisher") String publisher,
       @Param("publishedAt") LocalDate publishedAt);
+
+  @Query(value = """
+            UPDATE book
+            SET title = :title, summary = :summary, isbn = :isbn, publisher = :publisher, published_at = :publishedAt
+            WHERE id = :id
+            RETURNING id, title, summary, isbn, publisher, published_at
+            """, nativeQuery = true)
+  Optional<Book> updateById(@Param("id") UUID id,
+                                  @Param("title") String title,
+                                  @Param("summary") String summary,
+                                  @Param("isbn") String isbn,
+                                  @Param("publisher") String publisher,
+                                  @Param("publishedAt") LocalDate publishedAt);
 
   @Query(
       value =
