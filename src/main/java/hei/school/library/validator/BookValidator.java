@@ -29,24 +29,15 @@ public class BookValidator {
 
   private void publisherValidator(String publisher) {
     dataValidator.checkNull("publisher", publisher);
+    dataValidator.checkStringLength("publisher", publisher, 100);
     dataValidator.validateName("publisher", publisher);
   }
 
   public void validateCreation(BookRequest request) {
-    dataValidator.checkNull("title", request.getTitle());
-    dataValidator.checkStringLength("title", request.getTitle(), 100);
-    dataValidator.validateBookTitle(request.getTitle());
-
-    dataValidator.checkStringLength("summary", request.getSummary(), 1000);
-    dataValidator.validateText("summary", request.getSummary());
-
-    dataValidator.checkNull("isbn", request.getIsbn());
-    dataValidator.validateIsbn(request.getIsbn());
-
-    dataValidator.checkNull("publisher", request.getPublisher());
-    dataValidator.checkStringLength("publisher", request.getPublisher(), 100);
-    dataValidator.validateName("publisher", request.getPublisher());
-
+    titleValidator(request.getTitle());
+    summaryValidator(request.getSummary());
+    isbnValidator(request.getIsbn());
+    publisherValidator(request.getPublisher());
     dataValidator.checkNull("publishedAt", request.getPublishedAt());
   }
 
