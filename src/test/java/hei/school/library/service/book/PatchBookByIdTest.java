@@ -230,9 +230,7 @@ class PatchBookByIdTest {
 
     assertThatThrownBy(() -> bookService.updateBook(bookId, request))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessage(
-            "title field contain forbidden characters. Only letters (a-z, A-Z, éèê), hyphen and"
-                + " space are allowed.");
+        .hasMessage("title contains invalid characters.");
   }
 
   @Test
