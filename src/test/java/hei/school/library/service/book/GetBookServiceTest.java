@@ -91,10 +91,11 @@ class GetBookServiceTest {
   void listBooks_shouldReturnPaginatedBooks() {
     Page<Book> page = new PageImpl<>(List.of(bookWithAuthorsAndGenres, bookWithoutRelations));
 
-    when(bookRepository.searchBooks(eq(null), eq(null), eq(null), eq(null), any(PageRequest.class)))
+    when(bookRepository.searchBooks(
+            eq(null), eq(null), eq(null), eq(null), eq(null), any(PageRequest.class)))
         .thenReturn(page);
 
-    PageResponse<BookResponse> result = bookService.listBooks(null, null, null, null, 1, 20);
+    PageResponse<BookResponse> result = bookService.listBooks(null, null, null, null, null, 1, 20);
 
     assertThat(result.getData()).hasSize(2);
     assertThat(result.getPagination().getPage()).isEqualTo(1);
@@ -114,7 +115,7 @@ class GetBookServiceTest {
     assertThat(second.getGenres()).isNull();
 
     verify(bookRepository)
-        .searchBooks(eq(null), eq(null), eq(null), eq(null), any(PageRequest.class));
+        .searchBooks(eq(null), eq(null), eq(null), eq(null), eq(null), any(PageRequest.class));
   }
 
   @Test
@@ -123,10 +124,11 @@ class GetBookServiceTest {
     Page<Book> page = new PageImpl<>(List.of(bookWithAuthorsAndGenres));
 
     when(bookRepository.searchBooks(
-            eq("Petit"), eq(null), eq(null), eq(null), any(PageRequest.class)))
+            eq("Petit"), eq(null), eq(null), eq(null), eq(null), any(PageRequest.class)))
         .thenReturn(page);
 
-    PageResponse<BookResponse> result = bookService.listBooks("Petit", null, null, null, 1, 20);
+    PageResponse<BookResponse> result =
+        bookService.listBooks("Petit", null, null, null, null, 1, 20);
 
     assertThat(result.getData()).hasSize(1);
     assertThat(result.getData().get(0).getTitle()).isEqualTo("Le Petit Prince");
@@ -138,11 +140,11 @@ class GetBookServiceTest {
     Page<Book> page = new PageImpl<>(List.of(bookWithAuthorsAndGenres));
 
     when(bookRepository.searchBooks(
-            eq(null), eq(null), eq("de Saint-Exupéry"), eq(null), any(PageRequest.class)))
+            eq(null), eq(null), eq(null), eq("de Saint-Exupéry"), eq(null), any(PageRequest.class)))
         .thenReturn(page);
 
     PageResponse<BookResponse> result =
-        bookService.listBooks(null, null, "de Saint-Exupéry", null, 1, 20);
+        bookService.listBooks(null, null, null, "de Saint-Exupéry", null, 1, 20);
 
     assertThat(result.getData()).hasSize(1);
   }
@@ -153,10 +155,11 @@ class GetBookServiceTest {
     Page<Book> page = new PageImpl<>(List.of(bookWithAuthorsAndGenres));
 
     when(bookRepository.searchBooks(
-            eq(null), eq(null), eq(null), eq("Fiction"), any(PageRequest.class)))
+            eq(null), eq(null), eq(null), eq(null), eq("Fiction"), any(PageRequest.class)))
         .thenReturn(page);
 
-    PageResponse<BookResponse> result = bookService.listBooks(null, null, null, "Fiction", 1, 20);
+    PageResponse<BookResponse> result =
+        bookService.listBooks(null, null, null, null, "Fiction", 1, 20);
 
     assertThat(result.getData()).hasSize(1);
   }
@@ -167,11 +170,16 @@ class GetBookServiceTest {
     Page<Book> page = new PageImpl<>(List.of(bookWithAuthorsAndGenres));
 
     when(bookRepository.searchBooks(
-            eq(null), eq("978-2-07-061275-8"), eq(null), eq(null), any(PageRequest.class)))
+            eq(null),
+            eq(null),
+            eq("978-2-07-061275-8"),
+            eq(null),
+            eq(null),
+            any(PageRequest.class)))
         .thenReturn(page);
 
     PageResponse<BookResponse> result =
-        bookService.listBooks(null, "978-2-07-061275-8", null, null, 1, 20);
+        bookService.listBooks(null, null, "978-2-07-061275-8", null, null, 1, 20);
 
     assertThat(result.getData()).hasSize(1);
     assertThat(result.getData().get(0).getIsbn()).isEqualTo("978-2-07-061275-8");
@@ -182,12 +190,13 @@ class GetBookServiceTest {
   void listBooks_shouldUsePageAndSize() {
     Page<Book> emptyPage = new PageImpl<>(List.of());
 
-    when(bookRepository.searchBooks(eq(null), eq(null), eq(null), eq(null), any(PageRequest.class)))
+    when(bookRepository.searchBooks(
+            eq(null), eq(null), eq(null), eq(null), eq(null), any(PageRequest.class)))
         .thenReturn(emptyPage);
 
-    PageResponse<BookResponse> result = bookService.listBooks(null, null, null, null, 3, 10);
+    PageResponse<BookResponse> result = bookService.listBooks(null, null, null, null, null, 3, 10);
 
-    assertThat(result.getData()).isEmpty();
+    assertThat(result.getData()).isNull();
     assertThat(result.getPagination().getPage()).isEqualTo(3);
     assertThat(result.getPagination().getSize()).isEqualTo(10);
     assertThat(result.getPagination().getTotal()).isEqualTo(0);

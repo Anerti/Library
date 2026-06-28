@@ -1167,12 +1167,18 @@ paths:
       tags:
         - Books
       parameters:
-        - name: search
+        - name: title
           in: query
           schema:
             type: string
             maxLength: 100
-          description: Free-text search on title or publisher
+          description: Free-text search on title
+        - name: publisher
+          in: query
+          schema:
+            type: string
+            maxLength: 100
+          description: Free-text search on publisher
         - name: isbn
           in: query
           schema:
@@ -1186,7 +1192,7 @@ paths:
             type: string
             maxLength: 100
           description: Exact author last name match
-        - name: genreName
+        - name: genre
           in: query
           schema:
             type: string
