@@ -35,6 +35,7 @@ public class BookService {
   private final PaginationMapper paginationMapper;
   private static final String UNIQUE_CONSTRAINT_VIOLATION = "23505";
 
+  @Transactional
   public BookResponse createBook(BookRequest request) {
     bookValidator.validateCreation(request);
 
@@ -60,6 +61,7 @@ public class BookService {
         .orElseThrow(() -> new NotFoundException(String.format("Book %s not found", id)));
   }
 
+  @Transactional
   public BookResponse updateBook(UUID id, BookUpdateRequest request) {
     bookValidator.validateUpdate(request);
     try {
@@ -86,6 +88,7 @@ public class BookService {
         && UNIQUE_CONSTRAINT_VIOLATION.equals(sqlEx.getSQLState());
   }
 
+  @Transactional
   public void deleteBook(UUID id) {
     bookRepository
         .deleteByIdAndReturn(id)
