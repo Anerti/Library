@@ -1,9 +1,7 @@
 package hei.school.library.validator;
 
-import hei.school.library.dto.BookUpdateRequest;
 import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerUpdateRequest;
-import hei.school.library.entity.Book;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
@@ -119,7 +117,7 @@ public class DataValidator {
 
   public void validateName(String fieldName, String value) {
     if (value != null && !value.isBlank()) {
-      checkStringLength("name", value, 100);
+      checkStringLength(fieldName, value, 100);
 
       if (!SAFE_NAME_STRING.matcher(value).matches()) {
         throw new UnprocessableEntityException(

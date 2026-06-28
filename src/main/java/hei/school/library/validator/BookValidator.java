@@ -29,7 +29,6 @@ public class BookValidator {
 
   private void publisherValidator(String publisher) {
     dataValidator.checkNull("publisher", publisher);
-    dataValidator.checkStringLength("publisher", publisher, 100);
     dataValidator.validateName("publisher", publisher);
   }
 
@@ -53,12 +52,12 @@ public class BookValidator {
 
   public void validateUpdate(BookUpdateRequest request) {
     if (request.getTitle() == null
-            && request.getSummary() == null
-            && request.getIsbn() == null
-            && request.getPublisher() == null
-            && request.getPublishedAt() == null) {
+        && request.getSummary() == null
+        && request.getIsbn() == null
+        && request.getPublisher() == null
+        && request.getPublishedAt() == null) {
       throw new UnprocessableEntityException(
-              "At least one field (title, summary, isbn, publisher, publishedAt) must be provided");
+          "At least one field (title, summary, isbn, publisher, publishedAt) must be provided");
     }
 
     if (request.getTitle() != null) {
