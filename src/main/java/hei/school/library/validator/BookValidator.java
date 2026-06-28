@@ -50,6 +50,18 @@ public class BookValidator {
     dataValidator.checkNull("publishedAt", request.getPublishedAt());
   }
 
+  public void validateFetch(String title, String publisher, String isbn, String authorLastName, String genre) {
+    dataValidator.validateBookTitle(title);
+    dataValidator.validateName("publisher", publisher);
+
+    if (isbn != null && !isbn.isBlank()) {
+      dataValidator.validateIsbn(isbn);
+    }
+
+    dataValidator.validateName("lastName", authorLastName);
+    dataValidator.validateName("genre", genre);
+  }
+
   public void validateUpdate(BookUpdateRequest request) {
     if (request.getTitle() == null
         && request.getSummary() == null

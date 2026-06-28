@@ -97,20 +97,18 @@ public class BookService {
 
   @Transactional(readOnly = true)
   public PageResponse<BookResponse> listBooks(
-      String search, String isbn, String authorLastName, String genreName, int page, int size) {
-    if (search != null) {
-      dataValidator.validateString("search", search);
-    }
+      String title, String publisher, String isbn, String authorLastName, String genre, int page, int size) {
+    bookValidator.validateFetch(title, publisher, isbn, authorLastName, genre);
 
     Pageable pageable = PageRequest.of(page - 1, size);
 
     Page<Book> bookPage =
-        bookRepository.searchBooks(search, isbn, authorLastName, genreName, pageable);
+        bookRepository.searchBooks(title, publisher, isbn, authorLastName, genre, pageable);
 
     List<BookResponse> books = bookPage.getContent().stream().map(bookMapper::toResponse).toList();
 
     PaginationDto pagination = paginationMapper.toPaginationDto(bookPage, page, size);
 
-    return PageResponse.<BookResponse>builder().data(books).pagination(pagination).build();
+    return PageResponse.<BookResponse>builder().data(books.isEmpty() ? null : books).pagination(pagination).build();
   }
 }

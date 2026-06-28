@@ -68,15 +68,11 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
           LEFT JOIN author a ON a.id = ab.author_id
           LEFT JOIN book_genre bg ON bg.book_id = b.id
           LEFT JOIN genre g ON g.id = bg.genre_id
-          WHERE (:search IS NULL OR :search = ''
-              OR b.title ILIKE '%' || :search || '%'
-              OR b.isbn ILIKE '%' || :search || '%'
-              OR b.publisher ILIKE '%' || :search || '%'
-              OR a.last_name ILIKE '%' || :search || '%'
-          )
+          WHERE (:title IS NULL OR :title = '' OR b.title ILIKE '%' || :title || '%')
+          AND (:publisher IS NULL OR :publisher = '' OR b.publisher ILIKE '%' || :publisher || '%')
           AND (:isbn IS NULL OR b.isbn = :isbn)
           AND (:authorLastName IS NULL OR a.last_name = :authorLastName)
-          AND (:genreName IS NULL OR g.name = :genreName)
+          AND (:genre IS NULL OR g.name = :genre)
           """,
       countQuery =
           """
@@ -85,21 +81,18 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
           LEFT JOIN author a ON a.id = ab.author_id
           LEFT JOIN book_genre bg ON bg.book_id = b.id
           LEFT JOIN genre g ON g.id = bg.genre_id
-          WHERE (:search IS NULL OR :search = ''
-              OR b.title ILIKE '%' || :search || '%'
-              OR b.isbn ILIKE '%' || :search || '%'
-              OR b.publisher ILIKE '%' || :search || '%'
-              OR a.last_name ILIKE '%' || :search || '%'
-          )
+          WHERE (:title IS NULL OR :title = '' OR b.title ILIKE '%' || :title || '%')
+          AND (:publisher IS NULL OR :publisher = '' OR b.publisher ILIKE '%' || :publisher || '%')
           AND (:isbn IS NULL OR b.isbn = :isbn)
           AND (:authorLastName IS NULL OR a.last_name = :authorLastName)
-          AND (:genreName IS NULL OR g.name = :genreName)
+          AND (:genre IS NULL OR g.name = :genre)
           """,
       nativeQuery = true)
   Page<Book> searchBooks(
-      @Param("search") String search,
+      @Param("title") String title,
+      @Param("publisher") String publisher,
       @Param("isbn") String isbn,
       @Param("authorLastName") String authorLastName,
-      @Param("genreName") String genreName,
+      @Param("genre") String genre,
       Pageable pageable);
 }
