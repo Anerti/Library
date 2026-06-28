@@ -958,6 +958,17 @@ components:
             error: Unprocessable Entity
             message: At least one required field is missing or invalid
 
+    Conflict:
+      description: Resource conflict (e.g. duplicate unique field)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status: 409
+            error: Conflict
+            message: ISBN 978-2-07-036002-4 already exists.
+
 
 paths:
   # ═══════════════════════ Libraries ═══════════════════════
@@ -1380,6 +1391,8 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Unprocessable'
 

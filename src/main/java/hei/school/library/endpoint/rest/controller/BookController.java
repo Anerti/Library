@@ -43,7 +43,7 @@ public class BookController {
   @PatchMapping("/{id}")
   public ResponseEntity<BookResponse> updateBook(
       @PathVariable UUID id, @RequestBody BookUpdateRequest request) {
-    return ResponseEntity.ok(bookService.updateBook(id, request));
+    return ResponseEntity.status(HttpStatus.OK).body(bookService.updateBook(id, request));
   }
 
   @DeleteMapping("/{id}")

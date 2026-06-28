@@ -33,6 +33,27 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
   @Query(
       value =
           """
+          UPDATE book
+          SET title        = COALESCE(:title, title),
+              summary      = COALESCE(:summary, summary),
+              isbn         = COALESCE(:isbn, isbn),
+              publisher    = COALESCE(:publisher, publisher),
+              published_at = COALESCE(:publishedAt, published_at)
+          WHERE id = :id
+          RETURNING id, title, summary, isbn, publisher, published_at, created_at
+          """,
+      nativeQuery = true)
+  Optional<Book> updateById(
+      @Param("id") UUID id,
+      @Param("title") String title,
+      @Param("summary") String summary,
+      @Param("isbn") String isbn,
+      @Param("publisher") String publisher,
+      @Param("publishedAt") LocalDate publishedAt);
+
+  @Query(
+      value =
+          """
           DELETE FROM book WHERE id = :id
           RETURNING id
           """,

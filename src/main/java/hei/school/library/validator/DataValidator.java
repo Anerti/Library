@@ -1,9 +1,7 @@
 package hei.school.library.validator;
 
-import hei.school.library.dto.BookUpdateRequest;
 import hei.school.library.dto.CustomerRequest;
 import hei.school.library.dto.CustomerUpdateRequest;
-import hei.school.library.entity.Book;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
@@ -119,7 +117,7 @@ public class DataValidator {
 
   public void validateName(String fieldName, String value) {
     if (value != null && !value.isBlank()) {
-      checkStringLength("name", value, 100);
+      checkStringLength(fieldName, value, 100);
 
       if (!SAFE_NAME_STRING.matcher(value).matches()) {
         throw new UnprocessableEntityException(
@@ -128,40 +126,6 @@ public class DataValidator {
                     + "Only letters (a-z, A-Z, éèê), hyphen and space are allowed.",
                 fieldName));
       }
-    }
-  }
-
-  public void checkPatchBook(BookUpdateRequest request) {
-    if (request.getTitle() == null
-        && request.getSummary() == null
-        && request.getIsbn() == null
-        && request.getPublisher() == null
-        && request.getPublishedAt() == null) {
-      throw new UnprocessableEntityException(
-          "At least one field (title, summary, isbn, publisher, publishedAt) must be provided");
-    }
-  }
-
-  public void validatePatchBook(BookUpdateRequest request, Book book) {
-    checkPatchBook(request);
-    if (request.getTitle() != null) {
-      validateName("title", request.getTitle());
-      book.setTitle(request.getTitle());
-    }
-    if (request.getSummary() != null) {
-      validateString("summary", request.getSummary());
-      book.setSummary(request.getSummary());
-    }
-    if (request.getIsbn() != null) {
-      validateIsbn(request.getIsbn());
-      book.setIsbn(request.getIsbn());
-    }
-    if (request.getPublisher() != null) {
-      validateName("publisher", request.getPublisher());
-      book.setPublisher(request.getPublisher());
-    }
-    if (request.getPublishedAt() != null) {
-      book.setPublishedAt(request.getPublishedAt());
     }
   }
 

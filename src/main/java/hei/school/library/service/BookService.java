@@ -13,9 +13,11 @@ import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +33,7 @@ public class BookService {
   private final DataValidator dataValidator;
   private final BookValidator bookValidator;
   private final PaginationMapper paginationMapper;
+  private static final String UNIQUE_CONSTRAINT_VIOLATION = "23505";
 
   public BookResponse createBook(BookRequest request) {
     bookValidator.validateCreation(request);
@@ -58,13 +61,29 @@ public class BookService {
   }
 
   public BookResponse updateBook(UUID id, BookUpdateRequest request) {
-    Book book =
-        bookRepository
-            .findById(id)
-            .orElseThrow(() -> new NotFoundException("Book " + id + " not found"));
+    bookValidator.validateUpdate(request);
+    try {
+      return bookMapper.toResponse(
+          bookRepository
+              .updateById(
+                  id,
+                  request.getTitle(),
+                  request.getSummary(),
+                  request.getIsbn(),
+                  request.getPublisher(),
+                  request.getPublishedAt())
+              .orElseThrow(() -> new NotFoundException(String.format("Book %s not found", id))));
+    } catch (DataIntegrityViolationException e) {
+      if (uniqueViolation(e)) {
+        throw new ConflictException(String.format("ISBN %s already exists.", request.getIsbn()));
+      }
+      throw e;
+    }
+  }
 
-    dataValidator.validatePatchBook(request, book);
-    return bookMapper.toResponse(bookRepository.save(book));
+  private static boolean uniqueViolation(DataIntegrityViolationException e) {
+    return e.getRootCause() instanceof SQLException sqlEx
+        && UNIQUE_CONSTRAINT_VIOLATION.equals(sqlEx.getSQLState());
   }
 
   public void deleteBook(UUID id) {
