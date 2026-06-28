@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import hei.school.library.dto.BookResponse;
 import hei.school.library.dto.BookUpdateRequest;
 import hei.school.library.entity.Book;
+import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.BookMapper;
@@ -17,8 +18,8 @@ import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
 import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @ExtendWith(MockitoExtension.class)
 class PatchBookByIdTest {
@@ -36,7 +38,6 @@ class PatchBookByIdTest {
   private BookService bookService;
 
   private UUID bookId;
-  private Book existingBook;
 
   @BeforeEach
   void setUp() {
@@ -49,16 +50,17 @@ class PatchBookByIdTest {
             new PaginationMapper());
 
     bookId = UUID.randomUUID();
-    existingBook =
-        Book.builder()
-            .id(bookId)
-            .title("Le Petit Prince")
-            .summary("Un classique de la littérature française")
-            .isbn("978-2-07-061275-8")
-            .publisher("Gallimard")
-            .publishedAt(LocalDate.of(1943, 4, 6))
-            .createdAt(LocalDateTime.now())
-            .build();
+  }
+
+  private Book updatedBook(BookUpdateRequest request) {
+    return Book.builder()
+        .id(bookId)
+        .title(request.getTitle())
+        .summary(request.getSummary())
+        .isbn(request.getIsbn())
+        .publisher(request.getPublisher())
+        .publishedAt(request.getPublishedAt())
+        .build();
   }
 
   @Test
@@ -71,8 +73,14 @@ class PatchBookByIdTest {
     request.setPublisher("Gallimard");
     request.setPublishedAt(LocalDate.of(1942, 6, 15));
 
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-    when(bookRepository.save(any(Book.class))).thenReturn(existingBook);
+    when(bookRepository.updateById(
+            bookId,
+            request.getTitle(),
+            request.getSummary(),
+            request.getIsbn(),
+            request.getPublisher(),
+            request.getPublishedAt()))
+        .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
 
@@ -83,8 +91,14 @@ class PatchBookByIdTest {
     assertThat(result.getPublisher()).isEqualTo("Gallimard");
     assertThat(result.getPublishedAt()).isEqualTo(LocalDate.of(1942, 6, 15));
 
-    verify(bookRepository).findById(bookId);
-    verify(bookRepository).save(existingBook);
+    verify(bookRepository)
+        .updateById(
+            bookId,
+            request.getTitle(),
+            request.getSummary(),
+            request.getIsbn(),
+            request.getPublisher(),
+            request.getPublishedAt());
   }
 
   @Test
@@ -93,16 +107,17 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setTitle("Le Petit Prince Revised");
 
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-    when(bookRepository.save(any(Book.class))).thenReturn(existingBook);
+    when(bookRepository.updateById(
+            bookId, request.getTitle(), null, null, null, null))
+        .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
 
     assertThat(result.getTitle()).isEqualTo("Le Petit Prince Revised");
-    assertThat(result.getSummary()).isEqualTo("Un classique de la littérature française");
-    assertThat(result.getIsbn()).isEqualTo("978-2-07-061275-8");
-    assertThat(result.getPublisher()).isEqualTo("Gallimard");
-    assertThat(result.getPublishedAt()).isEqualTo(LocalDate.of(1943, 4, 6));
+    assertThat(result.getSummary()).isNull();
+    assertThat(result.getIsbn()).isNull();
+    assertThat(result.getPublisher()).isNull();
+    assertThat(result.getPublishedAt()).isNull();
   }
 
   @Test
@@ -111,16 +126,17 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setSummary("Nouveau resume mis a jour");
 
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-    when(bookRepository.save(any(Book.class))).thenReturn(existingBook);
+    when(bookRepository.updateById(
+            bookId, null, request.getSummary(), null, null, null))
+        .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
 
-    assertThat(result.getTitle()).isEqualTo("Le Petit Prince");
+    assertThat(result.getTitle()).isNull();
     assertThat(result.getSummary()).isEqualTo("Nouveau resume mis a jour");
-    assertThat(result.getIsbn()).isEqualTo("978-2-07-061275-8");
-    assertThat(result.getPublisher()).isEqualTo("Gallimard");
-    assertThat(result.getPublishedAt()).isEqualTo(LocalDate.of(1943, 4, 6));
+    assertThat(result.getIsbn()).isNull();
+    assertThat(result.getPublisher()).isNull();
+    assertThat(result.getPublishedAt()).isNull();
   }
 
   @Test
@@ -129,16 +145,17 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setIsbn("978-0-14-044926-6");
 
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-    when(bookRepository.save(any(Book.class))).thenReturn(existingBook);
+    when(bookRepository.updateById(
+            bookId, null, null, request.getIsbn(), null, null))
+        .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
 
-    assertThat(result.getTitle()).isEqualTo("Le Petit Prince");
-    assertThat(result.getSummary()).isEqualTo("Un classique de la littérature française");
+    assertThat(result.getTitle()).isNull();
+    assertThat(result.getSummary()).isNull();
     assertThat(result.getIsbn()).isEqualTo("978-0-14-044926-6");
-    assertThat(result.getPublisher()).isEqualTo("Gallimard");
-    assertThat(result.getPublishedAt()).isEqualTo(LocalDate.of(1943, 4, 6));
+    assertThat(result.getPublisher()).isNull();
+    assertThat(result.getPublishedAt()).isNull();
   }
 
   @Test
@@ -147,16 +164,17 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setPublisher("Hachette");
 
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-    when(bookRepository.save(any(Book.class))).thenReturn(existingBook);
+    when(bookRepository.updateById(
+            bookId, null, null, null, request.getPublisher(), null))
+        .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
 
-    assertThat(result.getTitle()).isEqualTo("Le Petit Prince");
-    assertThat(result.getSummary()).isEqualTo("Un classique de la littérature française");
-    assertThat(result.getIsbn()).isEqualTo("978-2-07-061275-8");
+    assertThat(result.getTitle()).isNull();
+    assertThat(result.getSummary()).isNull();
+    assertThat(result.getIsbn()).isNull();
     assertThat(result.getPublisher()).isEqualTo("Hachette");
-    assertThat(result.getPublishedAt()).isEqualTo(LocalDate.of(1943, 4, 6));
+    assertThat(result.getPublishedAt()).isNull();
   }
 
   @Test
@@ -165,15 +183,16 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setPublishedAt(LocalDate.of(1950, 1, 1));
 
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-    when(bookRepository.save(any(Book.class))).thenReturn(existingBook);
+    when(bookRepository.updateById(
+            bookId, null, null, null, null, request.getPublishedAt()))
+        .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
 
-    assertThat(result.getTitle()).isEqualTo("Le Petit Prince");
-    assertThat(result.getSummary()).isEqualTo("Un classique de la littérature française");
-    assertThat(result.getIsbn()).isEqualTo("978-2-07-061275-8");
-    assertThat(result.getPublisher()).isEqualTo("Gallimard");
+    assertThat(result.getTitle()).isNull();
+    assertThat(result.getSummary()).isNull();
+    assertThat(result.getIsbn()).isNull();
+    assertThat(result.getPublisher()).isNull();
     assertThat(result.getPublishedAt()).isEqualTo(LocalDate.of(1950, 1, 1));
   }
 
@@ -184,7 +203,8 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setTitle("Any Title");
 
-    when(bookRepository.findById(unknownId)).thenReturn(Optional.empty());
+    when(bookRepository.updateById(unknownId, "Any Title", null, null, null, null))
+        .thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> bookService.updateBook(unknownId, request))
         .isInstanceOf(NotFoundException.class)
@@ -195,8 +215,6 @@ class PatchBookByIdTest {
   @DisplayName("updateBook: should throw UnprocessableEntityException when no fields provided")
   void updateBook_shouldThrow_whenNoFieldsProvided() {
     BookUpdateRequest request = new BookUpdateRequest();
-
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
 
     assertThatThrownBy(() -> bookService.updateBook(bookId, request))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -209,8 +227,6 @@ class PatchBookByIdTest {
   void updateBook_shouldThrow_whenTitleHasInvalidChars() {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setTitle("Invalid Title @ 123");
-
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
 
     assertThatThrownBy(() -> bookService.updateBook(bookId, request))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -225,8 +241,6 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setIsbn("abcdefghij");
 
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-
     assertThatThrownBy(() -> bookService.updateBook(bookId, request))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessage("isbn is invalid or contain Illegal characters.");
@@ -237,8 +251,6 @@ class PatchBookByIdTest {
   void updateBook_shouldThrow_whenIsbnTooShort() {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setIsbn("123456789");
-
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
 
     assertThatThrownBy(() -> bookService.updateBook(bookId, request))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -251,12 +263,51 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setPublisher("Publisher 123");
 
-    when(bookRepository.findById(bookId)).thenReturn(Optional.of(existingBook));
-
     assertThatThrownBy(() -> bookService.updateBook(bookId, request))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessage(
             "publisher field contain forbidden characters. Only letters (a-z, A-Z, éèê), hyphen and"
                 + " space are allowed.");
+  }
+
+  @Test
+  @DisplayName("updateBook: should throw ConflictException when ISBN already exists")
+  void updateBook_shouldThrow_whenIsbnAlreadyExists() {
+    BookUpdateRequest request = new BookUpdateRequest();
+    request.setTitle("Some Title");
+    request.setIsbn("978-2-07-061275-8");
+
+    SQLException sqlEx = new SQLException("duplicate key value violates unique constraint", "23505");
+    DataIntegrityViolationException dive =
+        new DataIntegrityViolationException("wrap", sqlEx);
+    when(bookRepository.updateById(
+            bookId,
+            request.getTitle(),
+            null,
+            request.getIsbn(),
+            null,
+            null))
+        .thenThrow(dive);
+
+    assertThatThrownBy(() -> bookService.updateBook(bookId, request))
+        .isInstanceOf(ConflictException.class)
+        .hasMessage("ISBN 978-2-07-061275-8 already exists.");
+  }
+
+  @Test
+  @DisplayName("updateBook: should rethrow DataIntegrityViolationException when not a unique violation")
+  void updateBook_shouldRethrow_whenNonUniqueIntegrityViolation() {
+    BookUpdateRequest request = new BookUpdateRequest();
+    request.setTitle("Some Title");
+
+    SQLException sqlEx = new SQLException("not null violation", "23502");
+    DataIntegrityViolationException dive =
+        new DataIntegrityViolationException("wrap", sqlEx);
+    when(bookRepository.updateById(
+            any(UUID.class), any(), any(), any(), any(), any()))
+        .thenThrow(dive);
+
+    assertThatThrownBy(() -> bookService.updateBook(bookId, request))
+        .isInstanceOf(DataIntegrityViolationException.class);
   }
 }
