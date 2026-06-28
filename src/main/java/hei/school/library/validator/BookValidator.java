@@ -62,27 +62,18 @@ public class BookValidator {
 
     if (request.getTitle() != null) {
       titleValidator(request.getTitle());
-      request.setTitle(request.getTitle());
     }
 
     if (request.getSummary() != null) {
       summaryValidator(request.getSummary());
-      request.setSummary(request.getSummary());
     }
 
     if (request.getIsbn() != null) {
       isbnValidator(request.getIsbn());
-      request.setIsbn(request.getIsbn());
     }
 
     if (request.getPublisher() != null) {
       publisherValidator(request.getPublisher());
-      request.setPublisher(request.getPublisher());
-    }
-
-    if (request.getPublishedAt() != null) {
-      dataValidator.checkNull("publishedAt", request.getPublishedAt());
-      request.setPublishedAt(request.getPublishedAt());
     }
   }
 }
