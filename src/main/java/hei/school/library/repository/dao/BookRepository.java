@@ -34,11 +34,11 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
       value =
           """
           UPDATE book
-          SET title       = :title,
-              summary     = :summary,
-              isbn        = :isbn,
-              publisher   = :publisher,
-              published_at = :publishedAt
+          SET title        = COALESCE(:title, title),
+              summary      = COALESCE(:summary, summary),
+              isbn         = COALESCE(:isbn, isbn),
+              publisher    = COALESCE(:publisher, publisher),
+              published_at = COALESCE(:publishedAt, published_at)
           WHERE id = :id
           RETURNING id, title, summary, isbn, publisher, published_at, created_at
           """,
