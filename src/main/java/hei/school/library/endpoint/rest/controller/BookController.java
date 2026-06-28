@@ -33,7 +33,8 @@ public class BookController {
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
 
-    return ResponseEntity.status(HttpStatus.OK).body(bookService.listBooks(title, publisher, isbn, lastName, genre, page, size));
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(bookService.listBooks(title, publisher, isbn, lastName, genre, page, size));
   }
 
   @GetMapping("/{id}")

@@ -50,7 +50,8 @@ public class BookValidator {
     dataValidator.checkNull("publishedAt", request.getPublishedAt());
   }
 
-  public void validateFetch(String title, String publisher, String isbn, String authorLastName, String genre) {
+  public void validateFetch(
+      String title, String publisher, String isbn, String authorLastName, String genre) {
     dataValidator.validateBookTitle(title);
     dataValidator.validateName("publisher", publisher);
 

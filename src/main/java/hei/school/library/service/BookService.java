@@ -97,7 +97,13 @@ public class BookService {
 
   @Transactional(readOnly = true)
   public PageResponse<BookResponse> listBooks(
-      String title, String publisher, String isbn, String authorLastName, String genre, int page, int size) {
+      String title,
+      String publisher,
+      String isbn,
+      String authorLastName,
+      String genre,
+      int page,
+      int size) {
     bookValidator.validateFetch(title, publisher, isbn, authorLastName, genre);
 
     Pageable pageable = PageRequest.of(page - 1, size);
@@ -109,6 +115,9 @@ public class BookService {
 
     PaginationDto pagination = paginationMapper.toPaginationDto(bookPage, page, size);
 
-    return PageResponse.<BookResponse>builder().data(books.isEmpty() ? null : books).pagination(pagination).build();
+    return PageResponse.<BookResponse>builder()
+        .data(books.isEmpty() ? null : books)
+        .pagination(pagination)
+        .build();
   }
 }

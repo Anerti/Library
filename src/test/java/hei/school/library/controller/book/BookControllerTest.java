@@ -1,9 +1,9 @@
 package hei.school.library.controller.book;
 
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -132,7 +132,8 @@ public class BookControllerTest {
     PageResponse<BookResponse> response =
         PageResponse.<BookResponse>builder().data(List.of(book)).pagination(pagination).build();
 
-    when(bookService.listBooks(eq(null), eq(null), eq(null), eq("de Saint-Exupéry"), eq(null), eq(1), eq(20)))
+    when(bookService.listBooks(
+            eq(null), eq(null), eq(null), eq("de Saint-Exupéry"), eq(null), eq(1), eq(20)))
         .thenReturn(response);
 
     mockMvc
@@ -163,7 +164,8 @@ public class BookControllerTest {
     PageResponse<BookResponse> response =
         PageResponse.<BookResponse>builder().data(List.of(book)).pagination(pagination).build();
 
-    when(bookService.listBooks(eq(null), eq(null), eq(null), eq(null), eq("Fiction"), eq(1), eq(20)))
+    when(bookService.listBooks(
+            eq(null), eq(null), eq(null), eq(null), eq("Fiction"), eq(1), eq(20)))
         .thenReturn(response);
 
     mockMvc
@@ -209,7 +211,8 @@ public class BookControllerTest {
     PageResponse<BookResponse> response =
         PageResponse.<BookResponse>builder().data(null).pagination(pagination).build();
 
-    when(bookService.listBooks(eq("nonexistent"), eq(null), eq(null), eq(null), eq(null), eq(1), eq(20)))
+    when(bookService.listBooks(
+            eq("nonexistent"), eq(null), eq(null), eq(null), eq(null), eq(1), eq(20)))
         .thenReturn(response);
 
     mockMvc
