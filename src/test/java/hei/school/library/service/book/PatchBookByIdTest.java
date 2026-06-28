@@ -107,8 +107,7 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setTitle("Le Petit Prince Revised");
 
-    when(bookRepository.updateById(
-            bookId, request.getTitle(), null, null, null, null))
+    when(bookRepository.updateById(bookId, request.getTitle(), null, null, null, null))
         .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
@@ -126,8 +125,7 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setSummary("Nouveau resume mis a jour");
 
-    when(bookRepository.updateById(
-            bookId, null, request.getSummary(), null, null, null))
+    when(bookRepository.updateById(bookId, null, request.getSummary(), null, null, null))
         .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
@@ -145,8 +143,7 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setIsbn("978-0-14-044926-6");
 
-    when(bookRepository.updateById(
-            bookId, null, null, request.getIsbn(), null, null))
+    when(bookRepository.updateById(bookId, null, null, request.getIsbn(), null, null))
         .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
@@ -164,8 +161,7 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setPublisher("Hachette");
 
-    when(bookRepository.updateById(
-            bookId, null, null, null, request.getPublisher(), null))
+    when(bookRepository.updateById(bookId, null, null, null, request.getPublisher(), null))
         .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
@@ -183,8 +179,7 @@ class PatchBookByIdTest {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setPublishedAt(LocalDate.of(1950, 1, 1));
 
-    when(bookRepository.updateById(
-            bookId, null, null, null, null, request.getPublishedAt()))
+    when(bookRepository.updateById(bookId, null, null, null, null, request.getPublishedAt()))
         .thenReturn(Optional.of(updatedBook(request)));
 
     BookResponse result = bookService.updateBook(bookId, request);
@@ -275,16 +270,10 @@ class PatchBookByIdTest {
     request.setTitle("Some Title");
     request.setIsbn("978-2-07-061275-8");
 
-    SQLException sqlEx = new SQLException("duplicate key value violates unique constraint", "23505");
-    DataIntegrityViolationException dive =
-        new DataIntegrityViolationException("wrap", sqlEx);
-    when(bookRepository.updateById(
-            bookId,
-            request.getTitle(),
-            null,
-            request.getIsbn(),
-            null,
-            null))
+    SQLException sqlEx =
+        new SQLException("duplicate key value violates unique constraint", "23505");
+    DataIntegrityViolationException dive = new DataIntegrityViolationException("wrap", sqlEx);
+    when(bookRepository.updateById(bookId, request.getTitle(), null, request.getIsbn(), null, null))
         .thenThrow(dive);
 
     assertThatThrownBy(() -> bookService.updateBook(bookId, request))
@@ -293,16 +282,15 @@ class PatchBookByIdTest {
   }
 
   @Test
-  @DisplayName("updateBook: should rethrow DataIntegrityViolationException when not a unique violation")
+  @DisplayName(
+      "updateBook: should rethrow DataIntegrityViolationException when not a unique violation")
   void updateBook_shouldRethrow_whenNonUniqueIntegrityViolation() {
     BookUpdateRequest request = new BookUpdateRequest();
     request.setTitle("Some Title");
 
     SQLException sqlEx = new SQLException("not null violation", "23502");
-    DataIntegrityViolationException dive =
-        new DataIntegrityViolationException("wrap", sqlEx);
-    when(bookRepository.updateById(
-            any(UUID.class), any(), any(), any(), any(), any()))
+    DataIntegrityViolationException dive = new DataIntegrityViolationException("wrap", sqlEx);
+    when(bookRepository.updateById(any(UUID.class), any(), any(), any(), any(), any()))
         .thenThrow(dive);
 
     assertThatThrownBy(() -> bookService.updateBook(bookId, request))
