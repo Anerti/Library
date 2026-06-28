@@ -13,9 +13,7 @@ import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
-
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +63,15 @@ public class BookService {
   public BookResponse updateBook(UUID id, BookUpdateRequest request) {
     bookValidator.validateUpdate(request);
     try {
-      return bookMapper.toResponse(bookRepository.updateById(id, request.getTitle(), request.getSummary(), request.getIsbn(), request.getPublisher(), request.getPublishedAt())
+      return bookMapper.toResponse(
+          bookRepository
+              .updateById(
+                  id,
+                  request.getTitle(),
+                  request.getSummary(),
+                  request.getIsbn(),
+                  request.getPublisher(),
+                  request.getPublishedAt())
               .orElseThrow(() -> new NotFoundException(String.format("Book %s not found", id))));
     } catch (DataIntegrityViolationException e) {
       if (uniqueViolation(e)) {
@@ -77,7 +83,7 @@ public class BookService {
 
   private static boolean uniqueViolation(DataIntegrityViolationException e) {
     return e.getRootCause() instanceof SQLException sqlEx
-            && UNIQUE_CONSTRAINT_VIOLATION.equals(sqlEx.getSQLState());
+        && UNIQUE_CONSTRAINT_VIOLATION.equals(sqlEx.getSQLState());
   }
 
   public void deleteBook(UUID id) {
