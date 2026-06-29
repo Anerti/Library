@@ -5,7 +5,7 @@ import hei.school.library.dto.AuthResponse;
 import hei.school.library.dto.UserRequest;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.mapper.UserMapper;
-import hei.school.library.service.UserService;
+import hei.school.library.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final JwtTokenProvider tokenProvider;
-  private final UserService userService;
+  private final AuthService authService;
   private final UserMapper userMapper;
 
   @PostMapping("/register")
   public ResponseEntity<AuthResponse> register(@RequestBody UserRequest request) {
-    UserResponse userResponse = userService.create(request);
+    UserResponse userResponse = authService.create(request);
 
     String token =
         tokenProvider.generateToken(

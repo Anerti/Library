@@ -22,19 +22,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class GetUsersServiceTest {
 
   @Mock private UserRepository userRepository;
   @Mock private DataValidator dataValidator;
+  @Mock private PasswordEncoder passwordEncoder;
   private UserService userService;
   private User user;
 
   @BeforeEach
   void setUp() {
     userService =
-        new UserService(userRepository, new UserMapper(new PaginationMapper()), dataValidator);
+        new UserService(userRepository, new UserMapper(new PaginationMapper()), dataValidator, passwordEncoder);
 
     user =
         new User(

@@ -17,6 +17,7 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.SaleMapper;
 import hei.school.library.mapper.UserMapper;
+import hei.school.library.repository.dao.AuthRepository;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.repository.dao.SaleRepository;
 import hei.school.library.repository.dao.UserRepository;
@@ -35,6 +36,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PostSalesServiceTest {
 
   @Mock private SaleRepository saleRepository;
+  @Mock private AuthRepository authRepository;
   @Mock private UserRepository userRepository;
   @Mock private LibraryRepository libraryRepository;
   @Mock private SaleValidator saleValidator;
@@ -57,6 +59,7 @@ class PostSalesServiceTest {
     saleService =
         new SaleService(
             saleRepository,
+            authRepository,
             userRepository,
             libraryRepository,
             userMapper,
@@ -121,7 +124,7 @@ class PostSalesServiceTest {
   void create_shouldCreateUser_whenNotFound() {
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
     when(userRepository.findByEmail("marie@mail.com")).thenReturn(Optional.empty());
-    when(userRepository.create(any(), any(), any(), any(), any(), any(), any()))
+    when(authRepository.create(any(), any(), any(), any(), any(), any(), any()))
         .thenReturn(Optional.of(user));
     when(saleRepository.create(any(), any(), any(), any(), any())).thenReturn(Optional.of(sale));
     when(userMapper.toResponse(user)).thenReturn(userResponse);
@@ -129,7 +132,7 @@ class PostSalesServiceTest {
     SaleResponse result = saleService.create(libraryId, validRequest);
 
     assertThat(result.getUser().getEmail()).isEqualTo("marie@mail.com");
-    verify(userRepository).create(any(), any(), any(), any(), any(), any(), any());
+    verify(authRepository).create(any(), any(), any(), any(), any(), any(), any());
   }
 
   @Test

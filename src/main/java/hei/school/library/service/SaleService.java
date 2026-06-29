@@ -10,6 +10,7 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.SaleMapper;
 import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.LibraryRepository;
+import hei.school.library.repository.dao.AuthRepository;
 import hei.school.library.repository.dao.SaleRepository;
 import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.validator.SaleValidator;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SaleService {
 
   private final SaleRepository saleRepository;
+  private final AuthRepository authRepository;
   private final UserRepository userRepository;
   private final LibraryRepository libraryRepository;
   private final UserMapper userMapper;
@@ -140,7 +142,7 @@ public class SaleService {
             .findByEmail(userRequest.getEmail())
             .orElseGet(
                 () ->
-                    userRepository
+                    authRepository
                         .create(
                             userRequest.getLastName(),
                             userRequest.getFirstName(),

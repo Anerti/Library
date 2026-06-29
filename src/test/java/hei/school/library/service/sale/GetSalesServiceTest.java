@@ -15,6 +15,7 @@ import hei.school.library.entity.enums.SaleStatus;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.SaleMapper;
 import hei.school.library.mapper.UserMapper;
+import hei.school.library.repository.dao.AuthRepository;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.repository.dao.SaleRepository;
 import hei.school.library.repository.dao.UserRepository;
@@ -35,6 +36,7 @@ import org.springframework.data.domain.*;
 class GetSalesServiceTest {
 
   @Mock private SaleRepository saleRepository;
+  @Mock private AuthRepository authRepository;
   @Mock private UserRepository userRepository;
   @Mock private LibraryRepository libraryRepository;
   @Mock private UserMapper userMapper;
@@ -56,6 +58,7 @@ class GetSalesServiceTest {
     saleService =
         new SaleService(
             saleRepository,
+            authRepository,
             userRepository,
             libraryRepository,
             userMapper,

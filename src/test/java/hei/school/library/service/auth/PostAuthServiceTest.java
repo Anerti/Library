@@ -1,4 +1,4 @@
-package hei.school.library.service.user;
+package hei.school.library.service.auth;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -7,36 +7,41 @@ import static org.mockito.Mockito.*;
 import hei.school.library.dto.UserRequest;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.entity.User;
+import hei.school.library.entity.enums.Role;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.mapper.UserMapper;
-import hei.school.library.repository.dao.UserRepository;
-import hei.school.library.service.UserService;
+import hei.school.library.repository.dao.AuthRepository;
+import hei.school.library.service.AuthService;
 import hei.school.library.validator.DataValidator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
-class PostUsersServiceTest {
+class PostAuthServiceTest {
 
-  @Mock private UserRepository userRepository;
+  @Mock private AuthRepository authRepository;
   @Mock private DataValidator dataValidator;
-  private UserService userService;
+  @Mock private PasswordEncoder passwordEncoder;
+
+  private AuthService authService;
 
   private User user;
   private UserRequest validRequest;
 
   @BeforeEach
   void setUp() {
-    userService =
-        new UserService(userRepository, new UserMapper(new PaginationMapper()), dataValidator);
+    authService = new AuthService(authRepository, new UserMapper(new PaginationMapper()), dataValidator, passwordEncoder);
 
     UUID id = UUID.randomUUID();
     user =
@@ -46,9 +51,9 @@ class PostUsersServiceTest {
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "secret",
+            "encoded-secret",
             "+261****4567",
-            null,
+            Role.CUSTOMER,
             Instant.now(),
             Instant.now());
 
@@ -65,23 +70,26 @@ class PostUsersServiceTest {
   @Test
   @DisplayName("create: should save and return DTO")
   void create_shouldSaveAndReturnDto() {
-    when(userRepository.create(any(), any(), any(), any(), any(), any(), any()))
+    when(passwordEncoder.encode(validRequest.getPassword())).thenReturn("encoded-secret");
+    when(authRepository.create(any(), any(), any(), any(), any(), any(), any()))
         .thenReturn(Optional.of(user));
 
-    UserResponse result = userService.create(validRequest);
+    UserResponse result = authService.create(validRequest);
 
     assertThat(result.getLastName()).isEqualTo("Dupont");
     assertThat(result.getEmail()).isEqualTo("marie@mail.com");
     verify(dataValidator).validateUser(validRequest);
+    verify(passwordEncoder).encode("secret");
   }
 
   @Test
   @DisplayName("create: should throw ConflictException when email already exists")
   void create_shouldThrow_whenDuplicateEmail() {
-    when(userRepository.create(any(), any(), any(), any(), any(), any(), any()))
+    when(passwordEncoder.encode(validRequest.getPassword())).thenReturn("encoded-secret");
+    when(authRepository.create(any(), any(), any(), any(), any(), any(), any()))
         .thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> userService.create(validRequest))
+    assertThatThrownBy(() -> authService.create(validRequest))
         .isInstanceOf(ConflictException.class)
         .hasMessageContaining("marie@mail.com");
   }
@@ -96,7 +104,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("lastName is required.");
   }
@@ -111,7 +119,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("lastName is required.");
   }
@@ -127,7 +135,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("forbidden");
   }
@@ -144,7 +152,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("100 characters");
   }
@@ -159,7 +167,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("firstName is required.");
   }
@@ -174,7 +182,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("firstName is required.");
   }
@@ -190,7 +198,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("forbidden");
   }
@@ -207,7 +215,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("100 characters");
   }
@@ -222,7 +230,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Invalid email format");
   }
@@ -239,7 +247,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("100 characters");
   }
@@ -259,7 +267,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Invalid input for email");
   }
@@ -274,7 +282,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Invalid input for email");
   }
@@ -289,7 +297,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> userService.create(invalidRequest))
+    assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("birthDate is required.");
   }
@@ -305,7 +313,7 @@ class PostUsersServiceTest {
         .when(dataValidator)
         .validateUser(futureRequest);
 
-    assertThatThrownBy(() -> userService.create(futureRequest))
+    assertThatThrownBy(() -> authService.create(futureRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("birthDate cannot be in the future.");
   }

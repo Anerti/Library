@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.UserRequest;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.endpoint.rest.controller.UserController;
@@ -98,30 +97,6 @@ public class UserControllerTest {
         .thenThrow(new NotFoundException("User " + userId + " not found"));
 
     mockMvc.perform(get("/users/{id}", userId)).andExpect(status().isNotFound());
-  }
-
-  @Test
-  void should_create_user() throws Exception {
-    UserRequest request =
-        new UserRequest(
-            "Randria",
-            "Faly",
-            LocalDate.of(1995, 8, 12),
-            "faly.randria@email.com",
-            null,
-            "+261 32 11 234 56");
-
-    when(userService.create(any(UserRequest.class))).thenReturn(userResponse);
-
-    mockMvc
-        .perform(
-            post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id").value(userId.toString()))
-        .andExpect(jsonPath("$.lastName").value("Randria"))
-        .andExpect(jsonPath("$.email").value("faly.randria@email.com"));
   }
 
   @Test

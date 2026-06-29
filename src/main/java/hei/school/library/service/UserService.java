@@ -4,8 +4,6 @@ import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.UserRequest;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.dto.UserUpdateRequest;
-import hei.school.library.entity.enums.Role;
-import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
@@ -42,26 +40,6 @@ public class UserService {
         .findById(id)
         .map(userMapper::toResponse)
         .orElseThrow(() -> new NotFoundException("User " + id + " not found"));
-  }
-
-  @Transactional
-  public UserResponse create(UserRequest request) {
-    dataValidator.validateUser(request);
-
-    String encodedPassword = passwordEncoder.encode(request.getPassword());
-
-    return userRepository
-        .create(
-            request.getLastName(),
-            request.getFirstName(),
-            request.getBirthDate(),
-            request.getEmail(),
-            encodedPassword,
-            request.getPhone(),
-            Role.CUSTOMER.name())
-        .map(userMapper::toResponse)
-        .orElseThrow(
-            () -> new ConflictException(String.format("User email %s already used.",  request.getEmail())));
   }
 
   @Transactional

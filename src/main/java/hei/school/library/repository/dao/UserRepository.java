@@ -57,24 +57,6 @@ WHERE (:search IS NULL OR :search = ''
       @Param("email") String email,
       @Param("phone") String phone);
 
-  @Query(
-      value =
-          """
-          INSERT INTO users (last_name, first_name, birth_date, email, password, phone, role)
-          VALUES (:lastName, :firstName, :birthDate, :email, :password, :phone, :role)
-          ON CONFLICT (email) DO NOTHING
-          RETURNING id, last_name, first_name, birth_date, email, password, phone, role, created_at, updated_at
-          """,
-      nativeQuery = true)
-  Optional<User> create(
-      @Param("lastName") String lastName,
-      @Param("firstName") String firstName,
-      @Param("birthDate") LocalDate birthDate,
-      @Param("email") String email,
-      @Param("password") String password,
-      @Param("phone") String phone,
-      @Param("role") String role);
-
   @Query(value = "SELECT id, last_name, first_name, birth_date, email, password, phone, role FROM users WHERE email = :email", nativeQuery = true)
   Optional<User> findByEmail(@Param("email") String email);
 

@@ -16,6 +16,7 @@ import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.SaleMapper;
 import hei.school.library.mapper.UserMapper;
+import hei.school.library.repository.dao.AuthRepository;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.repository.dao.SaleRepository;
 import hei.school.library.repository.dao.UserRepository;
@@ -34,6 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PatchSalesServiceTest {
 
   @Mock private SaleRepository saleRepository;
+  @Mock private AuthRepository authRepository;
   @Mock private UserRepository userRepository;
   @Mock private LibraryRepository libraryRepository;
   @Mock private SaleValidator saleValidator;
@@ -55,6 +57,7 @@ class PatchSalesServiceTest {
     saleService =
         new SaleService(
             saleRepository,
+            authRepository,
             userRepository,
             libraryRepository,
             userMapper,
