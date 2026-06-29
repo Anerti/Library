@@ -10,6 +10,6 @@ import lombok.*;
 @Setter
 public class SaleRequest {
   private Instant saleDate;
-  private CustomerRequest customer;
+  private UserRequest user;
   private SaleStatus status;
 }

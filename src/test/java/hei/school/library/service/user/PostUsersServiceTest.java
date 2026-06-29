@@ -1,18 +1,18 @@
-package hei.school.library.service.customer;
+package hei.school.library.service.user;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import hei.school.library.dto.CustomerRequest;
-import hei.school.library.dto.CustomerResponse;
-import hei.school.library.entity.Customer;
+import hei.school.library.dto.UserRequest;
+import hei.school.library.dto.UserResponse;
+import hei.school.library.entity.User;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.UnprocessableEntityException;
-import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.mapper.PaginationMapper;
-import hei.school.library.repository.dao.CustomerRepository;
-import hei.school.library.service.CustomerService;
+import hei.school.library.mapper.UserMapper;
+import hei.school.library.repository.dao.UserRepository;
+import hei.school.library.service.UserService;
 import hei.school.library.validator.DataValidator;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -24,57 +24,64 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class PostCustomersServiceTest {
+class PostUsersServiceTest {
 
-  @Mock private CustomerRepository customerRepository;
+  @Mock private UserRepository userRepository;
   @Mock private DataValidator dataValidator;
-  private CustomerService customerService;
+  private UserService userService;
 
-  private Customer customer;
-  private CustomerRequest validRequest;
+  private User user;
+  private UserRequest validRequest;
 
   @BeforeEach
   void setUp() {
-    customerService =
-        new CustomerService(
-            customerRepository, new CustomerMapper(new PaginationMapper()), dataValidator);
+    userService =
+        new UserService(userRepository, new UserMapper(new PaginationMapper()), dataValidator);
 
     UUID id = UUID.randomUUID();
-    customer =
-        new Customer(
+    user =
+        new User(
             id,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
+            "secret",
             "+261****4567",
+            null,
             Instant.now(),
             Instant.now());
 
     validRequest =
-        new CustomerRequest(
-            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", "+261****4567");
+        new UserRequest(
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "marie@mail.com",
+            "secret",
+            "+261****4567");
   }
 
   @Test
   @DisplayName("create: should save and return DTO")
   void create_shouldSaveAndReturnDto() {
-    when(customerRepository.create(any(), any(), any(), any(), any()))
-        .thenReturn(Optional.of(customer));
+    when(userRepository.create(any(), any(), any(), any(), any(), any(), any()))
+        .thenReturn(Optional.of(user));
 
-    CustomerResponse result = customerService.create(validRequest);
+    UserResponse result = userService.create(validRequest);
 
     assertThat(result.getLastName()).isEqualTo("Dupont");
     assertThat(result.getEmail()).isEqualTo("marie@mail.com");
-    verify(dataValidator).validateCustomer(validRequest);
+    verify(dataValidator).validateUser(validRequest);
   }
 
   @Test
   @DisplayName("create: should throw ConflictException when email already exists")
   void create_shouldThrow_whenDuplicateEmail() {
-    when(customerRepository.create(any(), any(), any(), any(), any())).thenReturn(Optional.empty());
+    when(userRepository.create(any(), any(), any(), any(), any(), any(), any()))
+        .thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> customerService.create(validRequest))
+    assertThatThrownBy(() -> userService.create(validRequest))
         .isInstanceOf(ConflictException.class)
         .hasMessageContaining("marie@mail.com");
   }
@@ -82,14 +89,14 @@ class PostCustomersServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when lastName is missing")
   void create_shouldThrow_whenLastNameMissing() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest(null, "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest(null, "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("lastName is required."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("lastName is required.");
   }
@@ -97,14 +104,14 @@ class PostCustomersServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when lastName is blank")
   void create_shouldThrow_whenLastNameBlank() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest("", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest("", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("lastName is required."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("lastName is required.");
   }
@@ -112,15 +119,15 @@ class PostCustomersServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when lastName contains numbers")
   void create_shouldThrow_whenLastNameHasInvalidChars() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest(
-            "Dupont123", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest(
+            "Dupont123", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("lastName field contain forbidden characters."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("forbidden");
   }
@@ -129,15 +136,15 @@ class PostCustomersServiceTest {
   @DisplayName(
       "create: should throw UnprocessableEntityException when lastName exceeds 100 characters")
   void create_shouldThrow_whenLastNameTooLong() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest(
-            "D".repeat(101), "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest(
+            "D".repeat(101), "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("lastName cannot be longer than 100 characters."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("100 characters");
   }
@@ -145,14 +152,14 @@ class PostCustomersServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when firstName is missing")
   void create_shouldThrow_whenFirstNameMissing() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest("Dupont", null, LocalDate.of(1995, 3, 10), "marie@mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest("Dupont", null, LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("firstName is required."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("firstName is required.");
   }
@@ -160,14 +167,14 @@ class PostCustomersServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when firstName is blank")
   void create_shouldThrow_whenFirstNameBlank() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest("Dupont", "", LocalDate.of(1995, 3, 10), "marie@mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest("Dupont", "", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("firstName is required."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("firstName is required.");
   }
@@ -175,15 +182,15 @@ class PostCustomersServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when firstName contains numbers")
   void create_shouldThrow_whenFirstNameHasInvalidChars() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest(
-            "Dupont", "Marie123", LocalDate.of(1995, 3, 10), "marie@mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest(
+            "Dupont", "Marie123", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("firstName field contain forbidden characters."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("forbidden");
   }
@@ -192,15 +199,15 @@ class PostCustomersServiceTest {
   @DisplayName(
       "create: should throw UnprocessableEntityException when firstName exceeds 100 characters")
   void create_shouldThrow_whenFirstNameTooLong() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest(
-            "Dupont", "M".repeat(101), LocalDate.of(1995, 3, 10), "marie@mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest(
+            "Dupont", "M".repeat(101), LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("firstName cannot be longer than 100 characters."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("100 characters");
   }
@@ -208,14 +215,14 @@ class PostCustomersServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when email has invalid format")
   void create_shouldThrow_whenEmailInvalidFormat() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "not-an-email", null);
+    UserRequest invalidRequest =
+        new UserRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "not-an-email", null, null);
 
     doThrow(new UnprocessableEntityException("Invalid email format"))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Invalid email format");
   }
@@ -224,15 +231,15 @@ class PostCustomersServiceTest {
   @DisplayName(
       "create: should throw UnprocessableEntityException when email exceeds 100 characters")
   void create_shouldThrow_whenEmailTooLong() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest(
-            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "m".repeat(90) + "@mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest(
+            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "m".repeat(90) + "@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("email cannot be longer than 100 characters."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("100 characters");
   }
@@ -241,17 +248,18 @@ class PostCustomersServiceTest {
   @DisplayName(
       "create: should throw UnprocessableEntityException when email contains forbidden characters")
   void create_shouldThrow_whenEmailHasInvalidChars() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie @mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest(
+            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie @mail.com", null, null);
 
     doThrow(
             new UnprocessableEntityException(
                 "Invalid input for email: 'marie @mail.com' only a-zA-Z0-9@_.- characters are"
                     + " allowed."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Invalid input for email");
   }
@@ -259,14 +267,14 @@ class PostCustomersServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when email is blank")
   void create_shouldThrow_whenEmailBlank() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "", null);
+    UserRequest invalidRequest =
+        new UserRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "", null, null);
 
     doThrow(new UnprocessableEntityException("Invalid input for email"))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Invalid input for email");
   }
@@ -274,14 +282,14 @@ class PostCustomersServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when birthDate is null")
   void create_shouldThrow_whenBirthDateNull() {
-    CustomerRequest invalidRequest =
-        new CustomerRequest("Dupont", "Marie", null, "marie@mail.com", null);
+    UserRequest invalidRequest =
+        new UserRequest("Dupont", "Marie", null, "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("birthDate is required."))
         .when(dataValidator)
-        .validateCustomer(invalidRequest);
+        .validateUser(invalidRequest);
 
-    assertThatThrownBy(() -> customerService.create(invalidRequest))
+    assertThatThrownBy(() -> userService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("birthDate is required.");
   }
@@ -289,15 +297,15 @@ class PostCustomersServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when birthDate is in the future")
   void create_shouldThrow_whenBirthDateInFuture() {
-    CustomerRequest futureRequest =
-        new CustomerRequest(
-            "Dupont", "Marie", LocalDate.now().plusDays(1), "future@mail.com", null);
+    UserRequest futureRequest =
+        new UserRequest(
+            "Dupont", "Marie", LocalDate.now().plusDays(1), "future@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("birthDate cannot be in the future."))
         .when(dataValidator)
-        .validateCustomer(futureRequest);
+        .validateUser(futureRequest);
 
-    assertThatThrownBy(() -> customerService.create(futureRequest))
+    assertThatThrownBy(() -> userService.create(futureRequest))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("birthDate cannot be in the future.");
   }

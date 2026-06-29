@@ -4,20 +4,21 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import hei.school.library.dto.CustomerResponse;
 import hei.school.library.dto.SaleResponse;
 import hei.school.library.dto.SaleUpdateRequest;
-import hei.school.library.entity.Customer;
+import hei.school.library.dto.UserResponse;
 import hei.school.library.entity.Library;
 import hei.school.library.entity.Sale;
+import hei.school.library.entity.User;
+import hei.school.library.entity.enums.Role;
 import hei.school.library.entity.enums.SaleStatus;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
-import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.mapper.SaleMapper;
-import hei.school.library.repository.dao.CustomerRepository;
+import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.repository.dao.SaleRepository;
+import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.service.SaleService;
 import hei.school.library.validator.SaleValidator;
 import java.time.Instant;
@@ -33,10 +34,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PatchSalesServiceTest {
 
   @Mock private SaleRepository saleRepository;
-  @Mock private CustomerRepository customerRepository;
+  @Mock private UserRepository userRepository;
   @Mock private LibraryRepository libraryRepository;
   @Mock private SaleValidator saleValidator;
-  @Mock private CustomerMapper customerMapper;
+  @Mock private UserMapper userMapper;
   private SaleMapper saleMapper;
   private SaleService saleService;
 
@@ -44,9 +45,9 @@ class PatchSalesServiceTest {
   private UUID saleId;
   private UUID customerId;
   private Library library;
-  private Customer customer;
+  private User user;
   private Sale sale;
-  private CustomerResponse customerResponse;
+  private UserResponse userResponse;
 
   @BeforeEach
   void setUp() {
@@ -54,9 +55,9 @@ class PatchSalesServiceTest {
     saleService =
         new SaleService(
             saleRepository,
-            customerRepository,
+            userRepository,
             libraryRepository,
-            customerMapper,
+            userMapper,
             saleMapper,
             saleValidator);
 
@@ -64,29 +65,32 @@ class PatchSalesServiceTest {
     saleId = UUID.randomUUID();
     customerId = UUID.randomUUID();
 
-    library = new Library(libraryId, "Lib A", "+261341234567", "lib@mail.com", "Antananarivo");
-    customer =
-        new Customer(
+    library = new Library(libraryId, "Lib A", "+261****4567", "lib@mail.com", "Antananarivo");
+    user =
+        new User(
             customerId,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "+261331234567",
+            "secret",
+            "+261****4567",
+            Role.CUSTOMER,
             Instant.now(),
             Instant.now());
     sale =
         new Sale(
             saleId, Instant.now(), SaleStatus.BOOKED, customerId, libraryId, null, Instant.now());
 
-    customerResponse =
-        new CustomerResponse(
+    userResponse =
+        new UserResponse(
             customerId,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "+261331234567",
+            "+261****4567",
+            null,
             Instant.now(),
             Instant.now());
   }
@@ -109,8 +113,8 @@ class PatchSalesServiceTest {
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
     when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
     when(saleRepository.save(any(Sale.class))).thenReturn(updated);
-    when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
-    when(customerMapper.toResponse(customer)).thenReturn(customerResponse);
+    when(userRepository.findById(customerId)).thenReturn(Optional.of(user));
+    when(userMapper.toResponse(user)).thenReturn(userResponse);
 
     SaleResponse result = saleService.update(libraryId, saleId, request);
 

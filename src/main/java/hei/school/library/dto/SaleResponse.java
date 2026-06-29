@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class SaleResponse {
   private UUID id;
   private Instant saleDate;
-  private CustomerResponse customer;
+  private UserResponse user;
   private SaleStatus status;
   private LibraryResponse library;
   private Instant createdAt;

@@ -7,10 +7,11 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CustomerUpdateRequest {
+public class UserRequest {
   private String lastName;
   private String firstName;
   private LocalDate birthDate;
   private String email;
+  private String password;
   private String phone;
 }

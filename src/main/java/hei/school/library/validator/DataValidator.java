@@ -1,7 +1,7 @@
 package hei.school.library.validator;
 
-import hei.school.library.dto.CustomerRequest;
-import hei.school.library.dto.CustomerUpdateRequest;
+import hei.school.library.dto.UserRequest;
+import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
@@ -90,7 +90,7 @@ public class DataValidator {
     }
   }
 
-  public void validateCustomer(CustomerRequest request) {
+  public void validateUser(UserRequest request) {
     validateName("lastName", request.getLastName());
     validateName("firstName", request.getFirstName());
     validateEmail(request.getEmail());
@@ -129,7 +129,7 @@ public class DataValidator {
     }
   }
 
-  public void validateCustomerUpdate(CustomerUpdateRequest request) {
+  public void validateUserUpdate(UserUpdateRequest request) {
     if (request.getLastName() == null
         && request.getFirstName() == null
         && request.getBirthDate() == null
@@ -151,7 +151,7 @@ public class DataValidator {
     }
   }
 
-  public void validateCustomerPatchFields(CustomerUpdateRequest request) {
+  public void validateUserPatchFields(UserUpdateRequest request) {
     if (request.getLastName() != null) {
       validateName("lastName", request.getLastName());
     }

@@ -25,8 +25,8 @@ public class Sale {
   @Enumerated(EnumType.STRING)
   private SaleStatus status;
 
-  @Column(nullable = false)
-  private UUID customerId;
+  @Column(name = "user_id", nullable = false)
+  private UUID userId;
 
   @Column(nullable = false)
   private UUID libraryId;
