@@ -75,7 +75,7 @@ WHERE (:search IS NULL OR :search = ''
       @Param("phone") String phone,
       @Param("role") String role);
 
-  @Query(value = "SELECT * FROM users WHERE email = :email", nativeQuery = true)
+  @Query(value = "SELECT id, last_name, first_name, birth_date, email, password, phone, role FROM users WHERE email = :email", nativeQuery = true)
   Optional<User> findByEmail(@Param("email") String email);
 
   @Query(

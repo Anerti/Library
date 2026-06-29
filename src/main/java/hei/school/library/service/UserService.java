@@ -13,6 +13,7 @@ import hei.school.library.validator.DataValidator;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final DataValidator dataValidator;
+  private final PasswordEncoder passwordEncoder;
 
   @Transactional(readOnly = true)
   public PageResponse<UserResponse> findAll(String search, int page, int size) {
@@ -46,18 +48,20 @@ public class UserService {
   public UserResponse create(UserRequest request) {
     dataValidator.validateUser(request);
 
+    String encodedPassword = passwordEncoder.encode(request.getPassword());
+
     return userRepository
         .create(
             request.getLastName(),
             request.getFirstName(),
             request.getBirthDate(),
             request.getEmail(),
-            request.getPassword(),
+            encodedPassword,
             request.getPhone(),
             Role.CUSTOMER.name())
         .map(userMapper::toResponse)
         .orElseThrow(
-            () -> new ConflictException("User email " + request.getEmail() + " already exists"));
+            () -> new ConflictException(String.format("User email %s already used.",  request.getEmail())));
   }
 
   @Transactional
