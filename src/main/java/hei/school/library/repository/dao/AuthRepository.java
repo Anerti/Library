@@ -15,7 +15,7 @@ public interface AuthRepository extends JpaRepository<User, java.util.UUID> {
       value =
           """
           INSERT INTO users (last_name, first_name, birth_date, email, password, phone, role)
-          VALUES (:lastName, :firstName, :birthDate, :email, :password, :phone, :role::user_role)
+          VALUES (:lastName, :firstName, :birthDate, :email, :password, :phone, CAST(:role AS user_role))
           ON CONFLICT (email) DO NOTHING
           RETURNING id, last_name, first_name, birth_date, email, password, phone, role, created_at, updated_at
           """,

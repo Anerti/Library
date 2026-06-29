@@ -63,7 +63,7 @@ curlie POST "http://localhost:8080/auth/register" lastName="Dupont" firstName="M
 echo
 
 echo "── 16) 422 — POST /auth/register (email too long)  →  422 / cannot be longer than 100"
-curlie POST "http://localhost:8080/auth/register" lastName="Dupont" firstName="Marie" birthDate="1995-03-10" email="$(printf 'm%.0s' {1..90})@mail.com" password="Str0ng!Passphrase"
+curlie POST "http://localhost:8080/auth/register" lastName="Dupont" firstName="Marie" birthDate="1995-03-10" email="$(printf 'm%.0s' {1..92})@mail.com" password="Str0ng!Passphrase"
 echo
 
 echo "── 17) 422 — POST /auth/register (password null)  →  422 / password is required"
