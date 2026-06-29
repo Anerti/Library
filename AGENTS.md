@@ -7,6 +7,7 @@
 - **Database:** PostgreSQL (via RDS, `sslmode=require`)
 - **Cloud:** AWS Lambda (deployed as `springboot3` container), SQS, EventBridge, SES
 - **API:** OpenAPI 3.0.3 (hand-authored, 27 paths, 58 ops)
+- **Auth:** JWT (bearer token) + Argon2 password encoding + role-based access (ADMIN / CUSTOMER)
 - **Codegen:** `org.openapi.generator` 7.7.0 (generates Spring server stubs from spec)
 - **Test:** JUnit 5 + TestContainers 2.0.2 + JUnit Pioneer + MockMvc
 - **Coverage:** JaCoCo 0.8.11 (line coverage ≥ 0%, reports to XML + HTML)
@@ -26,27 +27,38 @@ Library/
 │   ├── cd-compute.yml           # deploy to AWS Lambda via Poja API (preprod/prod)
 │   └── release-version.yml
 ├── doc/
+│   ├── api.yml                  # API-specific OpenAPI spec
 │   ├── library-mcd.canvas       # MCD conceptuel (Obsidian Canvas)
 │   └── openapi.yml              # OpenAPI 3.0.3 spec (27 paths, 50 ops)
+├── script/auth/                 # Auth test scripts
+│   └── test_register.sh
 └── src/
-    ├── main/java/hei/school/library/
-    │   ├── PojaApplication.java             # @SpringBootApplication entry
-    │   ├── PojaGenerated.java               # Marker annotation (generated code)
-    │   ├── dto/                             # Request/Response DTOs (Lombok builders)
-    │   │   ├── ArrivalItemRequest/Response.java
-    │   │   ├── ArrivalRequest/Response.java
-    │   │   ├── AuthorListResponse.java
-    │   │   ├── AuthorRequest/Response/UpdateRequest.java
-    │   │   ├── BookCopyRequest/Response/UpdateRequest.java
-    │   │   ├── BookRequest/Response/UpdateRequest.java
-    │   │   ├── CustomerRequest/Response/UpdateRequest.java
-    │   │   ├── GenreListResponse.java
-    │   │   ├── GenreRequest/Response/Summary.java
-    │   │   ├── LibraryListResponse.java
-    │   │   ├── LibraryRequest/Response.java
-    │   │   ├── PageResponse.java + PaginationDto.java
-    │   │   ├── SaleItemRequest/Response.java
-    │   │   ├── SaleRequest/Response/UpdateRequest.java
+    ├── main/
+    │   ├── java/hei/school/library/
+    │   │   ├── PojaApplication.java             # @SpringBootApplication entry
+    │   │   ├── PojaGenerated.java               # Marker annotation (generated code)
+    │   │   ├── config/                          # Security config
+    │   │   │   ├── JwtAuthenticationFilter.java # OncePerRequestFilter — extracts JWT, sets SecurityContext
+    │   │   │   ├── JwtTokenProvider.java        # Token creation/validation (subject = user UUID)
+    │   │   │   └── SecurityConfig.java          # Spring Security filter chain, endpoint auth rules
+    │   │   ├── dto/                             # Request/Response DTOs (Lombok builders)
+    │   │   │   ├── ArrivalItemRequest/Response.java
+    │   │   │   ├── ArrivalRequest/Response.java
+    │   │   │   ├── AuthResponse.java            # JWT token response
+    │   │   │   ├── AuthorListResponse.java
+    │   │   │   ├── AuthorRequest/Response/UpdateRequest.java
+    │   │   │   ├── BookCopyRequest/Response/UpdateRequest.java
+    │   │   │   ├── BookRequest/Response/UpdateRequest.java
+    │   │   │   ├── CustomerRequest/Response/UpdateRequest.java
+    │   │   │   ├── GenreListResponse.java
+    │   │   │   ├── GenreRequest/Response/Summary.java
+    │   │   │   ├── LibraryListResponse.java
+    │   │   │   ├── LibraryRequest/Response.java
+    │   │   │   ├── PageResponse.java + PaginationDto.java
+    │   │   │   ├── SaleItemRequest/Response.java
+    │   │   │   ├── SaleRequest/Response/UpdateRequest.java
+    │   │   │   ├── UserRequest/Response.java
+    │   │   │   └── UserUpdateRequest.java
     │   ├── endpoint/
     │   │   ├── EndpointConf.java
     │   │   ├── RequestLoggerConfigurer.java
@@ -56,6 +68,7 @@ Library/
     │   │       │   └── HealthEmailController.java
     │   │       ├── ArrivalController.java
     │   │       ├── ArrivalItemController.java
+    │   │       ├── AuthController.java      # POST /register, POST /login
     │   │       ├── AuthorController.java
     │   │       ├── BookController.java
     │   │       ├── BookCopyController.java
@@ -64,7 +77,8 @@ Library/
     │   │       ├── GetStockBookCopyController.java
     │   │       ├── LibraryController.java
     │   │       ├── SaleController.java
-    │   │       └── SaleItemController.java
+    │   │       ├── SaleItemController.java
+    │   │       └── UserController.java       # CRUD users (admin)
     │   ├── entity/                          # JPA entities
     │   │   ├── Arrival.java
     │   │   ├── ArrivalItem.java
@@ -76,16 +90,20 @@ Library/
     │   │   ├── Library.java
     │   │   ├── Sale.java
     │   │   ├── SaleItem.java
+    │   │   ├── User.java                   # Replaces Customer — unified auth + profile
     │   │   └── enums/
     │   │       ├── BookCopyFormat.java
     │   │       ├── BookCopyStatus.java
+    │   │       ├── Role.java               # ADMIN, CUSTOMER
     │   │       └── SaleStatus.java
     │   ├── exception/                       # Centralised exception handling
     │   │   ├── BadRequestException.java
     │   │   ├── ConflictException.java
     │   │   ├── ErrorBody.java
+    │   │   ├── ForbiddenException.java      # 403 — insufficient role
     │   │   ├── GlobalExceptionHandler.java  # @RestControllerAdvice
     │   │   ├── NotFoundException.java
+    │   │   ├── UnauthorizedException.java   # 401 — missing/invalid JWT
     │   │   └── UnprocessableEntityException.java
     │   ├── file/hash/                       # FileHasher
     │   ├── file/zip/                        # FileTyper
@@ -104,21 +122,25 @@ Library/
     │   │   ├── LibraryMapper.java
     │   │   ├── PaginationMapper.java
     │   │   ├── SaleItemMapper.java
-    │   │   └── SaleMapper.java
+    │   │   ├── SaleMapper.java
+    │   │   └── UserMapper.java            # User → UserResponse
     │   ├── repository/dao/                  # JPA repositories (INSERT RETURNING pattern)
     │   │   ├── ArrivalItemRepository.java
     │   │   ├── ArrivalRepository.java
     │   │   ├── AuthorRepository.java
+    │   │   ├── AuthRepository.java        # Native queries for auth (register / login)
     │   │   ├── BookCopyRepository.java
     │   │   ├── BookRepository.java
     │   │   ├── CustomerRepository.java
     │   │   ├── GenreRepository.java
     │   │   ├── LibraryRepository.java
     │   │   ├── SaleItemRepository.java
-    │   │   └── SaleRepository.java
+    │   │   ├── SaleRepository.java
+    │   │   └── UserRepository.java        # CRUD users
     │   ├── service/                         # Validation + orchestration
     │   │   ├── ArrivalItemService.java
     │   │   ├── ArrivalService.java
+    │   │   ├── AuthService.java           # Register + login orchestration
     │   │   ├── AuthorService.java
     │   │   ├── BookCopyService.java
     │   │   ├── BookService.java
@@ -126,14 +148,16 @@ Library/
     │   │   ├── GenreService.java
     │   │   ├── LibraryService.java
     │   │   ├── SaleItemService.java
-    │   │   └── SaleService.java
+    │   │   ├── SaleService.java
+    │   │   └── UserService.java          # CRUD users
     │   └── validator/                       # Domain validators
     │       ├── AuthorValidator.java
     │       ├── BookCopyValidator.java
     │       ├── DataValidator.java           # Central string/email/phone/ISBN validation
     │       ├── LibraryValidator.java
     │       ├── SaleItemValidator.java
-    │       └── SaleValidator.java
+    │       ├── SaleValidator.java
+    │       └── UserValidator.java         # Registration validation
     └── test/java/hei/school/library/
         ├── conf/
         │   ├── FacadeIT.java                # Integration test base (TestContainers)
@@ -142,12 +166,14 @@ Library/
         ├── controller/                      # Controller layer tests (@WebMvcTest + MockMvc)
         │   ├── arrival/ArrivalControllerTest.java
         │   ├── arrivalItem/ArrivalItemControllerTest.java
+        │   ├── auth/AuthControllerTest.java
         │   ├── author/AuthorControllerTest.java
         │   ├── book/BookControllerTest.java
         │   ├── bookCopy/BookCopyControllerTest.java
         │   ├── customer/CustomerControllerTest.java
         │   ├── genre/GenreControllerTest.java
-        │   └── library/LibraryControllerTest.java
+        │   ├── library/LibraryControllerTest.java
+        │   └── user/UserControllerTest.java
         └── service/                         # Service layer tests (mocked repos, no Spring context)
             ├── arrivalItem/
             │   ├── DeleteArrivalItemServiceTest.java
@@ -157,6 +183,8 @@ Library/
             │   ├── ArrivalFindByIdServiceTest.java
             │   ├── ArrivalFindByLibraryIdServiceTest.java
             │   └── PostArrivalServiceTest.java
+            ├── auth/
+            │   └── PostAuthServiceTest.java
             ├── authors/
             │   ├── AuthorServiceTest.java
             │   ├── DeleteAuthorsByIdServiceTest.java
@@ -190,8 +218,13 @@ Library/
             │   ├── GetSalesServiceTest.java
             │   ├── PatchSalesServiceTest.java
             │   └── PostSalesServiceTest.java
-            └── saleItem/
-                ├── SaleItemServiceTest.java
+            ├── saleItem/
+            │   ├── SaleItemServiceTest.java
+            └── user/
+                ├── DeleteUsersByIdServiceTest.java
+                ├── GetUsersByIdServiceTest.java
+                ├── GetUsersServiceTest.java
+                └── PatchUsersServiceTest.java
 ```
 
 ## Common commands
