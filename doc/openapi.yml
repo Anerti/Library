@@ -50,6 +50,9 @@ components:
       required:
         - email
         - password
+        - firstName
+        - lastName
+        - birthDate
       properties:
         email:
           type: string
@@ -65,13 +68,20 @@ components:
         firstName:
           type: string
           maxLength: 100
-          nullable: true
           example: Faly
         lastName:
           type: string
           maxLength: 100
-          nullable: true
           example: Randria
+        birthDate:
+          type: string
+          format: date
+          example: "1995-08-12"
+        phone:
+          type: string
+          maxLength: 30
+          nullable: true
+          example: +261 32 11 234 56
 
     LoginRequest:
       type: object
@@ -93,30 +103,40 @@ components:
       type: object
       required:
         - token
-        - userId
-        - email
+        - user
       properties:
         token:
           type: string
           example: eyJhbGciOiJIUzI1NiIs...
-        userId:
-          type: string
-          format: uuid
-          example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
-        email:
-          type: string
-          format: email
-          example: faly.randria@email.com
-        firstName:
-          type: string
-          maxLength: 100
-          nullable: true
-          example: Faly
-        lastName:
-          type: string
-          maxLength: 100
-          nullable: true
-          example: Randria
+        user:
+          type: object
+          required:
+            - email
+            - firstName
+            - lastName
+            - birthDate
+          properties:
+            email:
+              type: string
+              format: email
+              example: faly.randria@email.com
+            firstName:
+              type: string
+              maxLength: 100
+              example: Faly
+            lastName:
+              type: string
+              maxLength: 100
+              example: Randria
+            birthDate:
+              type: string
+              format: date
+              example: "1995-08-12"
+            phone:
+              type: string
+              maxLength: 30
+              nullable: true
+              example: +261 32 11 234 56
 
     # ────────────────── Library ──────────────────
     LibraryRequest:
@@ -1087,10 +1107,12 @@ paths:
                 $ref: '#/components/schemas/AuthResponse'
               example:
                 token: eyJhbGciOiJIUzI1NiIs...
-                userId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
-                email: faly.randria@email.com
-                firstName: Faly
-                lastName: Randria
+                user:
+                  email: faly.randria@email.com
+                  firstName: Faly
+                  lastName: Randria
+                  birthDate: "1995-08-12"
+                  phone: "+261 32 11 234 56"
 
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -1121,10 +1143,12 @@ paths:
                 $ref: '#/components/schemas/AuthResponse'
               example:
                 token: eyJhbGciOiJIUzI1NiIs...
-                userId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
-                email: faly.randria@email.com
-                firstName: Faly
-                lastName: Randria
+                user:
+                  email: faly.randria@email.com
+                  firstName: Faly
+                  lastName: Randria
+                  birthDate: "1995-08-12"
+                  phone: "+261 32 11 234 56"
 
         '400':
           $ref: '#/components/responses/BadRequest'
