@@ -45,10 +45,10 @@ public interface SaleRepository extends JpaRepository<Sale, UUID> {
   @Query(
       value =
           """
-          INSERT INTO sale (sale_date, status, user_id, library_id, expiration_date)
-          VALUES (:saleDate, CAST(:status AS sale_status), :customerId, :libraryId, :expirationDate)
-          RETURNING id, sale_date, status, user_id, library_id, expiration_date, created_at
-          """,
+INSERT INTO sale (sale_date, status, user_id, library_id, expiration_date)
+VALUES (:saleDate, CAST(:status AS sale_status), :customerId, :libraryId, :expirationDate)
+RETURNING id, sale_date, status, user_id, library_id, expiration_date, created_at
+""",
       nativeQuery = true)
   Optional<Sale> create(
       @Param("saleDate") Instant saleDate,

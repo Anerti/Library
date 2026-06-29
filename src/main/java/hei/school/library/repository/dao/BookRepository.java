@@ -63,17 +63,17 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
   @Query(
       value =
           """
-          SELECT DISTINCT b.id, b.title, b.summary, b.isbn, b.publisher, b.published_at, b.created_at FROM book b
-          LEFT JOIN author_book ab ON ab.book_id = b.id
-          LEFT JOIN author a ON a.id = ab.author_id
-          LEFT JOIN book_genre bg ON bg.book_id = b.id
-          LEFT JOIN genre g ON g.id = bg.genre_id
-          WHERE (:title IS NULL OR :title = '' OR b.title ILIKE '%' || :title || '%')
-          AND (:publisher IS NULL OR :publisher = '' OR b.publisher ILIKE '%' || :publisher || '%')
-          AND (:isbn IS NULL OR b.isbn = :isbn)
-          AND (:authorLastName IS NULL OR a.last_name = :authorLastName)
-          AND (:genre IS NULL OR g.name = :genre)
-          """,
+SELECT DISTINCT b.id, b.title, b.summary, b.isbn, b.publisher, b.published_at, b.created_at FROM book b
+LEFT JOIN author_book ab ON ab.book_id = b.id
+LEFT JOIN author a ON a.id = ab.author_id
+LEFT JOIN book_genre bg ON bg.book_id = b.id
+LEFT JOIN genre g ON g.id = bg.genre_id
+WHERE (:title IS NULL OR :title = '' OR b.title ILIKE '%' || :title || '%')
+AND (:publisher IS NULL OR :publisher = '' OR b.publisher ILIKE '%' || :publisher || '%')
+AND (:isbn IS NULL OR b.isbn = :isbn)
+AND (:authorLastName IS NULL OR a.last_name = :authorLastName)
+AND (:genre IS NULL OR g.name = :genre)
+""",
       countQuery =
           """
           SELECT COUNT(DISTINCT b.id) FROM book b

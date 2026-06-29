@@ -14,11 +14,11 @@ public interface AuthRepository extends JpaRepository<User, java.util.UUID> {
   @Query(
       value =
           """
-          INSERT INTO users (last_name, first_name, birth_date, email, password, phone, role)
-          VALUES (:lastName, :firstName, :birthDate, :email, :password, :phone, CAST(:role AS user_role))
-          ON CONFLICT (email) DO NOTHING
-          RETURNING id, last_name, first_name, birth_date, email, password, phone, role, created_at, updated_at
-          """,
+INSERT INTO users (last_name, first_name, birth_date, email, password, phone, role)
+VALUES (:lastName, :firstName, :birthDate, :email, :password, :phone, CAST(:role AS user_role))
+ON CONFLICT (email) DO NOTHING
+RETURNING id, last_name, first_name, birth_date, email, password, phone, role, created_at, updated_at
+""",
       nativeQuery = true)
   Optional<User> create(
       @Param("lastName") String lastName,

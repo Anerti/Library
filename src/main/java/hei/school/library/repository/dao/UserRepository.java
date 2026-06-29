@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
   @Query(
       value =
-"""
+          """
 SELECT id, last_name, first_name, birth_date, email, password, phone, role, created_at, updated_at FROM users
 WHERE (:search IS NULL OR :search = ''
    OR last_name  ILIKE '%' || :search || '%'
@@ -37,17 +37,17 @@ WHERE (:search IS NULL OR :search = ''
   @Query(
       value =
           """
-          UPDATE users
-          SET
-            last_name = COALESCE(:lastName, last_name),
-            first_name = COALESCE(:firstName, first_name),
-            birth_date = COALESCE(:birthDate, birth_date),
-            email = COALESCE(:email, email),
-            phone = COALESCE(:phone, phone),
-            updated_at = NOW()
-          WHERE id = :id
-          RETURNING id, last_name, first_name, birth_date, email, phone, role, created_at, updated_at
-          """,
+UPDATE users
+SET
+  last_name = COALESCE(:lastName, last_name),
+  first_name = COALESCE(:firstName, first_name),
+  birth_date = COALESCE(:birthDate, birth_date),
+  email = COALESCE(:email, email),
+  phone = COALESCE(:phone, phone),
+  updated_at = NOW()
+WHERE id = :id
+RETURNING id, last_name, first_name, birth_date, email, phone, role, created_at, updated_at
+""",
       nativeQuery = true)
   Optional<User> patch(
       @Param("id") UUID id,
