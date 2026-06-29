@@ -61,3 +61,21 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'sale_status') THEN
+    CREATE TYPE sale_status AS ENUM ('PENDING', 'SOLD', 'BOOKED', 'CANCELED', 'EXPIRED');
+  END IF;
+END
+$$;
+
+CREATE TABLE IF NOT EXISTS sale (
+    id               UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    sale_date        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    user_id          UUID         REFERENCES users(id) ON DELETE SET NULL,
+    status           sale_status  NOT NULL DEFAULT 'BOOKED',
+    library_id       UUID         NOT NULL REFERENCES library(id),
+    expiration_date  TIMESTAMP,
+    created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
