@@ -1,7 +1,6 @@
 package hei.school.library.validator;
 
-import hei.school.library.dto.CustomerRequest;
-import hei.school.library.dto.CustomerUpdateRequest;
+import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
@@ -90,16 +89,30 @@ public class DataValidator {
     }
   }
 
-  public void validateCustomer(CustomerRequest request) {
-    validateName("lastName", request.getLastName());
-    validateName("firstName", request.getFirstName());
-    validateEmail(request.getEmail());
+  public void checkPasswordSecurityLevel(String password) {
+    checkNull("password", password);
 
-    if (request.getBirthDate() == null) {
-      throw new UnprocessableEntityException("birthDate is required.");
+    if (password.length() < 12) {
+      throw new UnprocessableEntityException("password must be at least 12 characters.");
     }
-    if (request.getBirthDate().isAfter(LocalDate.now())) {
-      throw new UnprocessableEntityException("birthDate cannot be in the future.");
+
+    if (!password.matches(".*[A-Z].*")) {
+      throw new UnprocessableEntityException(
+          "Password must contain at least one uppercase character.");
+    }
+
+    if (!password.matches(".*[a-z].*")) {
+      throw new UnprocessableEntityException(
+          "Password must contain at least one lowercase character.");
+    }
+
+    if (!password.matches(".*[0-9].*")) {
+      throw new UnprocessableEntityException("Password must contain at least one digits.");
+    }
+
+    if (!password.matches(".*[!?*+=@#$%^&()_\\-\\[\\]{}|\\\\:;\"'<>,./`~].*")) {
+      throw new UnprocessableEntityException(
+          "Password must contain at least one special character.");
     }
   }
 
@@ -129,7 +142,7 @@ public class DataValidator {
     }
   }
 
-  public void validateCustomerUpdate(CustomerUpdateRequest request) {
+  public void validateUserUpdate(UserUpdateRequest request) {
     if (request.getLastName() == null
         && request.getFirstName() == null
         && request.getBirthDate() == null
@@ -151,7 +164,7 @@ public class DataValidator {
     }
   }
 
-  public void validateCustomerPatchFields(CustomerUpdateRequest request) {
+  public void validateUserPatchFields(UserUpdateRequest request) {
     if (request.getLastName() != null) {
       validateName("lastName", request.getLastName());
     }

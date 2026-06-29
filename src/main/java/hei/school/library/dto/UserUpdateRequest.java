@@ -7,7 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CustomerUpdateRequest {
+public class UserUpdateRequest {
   private String lastName;
   private String firstName;
   private LocalDate birthDate;

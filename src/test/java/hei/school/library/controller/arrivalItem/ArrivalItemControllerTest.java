@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.dto.ArrivalItemRequest;
 import hei.school.library.dto.ArrivalItemResponse;
 import hei.school.library.endpoint.rest.controller.ArrivalItemController;
@@ -17,11 +18,13 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest({ArrivalItemController.class, GlobalExceptionHandler.class})
+@AutoConfigureMockMvc(addFilters = false)
 public class ArrivalItemControllerTest {
 
   @Autowired private MockMvc mockMvc;
@@ -29,6 +32,7 @@ public class ArrivalItemControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private ArrivalItemService arrivalItemService;
+  @MockBean private JwtTokenProvider jwtTokenProvider;
 
   private UUID arrivalId;
   private UUID bookCopyId;

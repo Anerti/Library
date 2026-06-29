@@ -1,5 +1,9 @@
 #! /usr/bin/env bash
 # Test script for GET /authors endpoint
+#
+# Also tests customer role access (GET is public)
+
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 01) OK — GET /authors  →  200 / data / meta"
 curlie "http://localhost:8080/authors"
@@ -51,3 +55,8 @@ curlie "http://localhost:8080/authors" "search==test123"
 echo
 echo "── 17) OK — GET /authors?search=Sagan  →  200 / Françoise Sagan (accented name)"
 curlie "http://localhost:8080/authors?search=Sagan"
+echo
+
+echo "── 18) OK — GET /authors (customer token)  →  200 / same data"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" "http://localhost:8080/authors?page=1&size=2"
+echo

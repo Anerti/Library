@@ -9,21 +9,20 @@ import org.springframework.stereotype.Component;
 public class SaleValidator {
 
   public void validateCreate(SaleRequest request) {
-    if (request.getCustomer() == null) {
-      throw new UnprocessableEntityException("customer is required.");
+    if (request.getUser() == null) {
+      throw new UnprocessableEntityException("user is required.");
     }
-    if (request.getCustomer().getLastName() == null
-        || request.getCustomer().getLastName().isBlank()) {
-      throw new UnprocessableEntityException("customer.lastName is required.");
+    if (request.getUser().getLastName() == null || request.getUser().getLastName().isBlank()) {
+      throw new UnprocessableEntityException("user.lastName is required.");
     }
-    if (request.getCustomer().getEmail() == null || request.getCustomer().getEmail().isBlank()) {
-      throw new UnprocessableEntityException("customer.email is required.");
+    if (request.getUser().getEmail() == null || request.getUser().getEmail().isBlank()) {
+      throw new UnprocessableEntityException("user.email is required.");
     }
-    if (request.getCustomer().getBirthDate() == null) {
-      throw new UnprocessableEntityException("customer.birthDate is required.");
+    if (request.getUser().getBirthDate() == null) {
+      throw new UnprocessableEntityException("user.birthDate is required.");
     }
-    if (request.getCustomer().getBirthDate().isAfter(java.time.LocalDate.now())) {
-      throw new UnprocessableEntityException("customer.birthDate cannot be in the future.");
+    if (request.getUser().getBirthDate().isAfter(java.time.LocalDate.now())) {
+      throw new UnprocessableEntityException("user.birthDate cannot be in the future.");
     }
   }
 

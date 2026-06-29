@@ -17,10 +17,10 @@ public interface SaleRepository extends JpaRepository<Sale, UUID> {
   @Query(
       value =
           """
-          SELECT id, sale_date, status, customer_id, library_id, expiration_date, created_at FROM sale
+          SELECT id, sale_date, status, user_id, library_id, expiration_date, created_at FROM sale
           WHERE library_id = :libraryId
           AND (:status IS NULL OR status = CAST(:status AS sale_status))
-          AND (CAST(:customerId AS uuid) IS NULL OR customer_id = CAST(:customerId AS uuid))
+          AND (CAST(:customerId AS uuid) IS NULL OR user_id = CAST(:customerId AS uuid))
           AND (CAST(:from AS timestamp) IS NULL OR sale_date >= CAST(:from AS timestamp))
           AND (CAST(:to AS timestamp) IS NULL OR sale_date <= CAST(:to AS timestamp))
           """,
@@ -29,7 +29,7 @@ public interface SaleRepository extends JpaRepository<Sale, UUID> {
           SELECT COUNT(id) FROM sale
           WHERE library_id = :libraryId
           AND (:status IS NULL OR status = CAST(:status AS sale_status))
-          AND (CAST(:customerId AS uuid) IS NULL OR customer_id = CAST(:customerId AS uuid))
+          AND (CAST(:customerId AS uuid) IS NULL OR user_id = CAST(:customerId AS uuid))
           AND (CAST(:from AS timestamp) IS NULL OR sale_date >= CAST(:from AS timestamp))
           AND (CAST(:to AS timestamp) IS NULL OR sale_date <= CAST(:to AS timestamp))
           """,
@@ -45,9 +45,9 @@ public interface SaleRepository extends JpaRepository<Sale, UUID> {
   @Query(
       value =
           """
-          INSERT INTO sale (sale_date, status, customer_id, library_id, expiration_date)
+          INSERT INTO sale (sale_date, status, user_id, library_id, expiration_date)
           VALUES (:saleDate, CAST(:status AS sale_status), :customerId, :libraryId, :expirationDate)
-          RETURNING id, sale_date, status, customer_id, library_id, expiration_date, created_at
+          RETURNING id, sale_date, status, user_id, library_id, expiration_date, created_at
           """,
       nativeQuery = true)
   Optional<Sale> create(

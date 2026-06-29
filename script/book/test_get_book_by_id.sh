@@ -5,6 +5,8 @@
 BOOK_ID="9f0f4191-c2e4-4e89-8773-4b8d1568c6da"
 BOOK_WITH_RELS_ID="e2b3f6e1-7c1d-4b8a-9a6e-3a6f9b2c1d4e"
 
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
+
 echo "── 1) OK — GET /books/{bookId}  →  200 / Le Petit Prince"
 curlie "http://localhost:8080/books/${BOOK_ID}"
 echo
@@ -23,4 +25,8 @@ echo
 
 echo "── 5) 400 — GET /books/{bookId} with invalid UUID format  →  400"
 curlie "http://localhost:8080/books/not-a-uuid"
+echo
+
+echo "── 6) OK — GET /books/{bookId} (customer token)  →  200 / Le Petit Prince"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" "http://localhost:8080/books/${BOOK_ID}"
 echo

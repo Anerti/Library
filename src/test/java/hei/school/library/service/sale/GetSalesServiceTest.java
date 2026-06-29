@@ -4,19 +4,21 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import hei.school.library.dto.CustomerResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.SaleResponse;
-import hei.school.library.entity.Customer;
+import hei.school.library.dto.UserResponse;
 import hei.school.library.entity.Library;
 import hei.school.library.entity.Sale;
+import hei.school.library.entity.User;
+import hei.school.library.entity.enums.Role;
 import hei.school.library.entity.enums.SaleStatus;
 import hei.school.library.exception.NotFoundException;
-import hei.school.library.mapper.CustomerMapper;
 import hei.school.library.mapper.SaleMapper;
-import hei.school.library.repository.dao.CustomerRepository;
+import hei.school.library.mapper.UserMapper;
+import hei.school.library.repository.dao.AuthRepository;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.repository.dao.SaleRepository;
+import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.service.SaleService;
 import hei.school.library.validator.SaleValidator;
 import java.time.Instant;
@@ -34,9 +36,10 @@ import org.springframework.data.domain.*;
 class GetSalesServiceTest {
 
   @Mock private SaleRepository saleRepository;
-  @Mock private CustomerRepository customerRepository;
+  @Mock private AuthRepository authRepository;
+  @Mock private UserRepository userRepository;
   @Mock private LibraryRepository libraryRepository;
-  @Mock private CustomerMapper customerMapper;
+  @Mock private UserMapper userMapper;
   @Mock private SaleValidator saleValidator;
   private SaleMapper saleMapper;
   private SaleService saleService;
@@ -45,9 +48,9 @@ class GetSalesServiceTest {
   private UUID saleId;
   private UUID customerId;
   private Sale sale;
-  private Customer customer;
+  private User user;
   private Library library;
-  private CustomerResponse customerResponse;
+  private UserResponse userResponse;
 
   @BeforeEach
   void setUp() {
@@ -55,9 +58,10 @@ class GetSalesServiceTest {
     saleService =
         new SaleService(
             saleRepository,
-            customerRepository,
+            authRepository,
+            userRepository,
             libraryRepository,
-            customerMapper,
+            userMapper,
             saleMapper,
             saleValidator);
 
@@ -65,29 +69,32 @@ class GetSalesServiceTest {
     saleId = UUID.randomUUID();
     customerId = UUID.randomUUID();
 
-    library = new Library(libraryId, "Lib A", "+261341234567", "lib@mail.com", "Antananarivo");
-    customer =
-        new Customer(
+    library = new Library(libraryId, "Lib A", "+261****4567", "lib@mail.com", "Antananarivo");
+    user =
+        new User(
             customerId,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "+261331234567",
+            "secret",
+            "+261****4567",
+            Role.CUSTOMER,
             Instant.now(),
             Instant.now());
     sale =
         new Sale(
             saleId, Instant.now(), SaleStatus.SOLD, customerId, libraryId, null, Instant.now());
 
-    customerResponse =
-        new CustomerResponse(
+    userResponse =
+        new UserResponse(
             customerId,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
-            "+261331234567",
+            "+261****4567",
+            null,
             Instant.now(),
             Instant.now());
   }
@@ -100,15 +107,15 @@ class GetSalesServiceTest {
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
     when(saleRepository.findByLibraryId(any(), any(), any(), any(), any(), any()))
         .thenReturn(salePage);
-    when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
-    when(customerMapper.toResponse(customer)).thenReturn(customerResponse);
+    when(userRepository.findById(customerId)).thenReturn(Optional.of(user));
+    when(userMapper.toResponse(user)).thenReturn(userResponse);
 
     PageResponse<SaleResponse> result =
         saleService.findAll(libraryId, null, null, null, null, 1, 20);
 
     assertThat(result.getData()).hasSize(1);
     assertThat(result.getData().getFirst().getStatus()).isEqualTo(SaleStatus.SOLD);
-    assertThat(result.getData().getFirst().getCustomer().getEmail()).isEqualTo("marie@mail.com");
+    assertThat(result.getData().getFirst().getUser().getEmail()).isEqualTo("marie@mail.com");
     assertThat(result.getPagination().getTotal()).isEqualTo(1);
     assertThat(result.getPagination().getPage()).isEqualTo(1);
     assertThat(result.getPagination().getSize()).isEqualTo(20);
@@ -130,14 +137,14 @@ class GetSalesServiceTest {
   void findById_shouldReturnSale() {
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
     when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
-    when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
-    when(customerMapper.toResponse(customer)).thenReturn(customerResponse);
+    when(userRepository.findById(customerId)).thenReturn(Optional.of(user));
+    when(userMapper.toResponse(user)).thenReturn(userResponse);
 
     SaleResponse result = saleService.findById(libraryId, saleId);
 
     assertThat(result.getId()).isEqualTo(saleId);
     assertThat(result.getStatus()).isEqualTo(SaleStatus.SOLD);
-    assertThat(result.getCustomer().getEmail()).isEqualTo("marie@mail.com");
+    assertThat(result.getUser().getEmail()).isEqualTo("marie@mail.com");
     assertThat(result.getLibrary().getName()).isEqualTo("Lib A");
   }
 

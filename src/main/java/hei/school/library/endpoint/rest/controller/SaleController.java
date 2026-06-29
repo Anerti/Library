@@ -24,7 +24,7 @@ public class SaleController {
   public ResponseEntity<PageResponse<SaleResponse>> findAll(
       @PathVariable UUID libraryId,
       @RequestParam(required = false) SaleStatus status,
-      @RequestParam(name = "customer.id", required = false) UUID customerId,
+      @RequestParam(name = "user.id", required = false) UUID customerId,
       @RequestParam(required = false) Instant from,
       @RequestParam(required = false) Instant to,
       @RequestParam(defaultValue = "1") int page,

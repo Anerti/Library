@@ -1,5 +1,6 @@
 package hei.school.library.entity;
 
+import hei.school.library.entity.enums.Role;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -9,11 +10,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "customer")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Customer {
+public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -31,12 +32,21 @@ public class Customer {
   @Column(nullable = false, length = 100, unique = true)
   private String email;
 
+  @Column(nullable = false)
+  private String password;
+
   @Column(length = 30)
   private String phone;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private Role role;
 
   @Column(updatable = false, nullable = false)
   @CreationTimestamp
   private Instant createdAt;
 
-  @UpdateTimestamp private Instant updatedAt;
+  @UpdateTimestamp
+  @Column(nullable = false)
+  private Instant updatedAt;
 }

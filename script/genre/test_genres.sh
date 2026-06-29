@@ -1,5 +1,9 @@
 #! /usr/bin/env bash
 # Test script for GET /genres endpoint
+#
+# Also tests customer role access (GET is public)
+
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 1) OK — GET /genres  →  200 / data / meta"
 curlie "http://localhost:8080/genres"
@@ -45,3 +49,8 @@ curlie "http://localhost:8080/genres" "search==<script>"
 echo
 echo "── 15) 422 — GET /genres?search=genre|bad  →  422 invalid characters"
 curlie "http://localhost:8080/genres" "search==genre|bad"
+echo
+
+echo "── 16) OK — GET /genres (customer token)  →  200 / same data"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" "http://localhost:8080/genres?page=1&size=2"
+echo

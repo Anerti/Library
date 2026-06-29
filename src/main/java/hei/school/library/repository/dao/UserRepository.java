@@ -1,6 +1,6 @@
 package hei.school.library.repository.dao;
 
-import hei.school.library.entity.Customer;
+import hei.school.library.entity.User;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -12,12 +12,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, UUID> {
+public interface UserRepository extends JpaRepository<User, UUID> {
 
   @Query(
       value =
 """
-SELECT id, last_name, first_name, birth_date, email, password, phone, created_at, updated_at FROM customer
+SELECT id, last_name, first_name, birth_date, email, password, phone, role, created_at, updated_at FROM users
 WHERE (:search IS NULL OR :search = ''
    OR last_name  ILIKE '%' || :search || '%'
    OR first_name ILIKE '%' || :search || '%'
@@ -25,19 +25,19 @@ WHERE (:search IS NULL OR :search = ''
 """,
       countQuery =
           """
-          SELECT COUNT(id) FROM customer
+          SELECT COUNT(id) FROM users
           WHERE (:search IS NULL OR :search = ''
              OR last_name  ILIKE '%' || :search || '%'
              OR first_name ILIKE '%' || :search || '%'
              OR email      ILIKE '%' || :search || '%')
           """,
       nativeQuery = true)
-  Page<Customer> findBySearch(@Param("search") String search, Pageable pageable);
+  Page<User> findBySearch(@Param("search") String search, Pageable pageable);
 
   @Query(
       value =
           """
-          UPDATE customer
+          UPDATE users
           SET
             last_name = COALESCE(:lastName, last_name),
             first_name = COALESCE(:firstName, first_name),
@@ -46,10 +46,10 @@ WHERE (:search IS NULL OR :search = ''
             phone = COALESCE(:phone, phone),
             updated_at = NOW()
           WHERE id = :id
-          RETURNING id, last_name, first_name, birth_date, email, phone, created_at, updated_at
+          RETURNING id, last_name, first_name, birth_date, email, phone, role, created_at, updated_at
           """,
       nativeQuery = true)
-  Optional<Customer> patch(
+  Optional<User> patch(
       @Param("id") UUID id,
       @Param("lastName") String lastName,
       @Param("firstName") String firstName,
@@ -59,27 +59,15 @@ WHERE (:search IS NULL OR :search = ''
 
   @Query(
       value =
-          """
-          INSERT INTO customer (last_name, first_name, birth_date, email, phone)
-          VALUES (:lastName, :firstName, :birthDate, :email, :phone)
-          ON CONFLICT (email) DO NOTHING
-          RETURNING id, last_name, first_name, birth_date, email, phone, created_at, updated_at
-          """,
+          "SELECT id, last_name, first_name, birth_date, email, password, phone, role FROM users"
+              + " WHERE email = :email",
       nativeQuery = true)
-  Optional<Customer> create(
-      @Param("lastName") String lastName,
-      @Param("firstName") String firstName,
-      @Param("birthDate") LocalDate birthDate,
-      @Param("email") String email,
-      @Param("phone") String phone);
-
-  @Query(value = "SELECT * FROM customer WHERE email = :email", nativeQuery = true)
-  Optional<Customer> findByEmail(@Param("email") String email);
+  Optional<User> findByEmail(@Param("email") String email);
 
   @Query(
       value =
           """
-          DELETE FROM customer WHERE id = :id
+          DELETE FROM users WHERE id = :id
           RETURNING id
           """,
       nativeQuery = true)

@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.BookResponse;
 import hei.school.library.dto.GenreSummary;
@@ -21,16 +22,19 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest({BookController.class, GlobalExceptionHandler.class})
+@AutoConfigureMockMvc(addFilters = false)
 public class BookControllerTest {
 
   @Autowired private MockMvc mockMvc;
   @MockBean private BookService bookService;
+  @MockBean private JwtTokenProvider jwtTokenProvider;
 
   @Test
   void should_list_books_with_pagination() throws Exception {
