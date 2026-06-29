@@ -3,6 +3,7 @@
 # Requires admin JWT (Bearer token obtained from POST /auth/login)
 
 ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 # Test 1 + 2 + 3: create → duplicate (self-contained conflict)
 echo "── 1) 201 — POST /authors (valid first + last)  →  201 / Jean Dupont"
@@ -43,4 +44,8 @@ echo
 
 echo "── 10) 422 — POST /authors (lastName blank)  →  422 / required and cannot be blank"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/authors" firstName="Albert" lastName=""
+echo
+
+echo "── 11) 403 — POST /authors (customer token)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" POST "http://localhost:8080/authors" firstName="Customer" lastName="Attempt"
 echo

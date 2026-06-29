@@ -10,6 +10,7 @@ SUCCESS_ID="0336c58f-664b-40da-96d0-cac2888cd00a"
 OTHER_ID="f8a4dddb-5f19-4961-8f71-f2cc6aa8ec36"
 
 ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 1) 200 — PATCH /authors/{id} (update both names)  →  200 / Eric Blair"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" PATCH "http://localhost:8080/authors/${SUCCESS_ID}" firstName="Eric" lastName="Blair"
@@ -73,4 +74,8 @@ curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/author
 echo
 # Then patch Jane Austen to the same name → conflict
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" PATCH "http://localhost:8080/authors/${OTHER_ID}" firstName="George" lastName="Orwell"
+echo
+
+echo "── 16) 403 — PATCH /authors/{id} (customer token)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" PATCH "http://localhost:8080/authors/${SUCCESS_ID}" firstName="Hacker" lastName="Attempt"
 echo
