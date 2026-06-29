@@ -40,7 +40,13 @@ CREATE TABLE IF NOT EXISTS book_genre (
     PRIMARY KEY (book_id, genre_id)
 );
 
-CREATE TYPE IF NOT EXISTS user_role AS ENUM ('ADMIN', 'CUSTOMER');
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+    CREATE TYPE user_role AS ENUM ('ADMIN', 'CUSTOMER');
+  END IF;
+END
+$$;
 
 CREATE TABLE IF NOT EXISTS users (
     id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
