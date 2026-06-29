@@ -1,6 +1,6 @@
 package hei.school.library.config;
 
-import hei.school.library.exception.ErrorResponseWriter;
+import hei.school.library.exception.ErrorBody;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -90,10 +90,10 @@ public class SecurityConfig {
         .exceptionHandling(exceptions ->
             exceptions
                 .authenticationEntryPoint((request, response, authException) ->
-                    ErrorResponseWriter.send(response, HttpStatus.UNAUTHORIZED, "Authentication required.")
+                    ErrorBody.send(response, HttpStatus.UNAUTHORIZED, "Authentication required.")
                 )
                 .accessDeniedHandler((request, response, accessDeniedException) ->
-                    ErrorResponseWriter.send(response, HttpStatus.FORBIDDEN, "Insufficient privileges.")
+                    ErrorBody.send(response, HttpStatus.FORBIDDEN, "Insufficient privileges.")
                 )
         );
 
