@@ -1,7 +1,5 @@
 package hei.school.library.config;
 
-import hei.school.library.exception.ForbiddenException;
-import hei.school.library.exception.UnauthorizedException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -90,10 +88,14 @@ public class SecurityConfig {
         .exceptionHandling(exceptions ->
             exceptions
                 .authenticationEntryPoint((request, response, authException) -> {
-                    throw new UnauthorizedException("Authentication required.");
+                    response.setStatus(401);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"error\":\"UNAUTHORIZED\",\"message\":\"Authentication required.\",\"status\":401}");
                 })
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    throw new ForbiddenException("Insufficient privileges.");
+                    response.setStatus(403);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"error\":\"FORBIDDEN\",\"message\":\"Insufficient privileges.\",\"status\":403}");
                 })
         );
 
