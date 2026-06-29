@@ -10,6 +10,7 @@ CONFLICT_ID="c5c659bb-5670-4409-8e4d-b02678ac8e72"
 SUCCESS_ID="0be3aa75-2757-4eae-941c-081abbdc32c5"
 
 ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 1) 201 — POST /genres (create conflict target)  →  201 / PatchConflictTarget"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/genres" name="PatchConflictTarget"
@@ -45,4 +46,8 @@ echo
 
 echo "── 9) 422 — PATCH /genres/{id} (name too long)  →  422 / cannot be longer than 100"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" PATCH "http://localhost:8080/genres/${SUCCESS_ID}" name="This name is definitely way too ridiculously long for a genre because the maximum allowed length is one hundred characters"
+echo
+
+echo "── 10) 403 — PATCH /genres/{id} (customer token)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" PATCH "http://localhost:8080/genres/${SUCCESS_ID}" name="HackedGenre"
 echo

@@ -4,6 +4,8 @@
 
 GENRE_ID_1="a820bef3-0ef1-47b9-8e78-36793b7c1a11"
 
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
+
 echo "── 1) OK — GET /genres/{genreId}  →  200 / Fantasy"
 curlie "http://localhost:8080/genres/${GENRE_ID_1}"
 echo
@@ -18,5 +20,9 @@ echo
 
 echo "── 4) 400 — GET /genres/{genreId} with invalid UUID format  →  400"
 curlie "http://localhost:8080/genres/not-a-uuid"
+echo
+
+echo "── 5) OK — GET /genres/{genreId} (customer token)  →  200 / Fantasy"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" "http://localhost:8080/genres/${GENRE_ID_1}"
 echo
 

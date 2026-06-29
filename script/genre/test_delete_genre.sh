@@ -4,6 +4,7 @@
 # Requires admin JWT (Bearer token obtained from POST /auth/login)
 
 ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 1) 204 — DELETE /genres/{uuid} (existing genre)  →  204 / no content"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/genres/6d6a30cb-bb49-48a1-9a46-81354d600eac"
@@ -15,4 +16,8 @@ echo
 
 echo "── 3) 404 — DELETE /genres/{uuid} (already deleted)  →  404 / not found"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/genres/6d6a30cb-bb49-48a1-9a46-81354d600eac"
+echo
+
+echo "── 4) 403 — DELETE /genres/{uuid} (customer token)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" DELETE "http://localhost:8080/genres/6d6a30cb-bb49-48a1-9a46-81354d600eac"
 echo

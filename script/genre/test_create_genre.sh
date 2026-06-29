@@ -3,6 +3,7 @@
 # Requires admin JWT (Bearer token obtained from POST /auth/login)
 
 ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 # Test 1 + 2: create → duplicate (self-contained conflict)
 echo "── 1) 201 — POST /genres (simple name)  →  201 / Test-Duplicate"
@@ -31,4 +32,8 @@ echo
 
 echo "── 7) 422 — POST /genres (name too long)  →  422 / cannot be longer than 100"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/genres" name="This name is definitely way too ridiculously long for a genre because the maximum allowed length is one hundred characters"
+echo
+
+echo "── 8) 403 — POST /genres (customer token)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" POST "http://localhost:8080/genres" name="CustomerGenre"
 echo
