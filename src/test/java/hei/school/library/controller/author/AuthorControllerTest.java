@@ -13,17 +13,20 @@ import hei.school.library.dto.AuthorUpdateRequest;
 import hei.school.library.endpoint.rest.controller.AuthorController;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
+import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.service.AuthorService;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest({AuthorController.class, GlobalExceptionHandler.class})
+@AutoConfigureMockMvc(addFilters = false)
 public class AuthorControllerTest {
 
   @Autowired private MockMvc mockMvc;
@@ -31,6 +34,7 @@ public class AuthorControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private AuthorService authorService;
+  @MockBean private JwtTokenProvider jwtTokenProvider;
 
   private UUID authorId;
   private AuthorResponse authorResponse;

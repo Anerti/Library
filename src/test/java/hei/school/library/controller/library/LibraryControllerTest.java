@@ -13,21 +13,25 @@ import hei.school.library.dto.PaginationDto;
 import hei.school.library.endpoint.rest.controller.LibraryController;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
+import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.service.LibraryService;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest({LibraryController.class, GlobalExceptionHandler.class})
+@AutoConfigureMockMvc(addFilters = false)
 class LibraryControllerTest {
 
   @Autowired private MockMvc mockMvc;
   @MockBean private LibraryService libraryService;
+  @MockBean private JwtTokenProvider jwtTokenProvider;
 
   @Test
   void should_return_200_with_list_of_libraries() throws Exception {

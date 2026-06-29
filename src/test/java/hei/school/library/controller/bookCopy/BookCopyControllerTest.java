@@ -15,6 +15,7 @@ import hei.school.library.entity.enums.BookCopyFormat;
 import hei.school.library.entity.enums.BookCopyStatus;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
+import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.service.BookCopyService;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -22,11 +23,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest({BookCopyController.class, GlobalExceptionHandler.class})
+@AutoConfigureMockMvc(addFilters = false)
 public class BookCopyControllerTest {
 
   @Autowired private MockMvc mockMvc;
@@ -34,6 +37,7 @@ public class BookCopyControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private BookCopyService bookCopyService;
+  @MockBean private JwtTokenProvider jwtTokenProvider;
 
   private UUID libraryId;
   private UUID copyId;

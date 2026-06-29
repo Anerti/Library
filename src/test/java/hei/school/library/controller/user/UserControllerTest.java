@@ -12,6 +12,7 @@ import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.endpoint.rest.controller.UserController;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
+import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.service.UserService;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -20,11 +21,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest({UserController.class, GlobalExceptionHandler.class})
+@AutoConfigureMockMvc(addFilters = false)
 public class UserControllerTest {
 
   @Autowired private MockMvc mockMvc;
@@ -32,6 +35,7 @@ public class UserControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private UserService userService;
+  @MockBean private JwtTokenProvider jwtTokenProvider;
 
   private UUID userId;
   private UserResponse userResponse;
