@@ -6,6 +6,8 @@ LIB_ID_1="3bc243ec-7250-4266-b9cb-c9f45f3ef5e1"
 LIB_ID_2="dd60c8ef-5835-4796-9f81-800407374506"
 LIB_ID_3="e082e042-69e9-4ece-a0e0-f782fb117aac"
 
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
+
 echo "── 1) OK — GET /libraries/{libraryId}  →  200 / Librairie Générale"
 curlie "http://localhost:8080/libraries/${LIB_ID_1}"
 echo
@@ -32,4 +34,8 @@ echo
 
 echo "── 7) 400 — GET /libraries/{libraryId} with empty string  →  400"
 curlie "http://localhost:8080/libraries/"
+echo
+
+echo "── 8) OK — GET /libraries/{libraryId} (customer token)  →  200 / Librairie Générale"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" "http://localhost:8080/libraries/${LIB_ID_1}"
 echo

@@ -3,6 +3,7 @@
 # Requires admin JWT (Bearer token obtained from POST /auth/login)
 
 ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 1) 201 — POST /libraries (all valid)  →  201 / id + fields"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/libraries" name="Central Library" phone="+261 33 44 55 77" email="test-create@test.mg" address="Main Street"
@@ -46,4 +47,8 @@ echo
 
 echo "── 11) 422 — POST /libraries (address invalid chars)  →  422 / invalid characters"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/libraries" name="Central Library" phone="+261 33 44 55 77" email="bad-address@test.mg" address="123 Main St|"
+echo
+
+echo "── 12) 403 — POST /libraries (customer token)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" POST "http://localhost:8080/libraries" name="Customer Library" phone="+261 33 44 55 77" email="customer@test.mg" address="Customer Street"
 echo
