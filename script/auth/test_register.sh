@@ -3,7 +3,7 @@
 
 # Test 1 + 3: create → duplicate (self-contained conflict)
 echo "── 1) 201 — POST /auth/register (all valid)  →  201 / Marie Dupont"
-curlie POST "http://localhost:8080/auth/register" lastName="Dupont" firstName="Marie" birthDate="1995-03-10" email="marie.register@mail.com" password="Str0ng!Passphrase" confirmPassword="Str0ng!Passphrase" phone="+261****6789"
+curlie POST "http://localhost:8080/auth/register" lastName="Dupont" firstName="Marie" birthDate="1995-03-10" email="marie.register@mail.com" password="Str0ng!Passphrase" confirmPassword="Str0ng!Passphrase" phone="+26134566789"
 echo
 
 echo "── 2) 201 — POST /auth/register (no phone)  →  201 / Jean Martin"

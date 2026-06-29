@@ -32,9 +32,7 @@ public class UserValidator {
 
         dataValidator.validatePhone(request.getPhone());
 
-        if (request.getBirthDate() == null) {
-            throw new UnprocessableEntityException("BirthDate is required.");
-        }
+        dataValidator.checkNull("birthDate", request.getBirthDate());
 
         if (request.getBirthDate().isAfter(LocalDate.now())) {
             throw new UnprocessableEntityException("BirthDate cannot be in the future.");
