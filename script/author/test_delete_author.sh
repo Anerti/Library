@@ -25,3 +25,7 @@ echo
 echo "── 4) 403 — DELETE /authors/{uuid} (customer token)  →  403 / forbidden"
 curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" DELETE "http://localhost:8080/authors/${AUTHOR_ID}"
 echo
+
+echo "── 5) 401 — DELETE /authors/{uuid} (no token)  →  401 / unauthorized"
+curlie DELETE "http://localhost:8080/authors/${AUTHOR_ID}"
+echo
