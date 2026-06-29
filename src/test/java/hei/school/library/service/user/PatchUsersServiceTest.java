@@ -44,7 +44,10 @@ class PatchUsersServiceTest {
   void setUp() {
     userService =
         new UserService(
-            userRepository, new UserMapper(new PaginationMapper()), new DataValidator(), passwordEncoder);
+            userRepository,
+            new UserMapper(new PaginationMapper()),
+            new DataValidator(),
+            passwordEncoder);
 
     existingId = UUID.randomUUID();
     now = Instant.now();

@@ -42,7 +42,13 @@ class PostAuthServiceTest {
 
   @BeforeEach
   void setUp() {
-    authService = new AuthService(authRepository, new UserMapper(new PaginationMapper()), userValidator, passwordEncoder, new DataValidator());
+    authService =
+        new AuthService(
+            authRepository,
+            new UserMapper(new PaginationMapper()),
+            userValidator,
+            passwordEncoder,
+            new DataValidator());
 
     UUID id = UUID.randomUUID();
     user =
@@ -100,7 +106,8 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when lastName is missing")
   void create_shouldThrow_whenLastNameMissing() {
     RegisterRequest invalidRequest =
-        new RegisterRequest(null, "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
+        new RegisterRequest(
+            null, "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("lastName is required."))
         .when(userValidator)
@@ -115,7 +122,8 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when lastName is blank")
   void create_shouldThrow_whenLastNameBlank() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
+        new RegisterRequest(
+            "", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("lastName is required."))
         .when(userValidator)
@@ -148,7 +156,13 @@ class PostAuthServiceTest {
   void create_shouldThrow_whenLastNameTooLong() {
     RegisterRequest invalidRequest =
         new RegisterRequest(
-            "D".repeat(101), "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
+            "D".repeat(101),
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "marie@mail.com",
+            null,
+            null,
+            null);
 
     doThrow(new UnprocessableEntityException("lastName cannot be longer than 100 characters."))
         .when(userValidator)
@@ -163,7 +177,8 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when firstName is missing")
   void create_shouldThrow_whenFirstNameMissing() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", null, LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
+        new RegisterRequest(
+            "Dupont", null, LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("firstName is required."))
         .when(userValidator)
@@ -178,7 +193,8 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when firstName is blank")
   void create_shouldThrow_whenFirstNameBlank() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", "", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
+        new RegisterRequest(
+            "Dupont", "", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("firstName is required."))
         .when(userValidator)
@@ -211,7 +227,13 @@ class PostAuthServiceTest {
   void create_shouldThrow_whenFirstNameTooLong() {
     RegisterRequest invalidRequest =
         new RegisterRequest(
-            "Dupont", "M".repeat(101), LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
+            "Dupont",
+            "M".repeat(101),
+            LocalDate.of(1995, 3, 10),
+            "marie@mail.com",
+            null,
+            null,
+            null);
 
     doThrow(new UnprocessableEntityException("firstName cannot be longer than 100 characters."))
         .when(userValidator)
@@ -226,7 +248,8 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when email has invalid format")
   void create_shouldThrow_whenEmailInvalidFormat() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "not-an-email", null, null, null);
+        new RegisterRequest(
+            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "not-an-email", null, null, null);
 
     doThrow(new UnprocessableEntityException("Invalid email format"))
         .when(userValidator)
@@ -243,7 +266,13 @@ class PostAuthServiceTest {
   void create_shouldThrow_whenEmailTooLong() {
     RegisterRequest invalidRequest =
         new RegisterRequest(
-            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "m".repeat(90) + "@mail.com", null, null, null);
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "m".repeat(90) + "@mail.com",
+            null,
+            null,
+            null);
 
     doThrow(new UnprocessableEntityException("email cannot be longer than 100 characters."))
         .when(userValidator)
@@ -327,7 +356,9 @@ class PostAuthServiceTest {
         new RegisterRequest(
             "Dupont", "Marie", LocalDate.now().minusYears(11), "young@mail.com", null, null, null);
 
-    doThrow(new UnprocessableEntityException("You must be at least 12 years old to create an account."))
+    doThrow(
+            new UnprocessableEntityException(
+                "You must be at least 12 years old to create an account."))
         .when(userValidator)
         .validateUserCreation(youngRequest);
 
@@ -340,7 +371,14 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when password is null")
   void create_shouldThrow_whenPasswordNull() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "pw-null@mail.com", null, "Str0ng!Passphrase", null);
+        new RegisterRequest(
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "pw-null@mail.com",
+            null,
+            "Str0ng!Passphrase",
+            null);
 
     doThrow(new UnprocessableEntityException("password is required and cannot be blank."))
         .when(userValidator)
@@ -355,7 +393,8 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when password is blank")
   void create_shouldThrow_whenPasswordBlank() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "pw-blank@mail.com", "", "", null);
+        new RegisterRequest(
+            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "pw-blank@mail.com", "", "", null);
 
     doThrow(new UnprocessableEntityException("password is required and cannot be blank."))
         .when(userValidator)
@@ -370,7 +409,14 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when password is too short")
   void create_shouldThrow_whenPasswordTooShort() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "pw-short@mail.com", "Short1!x", "Short1!x", null);
+        new RegisterRequest(
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "pw-short@mail.com",
+            "Short1!x",
+            "Short1!x",
+            null);
 
     doThrow(new UnprocessableEntityException("password must be at least 12 characters."))
         .when(userValidator)
@@ -385,9 +431,18 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when password has no uppercase")
   void create_shouldThrow_whenPasswordNoUppercase() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "pw-noupper@mail.com", "lowercase1!phrase", "lowercase1!phrase", null);
+        new RegisterRequest(
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "pw-noupper@mail.com",
+            "lowercase1!phrase",
+            "lowercase1!phrase",
+            null);
 
-    doThrow(new UnprocessableEntityException("Password must contain at least one uppercase character."))
+    doThrow(
+            new UnprocessableEntityException(
+                "Password must contain at least one uppercase character."))
         .when(userValidator)
         .validateUserCreation(invalidRequest);
 
@@ -400,9 +455,18 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when password has no lowercase")
   void create_shouldThrow_whenPasswordNoLowercase() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "pw-nolower@mail.com", "UPPERCASE1!PHRASE", "UPPERCASE1!PHRASE", null);
+        new RegisterRequest(
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "pw-nolower@mail.com",
+            "UPPERCASE1!PHRASE",
+            "UPPERCASE1!PHRASE",
+            null);
 
-    doThrow(new UnprocessableEntityException("Password must contain at least one lowercase character."))
+    doThrow(
+            new UnprocessableEntityException(
+                "Password must contain at least one lowercase character."))
         .when(userValidator)
         .validateUserCreation(invalidRequest);
 
@@ -415,7 +479,14 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when password has no digit")
   void create_shouldThrow_whenPasswordNoDigit() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "pw-nodigit@mail.com", "NoDigit!Passphrase", "NoDigit!Passphrase", null);
+        new RegisterRequest(
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "pw-nodigit@mail.com",
+            "NoDigit!Passphrase",
+            "NoDigit!Passphrase",
+            null);
 
     doThrow(new UnprocessableEntityException("Password must contain at least one digits."))
         .when(userValidator)
@@ -427,12 +498,22 @@ class PostAuthServiceTest {
   }
 
   @Test
-  @DisplayName("create: should throw UnprocessableEntityException when password has no special character")
+  @DisplayName(
+      "create: should throw UnprocessableEntityException when password has no special character")
   void create_shouldThrow_whenPasswordNoSpecial() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "pw-nospecial@mail.com", "NoSpecialChar1Phrase", "NoSpecialChar1Phrase", null);
+        new RegisterRequest(
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "pw-nospecial@mail.com",
+            "NoSpecialChar1Phrase",
+            "NoSpecialChar1Phrase",
+            null);
 
-    doThrow(new UnprocessableEntityException("Password must contain at least one special character."))
+    doThrow(
+            new UnprocessableEntityException(
+                "Password must contain at least one special character."))
         .when(userValidator)
         .validateUserCreation(invalidRequest);
 
@@ -445,7 +526,14 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when passwords do not match")
   void create_shouldThrow_whenPasswordsDoNotMatch() {
     RegisterRequest mismatchedRequest =
-        new RegisterRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "mismatch@mail.com", "Str0ng!Passphrase", "Different1!Passphrase", null);
+        new RegisterRequest(
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "mismatch@mail.com",
+            "Str0ng!Passphrase",
+            "Different1!Passphrase",
+            null);
 
     doThrow(new UnprocessableEntityException("Passwords do not match."))
         .when(userValidator)
@@ -460,9 +548,19 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when phone has invalid format")
   void create_shouldThrow_whenPhoneInvalidFormat() {
     RegisterRequest invalidRequest =
-        new RegisterRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "phone-invalid@mail.com", "Str0ng!Passphrase", "Str0ng!Passphrase", "not-a-phone");
+        new RegisterRequest(
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "phone-invalid@mail.com",
+            "Str0ng!Passphrase",
+            "Str0ng!Passphrase",
+            "not-a-phone");
 
-    doThrow(new UnprocessableEntityException("Invalid phone format: 'not-a-phone'. Only +, digits, spaces, hyphens and parentheses are allowed."))
+    doThrow(
+            new UnprocessableEntityException(
+                "Invalid phone format: 'not-a-phone'. Only +, digits, spaces, hyphens and"
+                    + " parentheses are allowed."))
         .when(userValidator)
         .validateUserCreation(invalidRequest);
 

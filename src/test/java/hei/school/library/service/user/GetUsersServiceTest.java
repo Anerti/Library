@@ -36,7 +36,8 @@ class GetUsersServiceTest {
   @BeforeEach
   void setUp() {
     userService =
-        new UserService(userRepository, new UserMapper(new PaginationMapper()), dataValidator, passwordEncoder);
+        new UserService(
+            userRepository, new UserMapper(new PaginationMapper()), dataValidator, passwordEncoder);
 
     user =
         new User(

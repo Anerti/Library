@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.BookResponse;
 import hei.school.library.dto.GenreSummary;
@@ -14,7 +15,6 @@ import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.PaginationDto;
 import hei.school.library.endpoint.rest.controller.BookController;
 import hei.school.library.exception.GlobalExceptionHandler;
-import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.service.BookService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;

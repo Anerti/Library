@@ -29,15 +29,11 @@ public class AuthController {
     UserResponse userResponse = authService.create(request);
 
     String token =
-        tokenProvider.generateToken(
-            userResponse.getId().toString(), userResponse.getRole().name());
+        tokenProvider.generateToken(userResponse.getId().toString(), userResponse.getRole().name());
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(
-            AuthResponse.builder()
-                .token(token)
-                .user(userMapper.toAuthUser(userResponse))
-                .build());
+            AuthResponse.builder().token(token).user(userMapper.toAuthUser(userResponse)).build());
   }
 
   @PostMapping("/login")
@@ -45,13 +41,10 @@ public class AuthController {
     UserResponse userResponse = authService.login(request);
 
     String token =
-        tokenProvider.generateToken(
-            userResponse.getId().toString(), userResponse.getRole().name());
+        tokenProvider.generateToken(userResponse.getId().toString(), userResponse.getRole().name());
 
-    return ResponseEntity.status(HttpStatus.OK).body(
-        AuthResponse.builder()
-            .token(token)
-            .user(userMapper.toAuthUser(userResponse))
-            .build());
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(
+            AuthResponse.builder().token(token).user(userMapper.toAuthUser(userResponse)).build());
   }
 }

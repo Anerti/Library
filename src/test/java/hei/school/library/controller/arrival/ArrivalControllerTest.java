@@ -6,21 +6,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.dto.ArrivalRequest;
 import hei.school.library.dto.ArrivalResponse;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.endpoint.rest.controller.ArrivalController;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
-import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.service.ArrivalService;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;

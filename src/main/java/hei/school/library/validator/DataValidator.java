@@ -97,11 +97,13 @@ public class DataValidator {
     }
 
     if (!password.matches(".*[A-Z].*")) {
-      throw new UnprocessableEntityException("Password must contain at least one uppercase character.");
+      throw new UnprocessableEntityException(
+          "Password must contain at least one uppercase character.");
     }
 
     if (!password.matches(".*[a-z].*")) {
-      throw new UnprocessableEntityException("Password must contain at least one lowercase character.");
+      throw new UnprocessableEntityException(
+          "Password must contain at least one lowercase character.");
     }
 
     if (!password.matches(".*[0-9].*")) {
@@ -109,7 +111,8 @@ public class DataValidator {
     }
 
     if (!password.matches(".*[!?*+=@#$%^&()_\\-\\[\\]{}|\\\\:;\"'<>,./`~].*")) {
-      throw new UnprocessableEntityException("Password must contain at least one special character.");
+      throw new UnprocessableEntityException(
+          "Password must contain at least one special character.");
     }
   }
 

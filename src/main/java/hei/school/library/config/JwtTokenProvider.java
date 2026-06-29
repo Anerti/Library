@@ -34,11 +34,7 @@ public class JwtTokenProvider {
   }
 
   public Claims validateToken(String token) {
-    return Jwts.parser()
-        .verifyWith(signingKey)
-        .build()
-        .parseSignedClaims(token)
-        .getPayload();
+    return Jwts.parser().verifyWith(signingKey).build().parseSignedClaims(token).getPayload();
   }
 
   public boolean isValidToken(String token) {
@@ -49,5 +45,4 @@ public class JwtTokenProvider {
       return false;
     }
   }
-
 }

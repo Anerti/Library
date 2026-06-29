@@ -42,7 +42,12 @@ class PostAuthLoginServiceTest {
     var dataValidator = new DataValidator();
     var userValidator = new UserValidator(dataValidator);
     authService =
-        new AuthService(authRepository, new UserMapper(new PaginationMapper()), userValidator, passwordEncoder, dataValidator);
+        new AuthService(
+            authRepository,
+            new UserMapper(new PaginationMapper()),
+            userValidator,
+            passwordEncoder,
+            dataValidator);
 
     UUID id = UUID.randomUUID();
     user =

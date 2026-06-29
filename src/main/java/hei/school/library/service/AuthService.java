@@ -42,7 +42,9 @@ public class AuthService {
             Role.CUSTOMER.name())
         .map(userMapper::toResponse)
         .orElseThrow(
-            () -> new ConflictException(String.format("User email %s already used.", request.getEmail())));
+            () ->
+                new ConflictException(
+                    String.format("User email %s already used.", request.getEmail())));
   }
 
   @Transactional(readOnly = true)

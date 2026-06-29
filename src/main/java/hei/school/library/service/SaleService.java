@@ -9,8 +9,8 @@ import hei.school.library.entity.enums.SaleStatus;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.SaleMapper;
 import hei.school.library.mapper.UserMapper;
-import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.repository.dao.AuthRepository;
+import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.repository.dao.SaleRepository;
 import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.validator.SaleValidator;
@@ -154,7 +154,8 @@ public class SaleService {
                         .orElseThrow(
                             () ->
                                 new NotFoundException(
-                                    "Failed to create user with email " + registerRequest.getEmail())));
+                                    "Failed to create user with email "
+                                        + registerRequest.getEmail())));
 
     Instant saleDate = request.getSaleDate() != null ? request.getSaleDate() : Instant.now();
     SaleStatus status = request.getStatus() != null ? request.getStatus() : SaleStatus.BOOKED;

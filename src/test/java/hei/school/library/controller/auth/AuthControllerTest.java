@@ -22,7 +22,6 @@ import hei.school.library.service.AuthService;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -133,8 +132,7 @@ class AuthControllerTest {
   @DisplayName("register: should return 422 when validation fails")
   void register_shouldReturn422_whenValidationFails() throws Exception {
     when(authService.create(any(RegisterRequest.class)))
-        .thenThrow(
-            new UnprocessableEntityException("lastName is required and cannot be blank."));
+        .thenThrow(new UnprocessableEntityException("lastName is required and cannot be blank."));
 
     RegisterRequest invalidRequest =
         new RegisterRequest(
@@ -187,8 +185,7 @@ class AuthControllerTest {
     when(authService.login(any(LoginRequest.class)))
         .thenThrow(new UnauthorizedException("Invalid credentials."));
 
-    LoginRequest loginRequest =
-        new LoginRequest("wrong@mail.com", "WrongPassword1");
+    LoginRequest loginRequest = new LoginRequest("wrong@mail.com", "WrongPassword1");
 
     mockMvc
         .perform(
