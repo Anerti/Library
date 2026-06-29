@@ -294,13 +294,13 @@ class PostAuthServiceTest {
     UserRequest invalidRequest =
         new UserRequest("Dupont", "Marie", null, "marie@mail.com", null, null, null);
 
-    doThrow(new UnprocessableEntityException("birthDate is required."))
+    doThrow(new UnprocessableEntityException("birthDate is required and cannot be blank."))
         .when(userValidator)
         .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessageContaining("birthDate is required.");
+        .hasMessageContaining("birthDate is required and cannot be blank.");
   }
 
   @Test
@@ -461,7 +461,7 @@ class PostAuthServiceTest {
     UserRequest invalidRequest =
         new UserRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "phone-invalid@mail.com", "Str0ng!Passphrase", "Str0ng!Passphrase", "not-a-phone");
 
-    doThrow(new UnprocessableEntityException("Invalid phone format: 'not-a-phone'"))
+    doThrow(new UnprocessableEntityException("Invalid phone format: 'not-a-phone'. Only +, digits, spaces, hyphens and parentheses are allowed."))
         .when(userValidator)
         .validateUserCreation(invalidRequest);
 

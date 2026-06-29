@@ -11,7 +11,7 @@ curlie POST "http://localhost:8080/auth/register" lastName="Martin" firstName="J
 echo
 
 echo "── 3) 409 — POST /auth/register (duplicate email from test 1)  →  409 / already used"
-curlie POST "http://localhost:8080/auth/register" lastName="Dupont" firstName="Marie" birthDate="1995-03-10" email="marie.register@mail.com" password="Str0ng!Passphrase" confirmPassword="Str0ng!Passphrase" phone="+261****6789"
+curlie POST "http://localhost:8080/auth/register" lastName="Dupont" firstName="Marie" birthDate="1995-03-10" email="marie.register@mail.com" password="Str0ng!Passphrase" confirmPassword="Str0ng!Passphrase" phone="+26134566789"
 echo
 
 echo "── 4) 422 — POST /auth/register (lastName null)  →  422 / lastName is required"
@@ -94,7 +94,7 @@ echo "── 23) 422 — POST /auth/register (password no special)  →  422 / s
 curlie POST "http://localhost:8080/auth/register" lastName="Dupont" firstName="Marie" birthDate="1995-03-10" email="test23@mail.com" password="NoSpecialChar1Phrase" confirmPassword="NoSpecialChar1Phrase"
 echo
 
-echo "── 24) 422 — POST /auth/register (birthDate null)  →  422 / BirthDate is required"
+echo "── 24) 422 — POST /auth/register (birthDate null)  →  422 / birthDate is required and cannot be blank."
 curlie POST "http://localhost:8080/auth/register" lastName="Dupont" firstName="Marie" email="test24@mail.com" password="Str0ng!Passphrase" confirmPassword="Str0ng!Passphrase"
 echo
 
