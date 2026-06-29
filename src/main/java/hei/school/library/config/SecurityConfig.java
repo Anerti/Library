@@ -63,7 +63,6 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.DELETE, "/genres/{genreId}").hasRole("ADMIN")
 
             .requestMatchers(HttpMethod.GET, "/users", "/users/{id}").authenticated()
-            .requestMatchers(HttpMethod.POST, "/users").hasAnyRole("ADMIN", "CUSTOMER")
             .requestMatchers(HttpMethod.PATCH, "/users/{id}").hasAnyRole("ADMIN", "CUSTOMER")
             .requestMatchers(HttpMethod.DELETE, "/users/{id}").hasAnyRole("ADMIN", "CUSTOMER")
 

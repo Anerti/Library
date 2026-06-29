@@ -2125,45 +2125,6 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
 
-    post:
-      operationId: createUser
-      summary: Create a new user
-      tags:
-        - Users
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserRequest'
-      responses:
-        '201':
-          description: User created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserResponse'
-              example:
-                id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
-                lastName: Randria
-                firstName: Faly
-                birthDate: 1995-08-12
-                email: faly.randria@email.com
-                phone: +261 32 11 234 56
-                updatedAt: "2026-06-01T10:30:00Z"
-                createdAt: "2026-06-01T10:30:00Z"
-
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '422':
-          $ref: '#/components/responses/Unprocessable'
-
   /users/{userId}:
     get:
       operationId: getUser

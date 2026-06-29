@@ -1,7 +1,6 @@
 package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.UserRequest;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.service.UserService;
@@ -29,11 +28,6 @@ public class UserController {
   @GetMapping("/{id}")
   public ResponseEntity<UserResponse> findById(@PathVariable UUID id) {
     return ResponseEntity.status(HttpStatus.OK).body(userService.findById(id));
-  }
-
-  @PostMapping
-  public ResponseEntity<UserResponse> create(@RequestBody UserRequest request) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(request));
   }
 
   @PatchMapping("/{id}")
