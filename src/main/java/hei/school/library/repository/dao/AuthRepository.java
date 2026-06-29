@@ -28,4 +28,9 @@ public interface AuthRepository extends JpaRepository<User, java.util.UUID> {
       @Param("password") String password,
       @Param("phone") String phone,
       @Param("role") String role);
+
+  @Query(
+      value = "SELECT id, first_name, last_name, birth_date, email, password, phone, role, created_at, updated_at FROM users WHERE email = :email",
+      nativeQuery = true)
+  Optional<User> findByEmail(@Param("email") String email);
 }

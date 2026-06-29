@@ -2,7 +2,8 @@ package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.dto.AuthResponse;
-import hei.school.library.dto.UserRequest;
+import hei.school.library.dto.LoginRequest;
+import hei.school.library.dto.RegisterRequest;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.mapper.UserMapper;
 import hei.school.library.service.AuthService;
@@ -24,7 +25,7 @@ public class AuthController {
   private final UserMapper userMapper;
 
   @PostMapping("/register")
-  public ResponseEntity<AuthResponse> register(@RequestBody UserRequest request) {
+  public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
     UserResponse userResponse = authService.create(request);
 
     String token =
@@ -37,5 +38,20 @@ public class AuthController {
                 .token(token)
                 .user(userMapper.toAuthUser(userResponse))
                 .build());
+  }
+
+  @PostMapping("/login")
+  public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    UserResponse userResponse = authService.login(request);
+
+    String token =
+        tokenProvider.generateToken(
+            userResponse.getId().toString(), userResponse.getRole().name());
+
+    return ResponseEntity.status(HttpStatus.OK).body(
+        AuthResponse.builder()
+            .token(token)
+            .user(userMapper.toAuthUser(userResponse))
+            .build());
   }
 }
