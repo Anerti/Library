@@ -8,6 +8,7 @@
 SUCCESS_ID="39a86751-7098-4460-a7fd-fc4ece9ea996"
 
 ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 1) 204 — DELETE /books/{id} (existing book)  →  204 / no content"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/books/${SUCCESS_ID}"
@@ -19,4 +20,8 @@ echo
 
 echo "── 3) 404 — DELETE /books/{id} (already deleted)  →  404 / not found"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/books/${SUCCESS_ID}"
+echo
+
+echo "── 4) 403 — DELETE /books/{id} (customer token)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" DELETE "http://localhost:8080/books/${SUCCESS_ID}"
 echo

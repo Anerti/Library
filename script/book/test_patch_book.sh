@@ -10,6 +10,7 @@ SUCCESS_ID="2ed55e73-fdf3-4879-a333-f38233fb9a88"
 OTHER_ID="5d4962d3-f460-4268-a6f3-27459f6bf8bf"
 
 ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
+CUSTOMER_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 1) 200 — PATCH /books/{id} (update all fields)  →  200 / Voyage au bout de la nuit"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" PATCH "http://localhost:8080/books/${SUCCESS_ID}" title="Voyage au bout de la nuit" summary="Le chef-d oeuvre de Louis-Ferdinand Céline" isbn="978-2-07-036002-4" publisher="Denoel" publishedAt="1932-05-19"
@@ -89,4 +90,8 @@ echo
 
 echo "── 20) 409 — PATCH /books/{id} (isbn already exists on other book)  →  409 / already exists"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" PATCH "http://localhost:8080/books/${SUCCESS_ID}" isbn="978-2-07-036780-1"
+echo
+
+echo "── 21) 403 — PATCH /books/{id} (customer token)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" PATCH "http://localhost:8080/books/${SUCCESS_ID}" title="Hacked Title"
 echo
