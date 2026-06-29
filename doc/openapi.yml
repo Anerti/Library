@@ -44,6 +44,80 @@ components:
         - EXPIRED
       description: Status of a sale
 
+    # ────────────────── Authentication ──────────────────
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 100
+          example: faly.randria@email.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 128
+          example: mySecureP@ss1
+        firstName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: Faly
+        lastName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: Randria
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 100
+          example: faly.randria@email.com
+        password:
+          type: string
+          format: password
+          example: mySecureP@ss1
+
+    AuthResponse:
+      type: object
+      required:
+        - token
+        - userId
+        - email
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIs...
+        userId:
+          type: string
+          format: uuid
+          example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+        email:
+          type: string
+          format: email
+          example: faly.randria@email.com
+        firstName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: Faly
+        lastName:
+          type: string
+          maxLength: 100
+          nullable: true
+          example: Randria
+
     # ────────────────── Library ──────────────────
     LibraryRequest:
       type: object
@@ -924,6 +998,13 @@ components:
                 type: string
                 description: Error description for this field
 
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from POST /auth/login or POST /auth/register
+
   responses:
     BadRequest:
       description: Malformed request or invalid parameters
@@ -969,8 +1050,89 @@ components:
             error: Conflict
             message: ISBN 978-2-07-036002-4 already exists.
 
+    Unauthorized:
+      description: Authentication failed or missing/invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status: 401
+            error: Unauthorized
+            message: Invalid or expired JWT token
+
 
 paths:
+
+  # ═══════════════════════ Authentication ═══════════════════════
+  /auth/register:
+    post:
+      operationId: register
+      summary: Create a new user account
+      description: Register a new user with email and password. Returns a JWT token.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              example:
+                token: eyJhbGciOiJIUzI1NiIs...
+                userId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                email: faly.randria@email.com
+                firstName: Faly
+                lastName: Randria
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
+  /auth/login:
+    post:
+      operationId: login
+      summary: Authenticate
+      description: Authenticate with email and password. Returns a JWT token.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              example:
+                token: eyJhbGciOiJIUzI1NiIs...
+                userId: e1f2a3b4-c5d6-7890-abcd-ef1234567890
+                email: faly.randria@email.com
+                firstName: Faly
+                lastName: Randria
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+
   # ═══════════════════════ Libraries ═══════════════════════
   /libraries:
     get:
