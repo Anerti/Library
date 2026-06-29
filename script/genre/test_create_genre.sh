@@ -1,31 +1,34 @@
 #! /usr/bin/env bash
 # Test script for POST /genres endpoint
+# Requires admin JWT (Bearer token obtained from POST /auth/login)
+
+ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 # Test 1 + 2: create → duplicate (self-contained conflict)
 echo "── 1) 201 — POST /genres (simple name)  →  201 / Test-Duplicate"
-curlie POST "http://localhost:8080/genres" name="Test-Duplicate"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/genres" name="Test-Duplicate"
 echo
 
 echo "── 2) 409 — POST /genres (duplicate of test 1)  →  409 / already exists"
-curlie POST "http://localhost:8080/genres" name="Test-Duplicate"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/genres" name="Test-Duplicate"
 echo
 
 echo "── 3) 201 — POST /genres (accented name)  →  201 / Poésie"
-curlie POST "http://localhost:8080/genres" name="Poésie"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/genres" name="Poésie"
 echo
 
 echo "── 4) 422 — POST /genres (blank name)  →  422 / name is required and cannot be blank"
-curlie POST "http://localhost:8080/genres" name=""
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/genres" name=""
 echo
 
 echo "── 5) 422 — POST /genres (name with digits)  →  422 / forbidden characters"
-curlie POST "http://localhost:8080/genres" name="Fantasy1"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/genres" name="Fantasy1"
 echo
 
 echo "── 6) 422 — POST /genres (name with underscore)  →  422 / forbidden characters"
-curlie POST "http://localhost:8080/genres" name="Fan_tasy"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/genres" name="Fan_tasy"
 echo
 
 echo "── 7) 422 — POST /genres (name too long)  →  422 / cannot be longer than 100"
-curlie POST "http://localhost:8080/genres" name="This name is definitely way too ridiculously long for a genre because the maximum allowed length is one hundred characters"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/genres" name="This name is definitely way too ridiculously long for a genre because the maximum allowed length is one hundred characters"
 echo
