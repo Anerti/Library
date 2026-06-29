@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS book_genre (
     PRIMARY KEY (book_id, genre_id)
 );
 
+CREATE TYPE IF NOT EXISTS user_role AS ENUM ('ADMIN', 'CUSTOMER');
+
 CREATE TABLE IF NOT EXISTS users (
     id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
     last_name   VARCHAR(100) NOT NULL,
@@ -48,7 +50,7 @@ CREATE TABLE IF NOT EXISTS users (
     email       VARCHAR(100) NOT NULL UNIQUE,
     password    VARCHAR(255) NOT NULL,
     phone       VARCHAR(30),
-    role        VARCHAR(20)  NOT NULL,
+    role        user_role    NOT NULL DEFAULT 'CUSTOMER',
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
