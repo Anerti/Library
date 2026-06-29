@@ -1,8 +1,10 @@
 package hei.school.library.config;
 
+import hei.school.library.exception.ErrorResponseWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -87,16 +89,12 @@ public class SecurityConfig {
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
         .exceptionHandling(exceptions ->
             exceptions
-                .authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(401);
-                    response.setContentType("application/json;charset=UTF-8");
-                    response.getWriter().write("{\"error\":\"UNAUTHORIZED\",\"message\":\"Authentication required.\",\"status\":401}");
-                })
-                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    response.setStatus(403);
-                    response.setContentType("application/json;charset=UTF-8");
-                    response.getWriter().write("{\"error\":\"FORBIDDEN\",\"message\":\"Insufficient privileges.\",\"status\":403}");
-                })
+                .authenticationEntryPoint((request, response, authException) ->
+                    ErrorResponseWriter.send(response, HttpStatus.UNAUTHORIZED, "Authentication required.")
+                )
+                .accessDeniedHandler((request, response, accessDeniedException) ->
+                    ErrorResponseWriter.send(response, HttpStatus.FORBIDDEN, "Insufficient privileges.")
+                )
         );
 
     return http.build();
