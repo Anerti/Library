@@ -136,25 +136,25 @@ public class SaleService {
             .findById(libraryId)
             .orElseThrow(() -> new NotFoundException("Library " + libraryId + " not found"));
 
-    UserRequest userRequest = request.getUser();
+    RegisterRequest registerRequest = request.getUser();
     User user =
         userRepository
-            .findByEmail(userRequest.getEmail())
+            .findByEmail(registerRequest.getEmail())
             .orElseGet(
                 () ->
                     authRepository
                         .create(
-                            userRequest.getLastName(),
-                            userRequest.getFirstName(),
-                            userRequest.getBirthDate(),
-                            userRequest.getEmail(),
-                            userRequest.getPassword(),
-                            userRequest.getPhone(),
+                            registerRequest.getLastName(),
+                            registerRequest.getFirstName(),
+                            registerRequest.getBirthDate(),
+                            registerRequest.getEmail(),
+                            registerRequest.getPassword(),
+                            registerRequest.getPhone(),
                             Role.CUSTOMER.name())
                         .orElseThrow(
                             () ->
                                 new NotFoundException(
-                                    "Failed to create user with email " + userRequest.getEmail())));
+                                    "Failed to create user with email " + registerRequest.getEmail())));
 
     Instant saleDate = request.getSaleDate() != null ? request.getSaleDate() : Instant.now();
     SaleStatus status = request.getStatus() != null ? request.getStatus() : SaleStatus.BOOKED;

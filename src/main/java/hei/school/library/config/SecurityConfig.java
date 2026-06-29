@@ -62,7 +62,8 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.PATCH, "/genres/{genreId}").hasRole("ADMIN")
             .requestMatchers(HttpMethod.DELETE, "/genres/{genreId}").hasRole("ADMIN")
 
-            .requestMatchers(HttpMethod.GET, "/users", "/users/{id}").authenticated()
+            .requestMatchers(HttpMethod.GET,"/users/{id}").hasAnyRole("ADMIN", "CUSTOMER")
+            .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
             .requestMatchers(HttpMethod.PATCH, "/users/{id}").hasAnyRole("ADMIN", "CUSTOMER")
             .requestMatchers(HttpMethod.DELETE, "/users/{id}").hasAnyRole("ADMIN", "CUSTOMER")
 

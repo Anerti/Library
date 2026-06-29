@@ -1,7 +1,6 @@
 package hei.school.library.service;
 
 import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.UserRequest;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.exception.NotFoundException;

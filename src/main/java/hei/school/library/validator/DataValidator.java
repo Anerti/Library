@@ -1,6 +1,5 @@
 package hei.school.library.validator;
 
-import hei.school.library.dto.UserRequest;
 import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;

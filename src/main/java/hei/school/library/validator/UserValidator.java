@@ -1,6 +1,7 @@
 package hei.school.library.validator;
 
-import hei.school.library.dto.UserRequest;
+import hei.school.library.dto.LoginRequest;
+import hei.school.library.dto.RegisterRequest;
 import hei.school.library.exception.UnprocessableEntityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ import java.time.LocalDate;
 public class UserValidator {
     private final DataValidator dataValidator;
 
-    public void validateUserCreation(UserRequest request) {
+    public void validateUserCreation(RegisterRequest request) {
         dataValidator.checkNull("lastName", request.getLastName());
         dataValidator.validateName("lastName", request.getLastName());
 
@@ -41,5 +42,11 @@ public class UserValidator {
         if (request.getBirthDate().plusYears(12).isAfter(LocalDate.now())) {
             throw new UnprocessableEntityException("You must be at least 12 years old to create an account.");
         }
+    }
+
+    public void validateUserFetch(LoginRequest request) {
+        dataValidator.checkNull("email", request.getEmail());
+        dataValidator.validateEmail(request.getEmail());
+        dataValidator.checkNull("password", request.getPassword());
     }
 }

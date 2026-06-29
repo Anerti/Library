@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 
 import hei.school.library.dto.SaleRequest;
 import hei.school.library.dto.SaleResponse;
-import hei.school.library.dto.UserRequest;
+import hei.school.library.dto.RegisterRequest;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.entity.Library;
 import hei.school.library.entity.Sale;
@@ -98,10 +98,10 @@ class PostSalesServiceTest {
             Instant.now(),
             Instant.now());
 
-    UserRequest userRequest =
-        new UserRequest(
+    RegisterRequest registerRequest =
+        new RegisterRequest(
             "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, "+261****4567");
-    validRequest = new SaleRequest(null, userRequest, null);
+    validRequest = new SaleRequest(null, registerRequest, null);
   }
 
   @Test
