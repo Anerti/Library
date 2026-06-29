@@ -47,5 +47,9 @@ curlie -H "Authorization:Bearer $ADMIN_TOKEN" POST "http://localhost:8080/author
 echo
 
 echo "── 11) 403 — POST /authors (customer token)  →  403 / forbidden"
-curlie -H "Authorization:Bearer $CUSTOMER_TOKEN" POST "http://localhost:8080/authors" firstName="Customer" lastName="Attempt"
+curlie -H "Authorization:Bearer ***" POST "http://localhost:8080/authors" firstName="Customer" lastName="Attempt"
+echo
+
+echo "── 12) 401 — POST /authors (no token)  →  401 / unauthorized"
+curlie POST "http://localhost:8080/authors" firstName="No" lastName="Token"
 echo
