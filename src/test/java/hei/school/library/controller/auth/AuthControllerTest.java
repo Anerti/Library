@@ -185,7 +185,7 @@ class AuthControllerTest {
   @DisplayName("login: should return 401 when credentials are invalid")
   void login_shouldReturn401_whenInvalidCredentials() throws Exception {
     when(authService.login(any(LoginRequest.class)))
-        .thenThrow(new UnauthorizedException("Invalid email or password."));
+        .thenThrow(new UnauthorizedException("Invalid credentials."));
 
     LoginRequest loginRequest =
         new LoginRequest("wrong@mail.com", "WrongPassword1");
@@ -198,7 +198,7 @@ class AuthControllerTest {
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.status").value(401))
         .andExpect(jsonPath("$.error").value("UNAUTHORIZED"))
-        .andExpect(jsonPath("$.message").value("Invalid email or password."));
+        .andExpect(jsonPath("$.message").value("Invalid credentials."));
   }
 
   @Test

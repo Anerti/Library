@@ -1,7 +1,6 @@
 package hei.school.library.service.auth;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import hei.school.library.dto.LoginRequest;
@@ -32,7 +31,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 class PostAuthLoginServiceTest {
 
   @Mock private AuthRepository authRepository;
-  @Mock private UserValidator userValidator;
   @Mock private PasswordEncoder passwordEncoder;
 
   private AuthService authService;
@@ -41,8 +39,10 @@ class PostAuthLoginServiceTest {
 
   @BeforeEach
   void setUp() {
+    var dataValidator = new DataValidator();
+    var userValidator = new UserValidator(dataValidator);
     authService =
-        new AuthService(authRepository, new UserMapper(new PaginationMapper()), userValidator, passwordEncoder, new DataValidator());
+        new AuthService(authRepository, new UserMapper(new PaginationMapper()), userValidator, passwordEncoder, dataValidator);
 
     UUID id = UUID.randomUUID();
     user =
@@ -83,7 +83,7 @@ class PostAuthLoginServiceTest {
 
     assertThatThrownBy(() -> authService.login(validRequest))
         .isInstanceOf(UnauthorizedException.class)
-        .hasMessage("Invalid email or password.");
+        .hasMessage("Invalid credentials.");
   }
 
   @Test
@@ -94,7 +94,7 @@ class PostAuthLoginServiceTest {
 
     assertThatThrownBy(() -> authService.login(validRequest))
         .isInstanceOf(UnauthorizedException.class)
-        .hasMessage("Invalid email or password.");
+        .hasMessage("Invalid credentials.");
   }
 
   @Test
@@ -104,7 +104,7 @@ class PostAuthLoginServiceTest {
 
     assertThatThrownBy(() -> authService.login(request))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessageContaining("email is required");
+        .hasMessage("email is required and cannot be blank.");
   }
 
   @Test
@@ -114,7 +114,7 @@ class PostAuthLoginServiceTest {
 
     assertThatThrownBy(() -> authService.login(request))
         .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessageContaining("password is required");
+        .hasMessage("password is required and cannot be blank.");
   }
 
   @Test
