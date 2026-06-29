@@ -431,8 +431,8 @@ components:
           maxLength: 100
           example: Fiction
 
-    # ────────────────── Customer ──────────────────
-    CustomerRequest:
+    # ────────────────── User ──────────────────
+    UserRequest:
       type: object
       required:
         - lastName
@@ -463,13 +463,14 @@ components:
           nullable: true
           example: +261 32 11 234 56
 
-    CustomerResponse:
+    UserResponse:
       type: object
       required:
         - id
         - lastName
         - birthDate
         - email
+        - role
         - updatedAt
         - createdAt
       properties:
@@ -500,6 +501,11 @@ components:
           maxLength: 30
           nullable: true
           example: +261 32 11 234 56
+        role:
+          type: string
+          enum: [ADMIN, CUSTOMER]
+          description: User role (discriminator)
+          example: CUSTOMER
         updatedAt:
           type: string
           format: date-time
@@ -509,7 +515,7 @@ components:
           format: date-time
           example: "2026-06-01T10:30:00Z"
 
-    CustomerUpdateRequest:
+    UserUpdateRequest:
       type: object
       minProperties: 1
       properties:
@@ -725,7 +731,7 @@ components:
           example: "2026-06-15T14:30:00Z"
           description: Sale date. Defaults to the current date.
         customer:
-          $ref: '#/components/schemas/CustomerRequest'
+          $ref: '#/components/schemas/UserRequest'
         status:
           $ref: '#/components/schemas/SaleStatus'
 
@@ -748,7 +754,7 @@ components:
           format: date-time
           example: "2026-06-15T14:30:00Z"
         customer:
-          $ref: '#/components/schemas/CustomerResponse'
+          $ref: '#/components/schemas/UserResponse'
         status:
           $ref: '#/components/schemas/SaleStatus'
         library:
@@ -926,7 +932,7 @@ components:
           format: date-time
           example: "2026-06-06T14:30:00Z"
         customer:
-          $ref: '#/components/schemas/CustomerResponse'
+          $ref: '#/components/schemas/UserResponse'
         status:
           $ref: '#/components/schemas/SaleStatus'
         totalAmount:
@@ -1081,6 +1087,17 @@ components:
             error: Unauthorized
             message: Invalid or expired JWT token
 
+    Forbidden:
+      description: Authenticated but insufficient permissions (requires ADMIN role)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            status: 403
+            error: Forbidden
+            message: Admin access required
+
 
 paths:
 
@@ -1226,6 +1243,8 @@ paths:
       summary: Create a new library
       tags:
         - Libraries
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1248,6 +1267,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
@@ -1289,6 +1312,8 @@ paths:
       summary: Update a library
       tags:
         - Libraries
+      security:
+        - BearerAuth: []
       parameters:
         - name: libraryId
           in: path
@@ -1319,6 +1344,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -1329,6 +1358,8 @@ paths:
       summary: Delete a library
       tags:
         - Libraries
+      security:
+        - BearerAuth: []
       parameters:
         - name: libraryId
           in: path
@@ -1342,6 +1373,10 @@ paths:
           description: Library deleted
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1461,6 +1496,8 @@ paths:
       summary: Create a new book
       tags:
         - Books
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1492,6 +1529,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
@@ -1542,6 +1583,8 @@ paths:
       summary: Update a book
       tags:
         - Books
+      security:
+        - BearerAuth: []
       parameters:
         - name: bookId
           in: path
@@ -1581,6 +1624,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
@@ -1593,6 +1640,8 @@ paths:
       summary: Delete a book
       tags:
         - Books
+      security:
+        - BearerAuth: []
       parameters:
         - name: bookId
           in: path
@@ -1606,6 +1655,10 @@ paths:
           description: Book deleted
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1676,6 +1729,8 @@ paths:
       summary: Create a new author
       tags:
         - Authors
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1696,6 +1751,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
@@ -1735,6 +1794,8 @@ paths:
       summary: Update an author
       tags:
         - Authors
+      security:
+        - BearerAuth: []
       parameters:
         - name: authorId
           in: path
@@ -1763,6 +1824,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -1773,6 +1838,8 @@ paths:
       summary: Delete an author
       tags:
         - Authors
+      security:
+        - BearerAuth: []
       parameters:
         - name: authorId
           in: path
@@ -1786,6 +1853,10 @@ paths:
           description: Author deleted
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1855,6 +1926,8 @@ paths:
       summary: Create a new genre
       tags:
         - Genres
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
@@ -1876,6 +1949,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
@@ -1916,6 +1993,8 @@ paths:
       summary: Update a genre
       tags:
         - Genres
+      security:
+        - BearerAuth: []
       parameters:
         - name: genreId
           in: path
@@ -1945,6 +2024,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -1955,6 +2038,8 @@ paths:
       summary: Delete a genre
       tags:
         - Genres
+      security:
+        - BearerAuth: []
       parameters:
         - name: genreId
           in: path
@@ -1968,16 +2053,20 @@ paths:
           description: Genre deleted
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
-  # ═══════════════════════ Customers ═══════════════════════
-  /customers:
+  # ═══════════════════════ Users ═══════════════════════
+  /users:
     get:
-      operationId: listCustomers
-      summary: List all customers
+      operationId: listUsers
+      summary: List all users
       tags:
-        - Customers
+        - Users
       parameters:
         - name: search
           in: query
@@ -2002,7 +2091,7 @@ paths:
             example: 20
       responses:
         '200':
-          description: Paginated list of customers
+          description: Paginated list of users
           content:
             application/json:
               schema:
@@ -2014,7 +2103,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/CustomerResponse'
+                      $ref: '#/components/schemas/UserResponse'
                   pagination:
                     $ref: '#/components/schemas/Pagination'
               example:
@@ -2037,23 +2126,25 @@ paths:
           $ref: '#/components/responses/BadRequest'
 
     post:
-      operationId: createCustomer
-      summary: Create a new customer
+      operationId: createUser
+      summary: Create a new user
       tags:
-        - Customers
+        - Users
+      security:
+        - BearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomerRequest'
+              $ref: '#/components/schemas/UserRequest'
       responses:
         '201':
-          description: Customer created
+          description: User created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: '#/components/schemas/UserResponse'
               example:
                 id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
                 lastName: Randria
@@ -2066,17 +2157,21 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
-  /customers/{customerId}:
+  /users/{userId}:
     get:
-      operationId: getCustomer
-      summary: Get a customer by ID
+      operationId: getUser
+      summary: Get a user by ID
       tags:
-        - Customers
+        - Users
       parameters:
-        - name: customerId
+        - name: userId
           in: path
           required: true
           schema:
@@ -2085,11 +2180,11 @@ paths:
             example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
       responses:
         '200':
-          description: Customer details
+          description: User details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: '#/components/schemas/UserResponse'
               example:
                 id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
                 lastName: Randria
@@ -2106,12 +2201,14 @@ paths:
           $ref: '#/components/responses/NotFound'
 
     patch:
-      operationId: updateCustomer
-      summary: Update a customer
+      operationId: updateUser
+      summary: Update a user
       tags:
-        - Customers
+        - Users
+      security:
+        - BearerAuth: []
       parameters:
-        - name: customerId
+        - name: userId
           in: path
           required: true
           schema:
@@ -2123,14 +2220,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomerUpdateRequest'
+              $ref: '#/components/schemas/UserUpdateRequest'
       responses:
         '200':
-          description: Customer updated
+          description: User updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerResponse'
+                $ref: '#/components/schemas/UserResponse'
               example:
                 id: e1f2a3b4-c5d6-7890-abcd-ef1234567890
                 lastName: Randria
@@ -2143,18 +2240,24 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Unprocessable'
 
     delete:
-      operationId: deleteCustomer
-      summary: Delete a customer
+      operationId: deleteUser
+      summary: Delete a user
       tags:
-        - Customers
+        - Users
+      security:
+        - BearerAuth: []
       parameters:
-        - name: customerId
+        - name: userId
           in: path
           required: true
           schema:
@@ -2163,9 +2266,13 @@ paths:
             example: e1f2a3b4-c5d6-7890-abcd-ef1234567890
       responses:
         '204':
-          description: Customer deleted
+          description: User deleted
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2273,6 +2380,8 @@ paths:
       summary: Add a new book copy to a library
       tags:
         - Book Copies
+      security:
+        - BearerAuth: []
       parameters:
         - name: libraryId
           in: path
@@ -2306,6 +2415,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2359,6 +2472,8 @@ paths:
       summary: Update a book copy
       tags:
         - Book Copies
+      security:
+        - BearerAuth: []
       parameters:
         - name: libraryId
           in: path
@@ -2399,6 +2514,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2409,6 +2528,8 @@ paths:
       summary: Remove a book copy from a library
       tags:
         - Book Copies
+      security:
+        - BearerAuth: []
       parameters:
         - name: libraryId
           in: path
@@ -2429,6 +2550,10 @@ paths:
           description: Book copy deleted
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2518,6 +2643,8 @@ paths:
       summary: Create a new arrival for a library
       tags:
         - Arrivals
+      security:
+        - BearerAuth: []
       parameters:
         - name: libraryId
           in: path
@@ -2552,6 +2679,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2644,6 +2775,8 @@ paths:
       summary: Add an item to an arrival
       tags:
         - Arrivals
+      security:
+        - BearerAuth: []
       parameters:
         - name: arrivalId
           in: path
@@ -2676,6 +2809,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2687,6 +2824,8 @@ paths:
       summary: Remove an item from an arrival
       tags:
         - Arrivals
+      security:
+        - BearerAuth: []
       parameters:
         - name: arrivalId
           in: path
@@ -2707,6 +2846,10 @@ paths:
           description: Arrival item deleted
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -2817,6 +2960,8 @@ paths:
       summary: Create a new sale in a library
       tags:
         - Sales
+      security:
+        - BearerAuth: []
       parameters:
         - name: libraryId
           in: path
@@ -2861,6 +3006,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -2925,6 +3074,8 @@ paths:
       summary: Update a sale (e.g. change status)
       tags:
         - Sales
+      security:
+        - BearerAuth: []
       parameters:
         - name: libraryId
           in: path
@@ -2976,6 +3127,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -3021,6 +3176,8 @@ paths:
       summary: Add an item to a sale
       tags:
         - Sales
+      security:
+        - BearerAuth: []
       parameters:
         - name: saleId
           in: path
@@ -3052,6 +3209,10 @@ paths:
 
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -3063,6 +3224,8 @@ paths:
       summary: Remove an item from a sale
       tags:
         - Sales
+      security:
+        - BearerAuth: []
       parameters:
         - name: saleId
           in: path
@@ -3083,6 +3246,10 @@ paths:
           description: Sale item deleted
         '400':
           $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
 
