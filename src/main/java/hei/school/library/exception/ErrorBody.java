@@ -2,6 +2,7 @@ package hei.school.library.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Instant;
@@ -18,7 +19,8 @@ public class ErrorBody {
   String message;
   @Builder.Default Instant timestamp = Instant.now();
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectMapper MAPPER =
+      new ObjectMapper().registerModule(new JavaTimeModule());
 
   public static void send(HttpServletResponse response, HttpStatus status, String message)
       throws IOException {
