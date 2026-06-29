@@ -24,6 +24,12 @@ public class UserValidator {
 
         dataValidator.checkPasswordSecurityLevel(request.getPassword());
 
+        dataValidator.checkNull("confirmPassword", request.getConfirmPassword());
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new UnprocessableEntityException("Passwords do not match.");
+        }
+
         dataValidator.validatePhone(request.getPhone());
 
         if (request.getBirthDate() == null) {

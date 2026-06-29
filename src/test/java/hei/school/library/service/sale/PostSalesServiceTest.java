@@ -100,7 +100,7 @@ class PostSalesServiceTest {
 
     UserRequest userRequest =
         new UserRequest(
-            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, "+261****4567");
+            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, "+261****4567");
     validRequest = new SaleRequest(null, userRequest, null);
   }
 

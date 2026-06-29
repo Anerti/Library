@@ -64,6 +64,7 @@ class PostAuthServiceTest {
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
             "secret",
+            "secret",
             "+261****4567");
   }
 
@@ -98,7 +99,7 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when lastName is missing")
   void create_shouldThrow_whenLastNameMissing() {
     UserRequest invalidRequest =
-        new UserRequest(null, "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
+        new UserRequest(null, "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("lastName is required."))
         .when(userValidator)
@@ -113,7 +114,7 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when lastName is blank")
   void create_shouldThrow_whenLastNameBlank() {
     UserRequest invalidRequest =
-        new UserRequest("", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
+        new UserRequest("", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("lastName is required."))
         .when(userValidator)
@@ -129,7 +130,7 @@ class PostAuthServiceTest {
   void create_shouldThrow_whenLastNameHasInvalidChars() {
     UserRequest invalidRequest =
         new UserRequest(
-            "Dupont123", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
+            "Dupont123", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("lastName field contain forbidden characters."))
         .when(userValidator)
@@ -146,7 +147,7 @@ class PostAuthServiceTest {
   void create_shouldThrow_whenLastNameTooLong() {
     UserRequest invalidRequest =
         new UserRequest(
-            "D".repeat(101), "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
+            "D".repeat(101), "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("lastName cannot be longer than 100 characters."))
         .when(userValidator)
@@ -161,7 +162,7 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when firstName is missing")
   void create_shouldThrow_whenFirstNameMissing() {
     UserRequest invalidRequest =
-        new UserRequest("Dupont", null, LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
+        new UserRequest("Dupont", null, LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("firstName is required."))
         .when(userValidator)
@@ -176,7 +177,7 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when firstName is blank")
   void create_shouldThrow_whenFirstNameBlank() {
     UserRequest invalidRequest =
-        new UserRequest("Dupont", "", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
+        new UserRequest("Dupont", "", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("firstName is required."))
         .when(userValidator)
@@ -192,7 +193,7 @@ class PostAuthServiceTest {
   void create_shouldThrow_whenFirstNameHasInvalidChars() {
     UserRequest invalidRequest =
         new UserRequest(
-            "Dupont", "Marie123", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
+            "Dupont", "Marie123", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("firstName field contain forbidden characters."))
         .when(userValidator)
@@ -209,7 +210,7 @@ class PostAuthServiceTest {
   void create_shouldThrow_whenFirstNameTooLong() {
     UserRequest invalidRequest =
         new UserRequest(
-            "Dupont", "M".repeat(101), LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
+            "Dupont", "M".repeat(101), LocalDate.of(1995, 3, 10), "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("firstName cannot be longer than 100 characters."))
         .when(userValidator)
@@ -224,7 +225,7 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when email has invalid format")
   void create_shouldThrow_whenEmailInvalidFormat() {
     UserRequest invalidRequest =
-        new UserRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "not-an-email", null, null);
+        new UserRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "not-an-email", null, null, null);
 
     doThrow(new UnprocessableEntityException("Invalid email format"))
         .when(userValidator)
@@ -241,7 +242,7 @@ class PostAuthServiceTest {
   void create_shouldThrow_whenEmailTooLong() {
     UserRequest invalidRequest =
         new UserRequest(
-            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "m".repeat(90) + "@mail.com", null, null);
+            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "m".repeat(90) + "@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("email cannot be longer than 100 characters."))
         .when(userValidator)
@@ -258,7 +259,7 @@ class PostAuthServiceTest {
   void create_shouldThrow_whenEmailHasInvalidChars() {
     UserRequest invalidRequest =
         new UserRequest(
-            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie @mail.com", null, null);
+            "Dupont", "Marie", LocalDate.of(1995, 3, 10), "marie @mail.com", null, null, null);
 
     doThrow(
             new UnprocessableEntityException(
@@ -276,7 +277,7 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when email is blank")
   void create_shouldThrow_whenEmailBlank() {
     UserRequest invalidRequest =
-        new UserRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "", null, null);
+        new UserRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "", null, null, null);
 
     doThrow(new UnprocessableEntityException("Invalid input for email"))
         .when(userValidator)
@@ -291,7 +292,7 @@ class PostAuthServiceTest {
   @DisplayName("create: should throw UnprocessableEntityException when birthDate is null")
   void create_shouldThrow_whenBirthDateNull() {
     UserRequest invalidRequest =
-        new UserRequest("Dupont", "Marie", null, "marie@mail.com", null, null);
+        new UserRequest("Dupont", "Marie", null, "marie@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("birthDate is required."))
         .when(userValidator)
@@ -307,7 +308,7 @@ class PostAuthServiceTest {
   void create_shouldThrow_whenBirthDateInFuture() {
     UserRequest futureRequest =
         new UserRequest(
-            "Dupont", "Marie", LocalDate.now().plusDays(1), "future@mail.com", null, null);
+            "Dupont", "Marie", LocalDate.now().plusDays(1), "future@mail.com", null, null, null);
 
     doThrow(new UnprocessableEntityException("birthDate cannot be in the future."))
         .when(userValidator)
