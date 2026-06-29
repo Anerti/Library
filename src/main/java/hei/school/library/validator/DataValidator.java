@@ -90,16 +90,27 @@ public class DataValidator {
     }
   }
 
-  public void validateUser(UserRequest request) {
-    validateName("lastName", request.getLastName());
-    validateName("firstName", request.getFirstName());
-    validateEmail(request.getEmail());
+  public void checkPasswordSecurityLevel(String password) {
+    checkNull("password", password);
 
-    if (request.getBirthDate() == null) {
-      throw new UnprocessableEntityException("birthDate is required.");
+    if (password.length() < 12) {
+      throw new UnprocessableEntityException("password must be at least 12 characters.");
     }
-    if (request.getBirthDate().isAfter(LocalDate.now())) {
-      throw new UnprocessableEntityException("birthDate cannot be in the future.");
+
+    if (!password.matches(".*[A-Z].*")) {
+      throw new UnprocessableEntityException("Password must contain at least one uppercase character.");
+    }
+
+    if (!password.matches(".*[a-z].*")) {
+      throw new UnprocessableEntityException("Password must contain at least one lowercase character.");
+    }
+
+    if (!password.matches(".*[0-9].*")) {
+      throw new UnprocessableEntityException("Password must contain at least one digits.");
+    }
+
+    if (!password.matches(".*[!?*+=@#$%^&()_\\-\\[\\]{}|\\\\:;\"'<>,./`~].*")) {
+      throw new UnprocessableEntityException("Password must contain at least one special character.");
     }
   }
 

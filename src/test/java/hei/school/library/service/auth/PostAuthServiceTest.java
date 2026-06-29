@@ -14,7 +14,7 @@ import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.AuthRepository;
 import hei.school.library.service.AuthService;
-import hei.school.library.validator.DataValidator;
+import hei.school.library.validator.UserValidator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -31,7 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 class PostAuthServiceTest {
 
   @Mock private AuthRepository authRepository;
-  @Mock private DataValidator dataValidator;
+  @Mock private UserValidator userValidator;
   @Mock private PasswordEncoder passwordEncoder;
 
   private AuthService authService;
@@ -41,7 +41,7 @@ class PostAuthServiceTest {
 
   @BeforeEach
   void setUp() {
-    authService = new AuthService(authRepository, new UserMapper(new PaginationMapper()), dataValidator, passwordEncoder);
+    authService = new AuthService(authRepository, new UserMapper(new PaginationMapper()), userValidator, passwordEncoder);
 
     UUID id = UUID.randomUUID();
     user =
@@ -78,7 +78,7 @@ class PostAuthServiceTest {
 
     assertThat(result.getLastName()).isEqualTo("Dupont");
     assertThat(result.getEmail()).isEqualTo("marie@mail.com");
-    verify(dataValidator).validateUser(validRequest);
+    verify(userValidator).validateUserCreation(validRequest);
     verify(passwordEncoder).encode("secret");
   }
 
@@ -101,8 +101,8 @@ class PostAuthServiceTest {
         new UserRequest(null, "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("lastName is required."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -116,8 +116,8 @@ class PostAuthServiceTest {
         new UserRequest("", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("lastName is required."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -132,8 +132,8 @@ class PostAuthServiceTest {
             "Dupont123", "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("lastName field contain forbidden characters."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -149,8 +149,8 @@ class PostAuthServiceTest {
             "D".repeat(101), "Marie", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("lastName cannot be longer than 100 characters."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -164,8 +164,8 @@ class PostAuthServiceTest {
         new UserRequest("Dupont", null, LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("firstName is required."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -179,8 +179,8 @@ class PostAuthServiceTest {
         new UserRequest("Dupont", "", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("firstName is required."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -195,8 +195,8 @@ class PostAuthServiceTest {
             "Dupont", "Marie123", LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("firstName field contain forbidden characters."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -212,8 +212,8 @@ class PostAuthServiceTest {
             "Dupont", "M".repeat(101), LocalDate.of(1995, 3, 10), "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("firstName cannot be longer than 100 characters."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -227,8 +227,8 @@ class PostAuthServiceTest {
         new UserRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "not-an-email", null, null);
 
     doThrow(new UnprocessableEntityException("Invalid email format"))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -244,8 +244,8 @@ class PostAuthServiceTest {
             "Dupont", "Marie", LocalDate.of(1995, 3, 10), "m".repeat(90) + "@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("email cannot be longer than 100 characters."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -264,8 +264,8 @@ class PostAuthServiceTest {
             new UnprocessableEntityException(
                 "Invalid input for email: 'marie @mail.com' only a-zA-Z0-9@_.- characters are"
                     + " allowed."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -279,8 +279,8 @@ class PostAuthServiceTest {
         new UserRequest("Dupont", "Marie", LocalDate.of(1995, 3, 10), "", null, null);
 
     doThrow(new UnprocessableEntityException("Invalid input for email"))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -294,8 +294,8 @@ class PostAuthServiceTest {
         new UserRequest("Dupont", "Marie", null, "marie@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("birthDate is required."))
-        .when(dataValidator)
-        .validateUser(invalidRequest);
+        .when(userValidator)
+        .validateUserCreation(invalidRequest);
 
     assertThatThrownBy(() -> authService.create(invalidRequest))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -310,8 +310,8 @@ class PostAuthServiceTest {
             "Dupont", "Marie", LocalDate.now().plusDays(1), "future@mail.com", null, null);
 
     doThrow(new UnprocessableEntityException("birthDate cannot be in the future."))
-        .when(dataValidator)
-        .validateUser(futureRequest);
+        .when(userValidator)
+        .validateUserCreation(futureRequest);
 
     assertThatThrownBy(() -> authService.create(futureRequest))
         .isInstanceOf(UnprocessableEntityException.class)

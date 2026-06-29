@@ -6,7 +6,7 @@ import hei.school.library.entity.enums.Role;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.AuthRepository;
-import hei.school.library.validator.DataValidator;
+import hei.school.library.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,12 +18,12 @@ public class AuthService {
 
   private final AuthRepository authRepository;
   private final UserMapper userMapper;
-  private final DataValidator dataValidator;
+  private final UserValidator userValidator;
   private final PasswordEncoder passwordEncoder;
 
   @Transactional
   public UserResponse create(UserRequest request) {
-    dataValidator.validateUser(request);
+    userValidator.validateUserCreation(request);
 
     String encodedPassword = passwordEncoder.encode(request.getPassword());
 
