@@ -35,6 +35,7 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers("/ping")
                     .permitAll()
+
                     .requestMatchers(HttpMethod.GET, "/libraries")
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/libraries/{libraryId}")
@@ -43,6 +44,7 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/libraries/{libraryId}")
                     .hasRole("ADMIN")
+
                     .requestMatchers(HttpMethod.GET, "/books", "/books/{id}")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/books")
@@ -53,6 +55,7 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.GET, "/books/{bookId}/stock")
                     .permitAll()
+
                     .requestMatchers(
                         HttpMethod.GET,
                         "/libraries/{libraryId}/copies",
@@ -64,6 +67,7 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/libraries/{libraryId}/copies/{copyId}")
                     .hasRole("ADMIN")
+
                     .requestMatchers(HttpMethod.GET, "/authors", "/authors/{id}")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/authors")
@@ -72,6 +76,7 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/authors/{id}")
                     .hasRole("ADMIN")
+
                     .requestMatchers(HttpMethod.GET, "/genres", "/genres/{genreId}")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/genres")
@@ -80,6 +85,7 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/genres/{genreId}")
                     .hasRole("ADMIN")
+
                     .requestMatchers(HttpMethod.GET, "/users/{id}")
                     .hasAnyRole("ADMIN", "CUSTOMER")
                     .requestMatchers(HttpMethod.GET, "/users")
@@ -88,6 +94,7 @@ public class SecurityConfig {
                     .hasAnyRole("ADMIN", "CUSTOMER")
                     .requestMatchers(HttpMethod.DELETE, "/users/{id}")
                     .hasAnyRole("ADMIN", "CUSTOMER")
+
                     .requestMatchers(
                         HttpMethod.GET,
                         "/libraries/{libraryId}/arrivals",
