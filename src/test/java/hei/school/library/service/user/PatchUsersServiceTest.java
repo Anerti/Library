@@ -27,13 +27,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class PatchUsersServiceTest {
 
   @Mock private UserRepository userRepository;
-  @Mock private PasswordEncoder passwordEncoder;
 
   private UserService userService;
 
@@ -44,10 +42,7 @@ class PatchUsersServiceTest {
   void setUp() {
     userService =
         new UserService(
-            userRepository,
-            new UserMapper(new PaginationMapper()),
-            new DataValidator(),
-            passwordEncoder);
+            userRepository, new UserMapper(new PaginationMapper()), new DataValidator());
 
     existingId = UUID.randomUUID();
     now = Instant.now();

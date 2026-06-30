@@ -1,8 +1,7 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.UserResponse;
-import hei.school.library.dto.UserUpdateRequest;
+import hei.school.library.dto.*;
+import hei.school.library.exception.ForbiddenException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
@@ -10,7 +9,8 @@ import hei.school.library.validator.DataValidator;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +21,6 @@ public class UserService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final DataValidator dataValidator;
-  private final PasswordEncoder passwordEncoder;
 
   @Transactional(readOnly = true)
   public PageResponse<UserResponse> findAll(String search, int page, int size) {
@@ -58,10 +57,24 @@ public class UserService {
         .orElseThrow(() -> new NotFoundException("User " + id + " not found"));
   }
 
+  private boolean resourcesAccessGranted(UUID requestedResourceId) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String authenticatedUserId = auth.getName();
+    String role = auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
+
+    return role.equals("ADMIN") && authenticatedUserId.equals(requestedResourceId.toString())
+        || role.equals("CUSTOMER") && authenticatedUserId.equals(requestedResourceId.toString());
+  }
+
   @Transactional
   public void delete(UUID id) {
-    userRepository
-        .delete(id)
-        .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+
+    if (resourcesAccessGranted(id)) {
+      userRepository
+          .delete(id)
+          .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
+    } else {
+      throw new ForbiddenException(String.format("Cannot delete user %s", id));
+    }
   }
 }

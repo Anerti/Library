@@ -11,6 +11,7 @@ import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.endpoint.rest.controller.UserController;
+import hei.school.library.exception.ForbiddenException;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.service.UserService;
@@ -161,5 +162,12 @@ public class UserControllerTest {
         .delete(userId);
 
     mockMvc.perform(delete("/users/{id}", userId)).andExpect(status().isNotFound());
+  }
+
+  @Test
+  void should_return_forbidden_when_deleting_another_user() throws Exception {
+    doThrow(new ForbiddenException("Cannot delete another user")).when(userService).delete(userId);
+
+    mockMvc.perform(delete("/users/{id}", userId)).andExpect(status().isForbidden());
   }
 }
