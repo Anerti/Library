@@ -2,7 +2,7 @@
 # Test script for DELETE /users/{id} endpoint
 # Requires seed users to exist (admin@library.com and marie@mail.com login users).
 # Requires db/user/seed_user.sql to be run first (provides John Doe, Customer Target, Admin Target).
-# Self-delete only: a user can only delete their own account.
+# Access rules: CUSTOMER can only delete own account; ADMIN can delete any user.
 #
 # Login user IDs (from db/auth/seed_user_for_login.sql):
 #   fcd16cd1-0f2b-460e-a6c2-3dece9e89d22  —  Marie Dupont (CUSTOMER)
@@ -31,22 +31,22 @@ curlie -H "Authorization:Bearer ${MARIE_TOKEN}" DELETE "http://localhost:8080/us
 echo
 
 echo "── 3) 400 — DELETE /users/{invalid} (malformed UUID)  →  400 / bad request"
-curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" DELETE "http://localhost:8080/users/not-a-uuid"
+curlie -H "Authorization:Bearer ${MARIE_TOKEN}" DELETE "http://localhost:8080/users/not-a-uuid"
 echo
 
 echo "── 4) 404 — DELETE /users/{id} (already deleted)  →  404 / not found"
 curlie -H "Authorization:Bearer ${MARIE_TOKEN}" DELETE "http://localhost:8080/users/${MARIE_ID}"
 echo
 
-echo "── 5) 403 — ADMIN (Admin A) tries to delete a CUSTOMER (John Doe)  →  403 / forbidden"
+echo "── 5) 204 — ADMIN deletes CUSTOMER (John Doe)  →  204 / no content"
 curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" DELETE "http://localhost:8080/users/${JOHN_ID}"
 echo
 
-echo "── 6) 403 — ADMIN (Admin A) tries to delete another ADMIN (Target Admin)  →  403 / forbidden"
+echo "── 6) 204 — ADMIN deletes another ADMIN (Target Admin)  →  204 / no content"
 curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" DELETE "http://localhost:8080/users/${ADMIN_TARGET_ID}"
 echo
 
-echo "── 7) 204 — ADMIN (Admin A) deletes own account  →  204 / no content"
+echo "── 7) 204 — ADMIN deletes own account  →  204 / no content"
 curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" DELETE "http://localhost:8080/users/${ADMIN_ID}"
 echo
 

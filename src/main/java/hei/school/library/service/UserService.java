@@ -32,7 +32,7 @@ public class UserService {
         : userMapper.toPageResponse(userRepository.findBySearch(search, pageable), page, size);
   }
 
-  private boolean resourcesAccessGrantedForReading(UUID requestedResourceId) {
+  private boolean resourcesAccessGranted(UUID requestedResourceId) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     String authenticatedUserId = auth.getName();
     String role = auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
@@ -43,7 +43,7 @@ public class UserService {
   @Transactional(readOnly = true)
   public UserResponse findById(UUID id) {
 
-    if (resourcesAccessGrantedForReading(id)) {
+    if (resourcesAccessGranted(id)) {
       return userRepository
           .findById(id)
           .map(userMapper::toResponse)
@@ -68,15 +68,6 @@ public class UserService {
             request.getPhone())
         .map(userMapper::toResponse)
         .orElseThrow(() -> new NotFoundException("User " + id + " not found"));
-  }
-
-  private boolean resourcesAccessGranted(UUID requestedResourceId) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    String authenticatedUserId = auth.getName();
-    String role = auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
-
-    return role.equals("ADMIN") && authenticatedUserId.equals(requestedResourceId.toString())
-        || role.equals("CUSTOMER") && authenticatedUserId.equals(requestedResourceId.toString());
   }
 
   @Transactional

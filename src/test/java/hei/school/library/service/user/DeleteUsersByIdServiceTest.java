@@ -83,8 +83,8 @@ class DeleteUsersByIdServiceTest {
   }
 
   @Test
-  @DisplayName("delete: should throw ForbiddenException when deleting another user")
-  void delete_shouldThrow_whenDeletingOtherUser() {
+  @DisplayName("delete: should throw ForbiddenException when CUSTOMER deletes another user")
+  void delete_shouldThrow_whenCustomerDeletesOtherUser() {
     doReturn(existingId.toString()).when(auth).getName();
     doReturn(List.of(new SimpleGrantedAuthority("ROLE_CUSTOMER"))).when(auth).getAuthorities();
     SecurityContextHolder.getContext().setAuthentication(auth);
@@ -94,5 +94,35 @@ class DeleteUsersByIdServiceTest {
         .hasMessageContaining("Cannot delete user %s".formatted(otherId));
 
     verify(userRepository, never()).delete(any(UUID.class));
+  }
+
+  @Test
+  @DisplayName("delete: should delete when ADMIN deletes another user")
+  void delete_shouldDelete_whenAdminDeletesOtherUser() {
+    doReturn(existingId.toString()).when(auth).getName();
+    doReturn(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))).when(auth).getAuthorities();
+    SecurityContextHolder.getContext().setAuthentication(auth);
+
+    when(userRepository.delete(otherId)).thenReturn(Optional.of(otherId));
+
+    userService.delete(otherId);
+
+    verify(userRepository).delete(otherId);
+  }
+
+  @Test
+  @DisplayName("delete: should throw NotFoundException when ADMIN deletes non-existent user")
+  void delete_shouldThrow_whenAdminDeletesNonExistent() {
+    doReturn(existingId.toString()).when(auth).getName();
+    doReturn(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))).when(auth).getAuthorities();
+    SecurityContextHolder.getContext().setAuthentication(auth);
+
+    when(userRepository.delete(unknownId)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> userService.delete(unknownId))
+        .isInstanceOf(NotFoundException.class)
+        .hasMessageContaining(unknownId.toString());
+
+    verify(userRepository).delete(unknownId);
   }
 }
