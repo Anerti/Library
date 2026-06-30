@@ -1,8 +1,7 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.UserResponse;
-import hei.school.library.dto.UserUpdateRequest;
+import hei.school.library.dto.*;
+import hei.school.library.exception.ForbiddenException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
@@ -10,6 +9,8 @@ import hei.school.library.validator.DataValidator;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +61,13 @@ public class UserService {
 
   @Transactional
   public void delete(UUID id) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String authenticatedUserId = auth.getName();
+
+    if (!authenticatedUserId.equals(id.toString())) {
+      throw new ForbiddenException("Cannot delete another user");
+    }
+
     userRepository
         .delete(id)
         .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
