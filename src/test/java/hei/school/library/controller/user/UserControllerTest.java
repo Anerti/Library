@@ -166,9 +166,7 @@ public class UserControllerTest {
 
   @Test
   void should_return_forbidden_when_deleting_another_user() throws Exception {
-    doThrow(new ForbiddenException("Cannot delete another user"))
-        .when(userService)
-        .delete(userId);
+    doThrow(new ForbiddenException("Cannot delete another user")).when(userService).delete(userId);
 
     mockMvc.perform(delete("/users/{id}", userId)).andExpect(status().isForbidden());
   }

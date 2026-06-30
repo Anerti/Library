@@ -35,9 +35,7 @@ class GetUsersByIdServiceTest {
   void setUp() {
     userService =
         new UserService(
-            userRepository,
-            new UserMapper(new PaginationMapper()),
-            new DataValidator());
+            userRepository, new UserMapper(new PaginationMapper()), new DataValidator());
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();

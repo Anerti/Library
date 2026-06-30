@@ -62,7 +62,8 @@ public class UserService {
     String authenticatedUserId = auth.getName();
     String role = auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
 
-    return role.equals("ADMIN") && authenticatedUserId.equals(requestedResourceId.toString()) || role.equals("CUSTOMER") && authenticatedUserId.equals(requestedResourceId.toString());
+    return role.equals("ADMIN") && authenticatedUserId.equals(requestedResourceId.toString())
+        || role.equals("CUSTOMER") && authenticatedUserId.equals(requestedResourceId.toString());
   }
 
   @Transactional
@@ -70,10 +71,9 @@ public class UserService {
 
     if (resourcesAccessGranted(id)) {
       userRepository
-              .delete(id)
-              .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
-    }
-    else {
+          .delete(id)
+          .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
+    } else {
       throw new ForbiddenException(String.format("Cannot delete user %s", id));
     }
   }
