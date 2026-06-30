@@ -32,10 +32,18 @@ public class UserService {
         : userMapper.toPageResponse(userRepository.findBySearch(search, pageable), page, size);
   }
 
+  private boolean resourcesAccessGrantedForReading(UUID requestedResourceId) {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String authenticatedUserId = auth.getName();
+    String role = auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
+
+    return (authenticatedUserId.equals(requestedResourceId.toString())) || role.equals("ADMIN");
+  }
+
   @Transactional(readOnly = true)
   public UserResponse findById(UUID id) {
 
-    if (resourcesAccessGranted(id)) {
+    if (resourcesAccessGrantedForReading(id)) {
       return userRepository
           .findById(id)
           .map(userMapper::toResponse)

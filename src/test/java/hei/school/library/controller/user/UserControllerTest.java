@@ -113,6 +113,16 @@ public class UserControllerTest {
   }
 
   @Test
+  void should_return_user_when_admin_reads_customer() throws Exception {
+    when(userService.findById(userId)).thenReturn(userResponse);
+
+    mockMvc
+        .perform(get("/users/{id}", userId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(userId.toString()));
+  }
+
+  @Test
   void should_update_user() throws Exception {
     UserUpdateRequest request = new UserUpdateRequest(null, "Faly Updated", null, null, null);
 
