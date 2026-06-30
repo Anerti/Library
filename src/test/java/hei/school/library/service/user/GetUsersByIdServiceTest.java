@@ -19,13 +19,11 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class GetUsersByIdServiceTest {
 
   @Mock private UserRepository userRepository;
-  @Mock private PasswordEncoder passwordEncoder;
 
   private UserService userService;
 
@@ -39,8 +37,7 @@ class GetUsersByIdServiceTest {
         new UserService(
             userRepository,
             new UserMapper(new PaginationMapper()),
-            new DataValidator(),
-            passwordEncoder);
+            new DataValidator());
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();

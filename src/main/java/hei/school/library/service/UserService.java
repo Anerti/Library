@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +21,6 @@ public class UserService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final DataValidator dataValidator;
-  private final PasswordEncoder passwordEncoder;
 
   @Transactional(readOnly = true)
   public PageResponse<UserResponse> findAll(String search, int page, int size) {
@@ -59,17 +57,24 @@ public class UserService {
         .orElseThrow(() -> new NotFoundException("User " + id + " not found"));
   }
 
-  @Transactional
-  public void delete(UUID id) {
+  private boolean resourcesAccessGranted(UUID requestedResourceId) {
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     String authenticatedUserId = auth.getName();
+    String role = auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
 
-    if (!authenticatedUserId.equals(id.toString())) {
-      throw new ForbiddenException("Cannot delete another user");
+    return role.equals("ADMIN") && authenticatedUserId.equals(requestedResourceId.toString()) || role.equals("CUSTOMER") && authenticatedUserId.equals(requestedResourceId.toString());
+  }
+
+  @Transactional
+  public void delete(UUID id) {
+
+    if (resourcesAccessGranted(id)) {
+      userRepository
+              .delete(id)
+              .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
     }
-
-    userRepository
-        .delete(id)
-        .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
+    else {
+      throw new ForbiddenException(String.format("Cannot delete user %s", id));
+    }
   }
 }
