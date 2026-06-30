@@ -105,6 +105,24 @@ public class UserControllerTest {
   }
 
   @Test
+  void should_return_forbidden_when_accessing_another_user_by_id() throws Exception {
+    when(userService.findById(userId))
+        .thenThrow(new ForbiddenException("Cannot read user " + userId));
+
+    mockMvc.perform(get("/users/{id}", userId)).andExpect(status().isForbidden());
+  }
+
+  @Test
+  void should_return_user_when_admin_reads_customer() throws Exception {
+    when(userService.findById(userId)).thenReturn(userResponse);
+
+    mockMvc
+        .perform(get("/users/{id}", userId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(userId.toString()));
+  }
+
+  @Test
   void should_update_user() throws Exception {
     UserUpdateRequest request = new UserUpdateRequest(null, "Faly Updated", null, null, null);
 
