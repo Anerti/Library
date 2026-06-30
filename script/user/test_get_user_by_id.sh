@@ -20,27 +20,27 @@ ALICE_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="alice.reader
 BOB_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="bob.moderator@mail.com" password="password123" | jq -r '.token')
 
 echo "── 1) 200 — CUSTOMER (Alice) reads own account  →  200 / Alice Reader"
-curlie -H "Authorization:Bearer ***" "http://localhost:8080/users/${ALICE_ID}"
+curlie -H "Authorization:Bearer ${ALICE_TOKEN}" "http://localhost:8080/users/${ALICE_ID}"
 echo
 
 echo "── 2) 200 — ADMIN (Bob) reads own account  →  200 / Bob Moderator"
-curlie -H "Authorization:Bearer ***" "http://localhost:8080/users/${BOB_ID}"
+curlie -H "Authorization:Bearer ${BOB_TOKEN}" "http://localhost:8080/users/${BOB_ID}"
 echo
 
 echo "── 3) 403 — CUSTOMER (Alice) tries to read ADMIN (Bob)  →  403 / forbidden"
-curlie -H "Authorization:Bearer ***" "http://localhost:8080/users/${BOB_ID}"
+curlie -H "Authorization:Bearer ${ALICE_TOKEN}" "http://localhost:8080/users/${BOB_ID}"
 echo
 
 echo "── 4) 403 — ADMIN (Bob) tries to read CUSTOMER (Alice)  →  403 / forbidden"
-curlie -H "Authorization:Bearer ***" "http://localhost:8080/users/${ALICE_ID}"
+curlie -H "Authorization:Bearer ${BOB_TOKEN}" "http://localhost:8080/users/${ALICE_ID}"
 echo
 
 echo "── 5) 404 — GET /users/{id} (non-existent UUID)  →  404 / not found"
-curlie -H "Authorization:Bearer ***" "http://localhost:8080/users/${NONEXISTENT_ID}"
+curlie -H "Authorization:Bearer ${ALICE_TOKEN}" "http://localhost:8080/users/${NONEXISTENT_ID}"
 echo
 
 echo "── 6) 400 — GET /users/{id} (malformed UUID)  →  400 / bad request"
-curlie -H "Authorization:Bearer ***" "http://localhost:8080/users/not-a-uuid"
+curlie -H "Authorization:Bearer ${ALICE_TOKEN}" "http://localhost:8080/users/not-a-uuid"
 echo
 
 echo "── 7) 401 — GET /users/{id} (no token)  →  401 / unauthorized"
