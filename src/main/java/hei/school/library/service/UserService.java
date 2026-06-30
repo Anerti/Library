@@ -37,12 +37,11 @@ public class UserService {
 
     if (resourcesAccessGranted(id)) {
       return userRepository
-              .findById(id)
-              .map(userMapper::toResponse)
-              .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
-    }
-    else{
-      throw new ForbiddenException(String.format("Cannot delete user %s", id));
+          .findById(id)
+          .map(userMapper::toResponse)
+          .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
+    } else {
+      throw new ForbiddenException(String.format("Cannot read user %s", id));
     }
   }
 
