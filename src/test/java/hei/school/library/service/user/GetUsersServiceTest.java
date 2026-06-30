@@ -91,6 +91,19 @@ class GetUsersServiceTest {
   }
 
   @Test
+  @DisplayName("findAll: should return null data when page is empty")
+  void findAll_shouldReturnNullData_whenPageEmpty() {
+    Page<User> emptyPage = new PageImpl<>(List.of());
+    when(userRepository.findAll(any(Pageable.class))).thenReturn(emptyPage);
+
+    PageResponse<UserResponse> result = userService.findAll(null, 1, 20);
+
+    assertThat(result.getData()).isNull();
+    assertThat(result.getPagination().getTotal()).isZero();
+    verify(userRepository).findAll(any(Pageable.class));
+  }
+
+  @Test
   @DisplayName(
       "findAll: should throw UnprocessableEntityException when search contains invalid characters")
   void findAll_shouldThrow_whenSearchInvalid() {
