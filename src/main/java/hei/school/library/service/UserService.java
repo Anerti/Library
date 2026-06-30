@@ -62,6 +62,6 @@ public class UserService {
   public void delete(UUID id) {
     userRepository
         .delete(id)
-        .orElseThrow(() -> new NotFoundException("User with id " + id + " not found"));
+        .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
   }
 }
