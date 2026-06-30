@@ -30,7 +30,10 @@ public class UserMapper {
 
   public PageResponse<UserResponse> toPageResponse(Page<User> page, int pageNum, int pageSize) {
     return PageResponse.<UserResponse>builder()
-        .data(page.getContent().stream().map(this::toResponse).toList().isEmpty() ? null : page.getContent().stream().map(this::toResponse).toList())
+        .data(
+            page.getContent().stream().map(this::toResponse).toList().isEmpty()
+                ? null
+                : page.getContent().stream().map(this::toResponse).toList())
         .pagination(paginationMapper.toPaginationDto(page, pageNum, pageSize))
         .build();
   }
