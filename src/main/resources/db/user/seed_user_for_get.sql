@@ -1,5 +1,5 @@
 -- Generated with: uuidgen
--- Password (plaintext): password123 → $argon2id$v=19$m=47104,t=3,p=1$5IU3I4BVTD0VP5cnv4pQtw$cLeGXTKYDvCJzeKSufZrME6KtX93WYp/kxiLkF5MykA
+-- Password (plaintext): Str0ng!Passphrase1 → $argon2id$v=19$m=47104,t=3,p=1$5IU3I4BVTD0VP5cnv4pQtw$cLeGXTKYDvCJzeKSufZrME6KtX93WYp/kxiLkF5MykA
 INSERT INTO users (id, last_name, first_name, birth_date, email, password, phone, role)
 VALUES ('943781cb-8237-46e1-9da5-59d3c11e972f', 'Reader', 'Alice', '1992-07-21', 'alice.reader@mail.com',
         '$argon2id$v=19$m=47104,t=3,p=1$5IU3I4BVTD0VP5cnv4pQtw$cLeGXTKYDvCJzeKSufZrME6KtX93WYp/kxiLkF5MykA',

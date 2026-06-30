@@ -16,8 +16,8 @@ ALICE_ID="943781cb-8237-46e1-9da5-59d3c11e972f"
 BOB_ID="383d233b-06cb-4383-a18e-7be27adaca37"
 NONEXISTENT_ID="00000000-0000-0000-0000-000000000000"
 
-ALICE_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="alice.reader@mail.com" password="password123" | jq -r '.token')
-BOB_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="bob.moderator@mail.com" password="password123" | jq -r '.token')
+ALICE_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="alice.reader@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
+BOB_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="bob.moderator@mail.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 1) 200 — CUSTOMER (Alice) reads own account  →  200 / Alice Reader"
 curlie -H "Authorization:Bearer ${ALICE_TOKEN}" "http://localhost:8080/users/${ALICE_ID}"
