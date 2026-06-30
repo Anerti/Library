@@ -34,10 +34,16 @@ public class UserService {
 
   @Transactional(readOnly = true)
   public UserResponse findById(UUID id) {
-    return userRepository
-        .findById(id)
-        .map(userMapper::toResponse)
-        .orElseThrow(() -> new NotFoundException("User " + id + " not found"));
+
+    if (resourcesAccessGranted(id)) {
+      return userRepository
+              .findById(id)
+              .map(userMapper::toResponse)
+              .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
+    }
+    else{
+      throw new ForbiddenException(String.format("Cannot delete user %s", id));
+    }
   }
 
   @Transactional
