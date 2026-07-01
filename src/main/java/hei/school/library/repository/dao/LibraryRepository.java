@@ -1,6 +1,9 @@
 package hei.school.library.repository.dao;
 
+import hei.school.library.dto.RevenueByGenreItem;
 import hei.school.library.entity.Library;
+
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -58,4 +61,39 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
           """,
       nativeQuery = true)
   Optional<UUID> deleteByIdAndReturn(@Param("id") UUID id);
+
+    @Query(
+            value = """
+    SELECT new hei.school.library.dto.RevenueByGenreItem(
+        g.id, g.name, SUM(si.price * si.quantity), CAST(SUM(si.quantity) AS integer)
+    )
+    FROM Genre g
+    JOIN g.books b
+    JOIN BookCopy bc ON bc.book = b
+    JOIN SaleItem si ON si.bookCopyId = bc.id
+    JOIN Sale s ON s.id = si.saleId
+    WHERE bc.library.id = :libraryId
+      AND s.status = hei.school.library.entity.enums.SaleStatus.SOLD
+      AND s.saleDate BETWEEN :start AND :end
+    GROUP BY g.id, g.name
+    ORDER BY CASE WHEN :sortOrder = 'asc' THEN SUM(si.price * si.quantity) END ASC,
+             CASE WHEN :sortOrder != 'asc' THEN SUM(si.price * si.quantity) END DESC
+    """,
+            countQuery = """
+          SELECT COUNT(DISTINCT g.id)
+          FROM Genre g
+          JOIN g.books b
+          JOIN BookCopy bc ON bc.book = b
+          JOIN SaleItem si ON si.bookCopyId = bc.id
+          JOIN Sale s ON s.id = si.saleId
+          WHERE bc.library.id = :libraryId
+            AND s.status = hei.school.library.entity.enums.SaleStatus.SOLD
+            AND s.saleDate BETWEEN :start AND :end
+          """)
+    Page<RevenueByGenreItem> findRevenueByGenre(
+            @Param("libraryId") UUID libraryId,
+            @Param("start") Instant start,
+            @Param("end") Instant end,
+            @Param("sortOrder") String sortOrder,
+            Pageable pageable);
 }
