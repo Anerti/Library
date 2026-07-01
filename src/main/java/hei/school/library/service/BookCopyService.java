@@ -10,6 +10,7 @@ import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookCopyRepository;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.repository.dao.LibraryRepository;
+import hei.school.library.repository.dao.StockRepository;
 import hei.school.library.validator.BookCopyValidator;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class BookCopyService {
   private final BookCopyValidator bookCopyValidator;
   private final BookCopyMapper bookCopyMapper;
   private final PaginationMapper paginationMapper;
+  private final StockRepository stockRepository;
 
   public PageResponse<BookCopyResponse> findByFilters(
       UUID libraryId,
@@ -124,6 +126,12 @@ public class BookCopyService {
     if (libraryId != null && !libraryRepository.existsById(libraryId)) {
       throw new NotFoundException("Library with id " + libraryId + " not found");
     }
-    return bookCopyRepository.countAvailableStock(bookId, format, libraryId);
+
+    List<Long> stocks = stockRepository.calculateStock(
+            bookId,
+            format != null ? format.name() : null,
+            libraryId != null ? libraryId.toString() : null);
+
+    return stocks.stream().mapToLong(Long::longValue).sum();
   }
 }
