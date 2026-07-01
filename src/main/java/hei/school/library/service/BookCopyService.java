@@ -127,7 +127,8 @@ public class BookCopyService {
       throw new NotFoundException("Library with id " + libraryId + " not found");
     }
 
-    List<Long> stocks = stockRepository.calculateStock(
+    List<Long> stocks =
+        stockRepository.calculateStock(
             bookId,
             format != null ? format.name() : null,
             libraryId != null ? libraryId.toString() : null);

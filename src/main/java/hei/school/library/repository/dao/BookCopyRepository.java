@@ -1,7 +1,6 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.BookCopy;
-import hei.school.library.entity.enums.BookCopyFormat;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -42,7 +41,7 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, UUID> {
 
   @Query(
       value =
-          """
+"""
 INSERT INTO book_copy (id, price, format, library_id, book_id, status, page_number, updated_at)
 VALUES (gen_random_uuid(), :price, CAST(:format AS book_copy_format), :libraryId, :bookId, 'AVAILABLE', :pageNumber, now())
 RETURNING id, price, format, library_id, book_id, status, page_number, updated_at

@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
   @Query(
       value =
-          """
+"""
 SELECT id, last_name, first_name, birth_date, email, password, phone, role, created_at, updated_at FROM users
 WHERE (:search IS NULL OR :search = ''
    OR last_name  ILIKE '%' || :search || '%'
@@ -36,7 +36,7 @@ WHERE (:search IS NULL OR :search = ''
 
   @Query(
       value =
-          """
+"""
 UPDATE users
 SET
   last_name = COALESCE(:lastName, last_name),
@@ -59,11 +59,12 @@ RETURNING id, last_name, first_name, birth_date, email, phone, role, created_at,
 
   @Query(
       value =
-          """
+"""
 SELECT
     id, last_name, first_name, birth_date, email, password, phone, role, created_at, updated_at
 FROM users
-WHERE email = :email""",
+WHERE email = :email\
+""",
       nativeQuery = true)
   Optional<User> findByEmail(@Param("email") String email);
 
