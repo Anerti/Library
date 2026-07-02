@@ -11,7 +11,6 @@ import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.service.UserService;
 import hei.school.library.validator.DataValidator;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,24 +49,23 @@ class DeleteUsersByIdServiceTest {
   @DisplayName("delete: should delete when authenticated user deletes own account")
   void delete_shouldDelete_whenOwnAccount() {
     when(resourcesAccessRules.GrantAccessFor(existingId)).thenReturn(true);
-    when(userRepository.delete(existingId)).thenReturn(Optional.of(existingId));
 
     userService.delete(existingId);
 
-    verify(userRepository).delete(existingId);
+    verify(userRepository).deleteById(existingId);
   }
 
   @Test
-  @DisplayName("delete: should throw NotFoundException when user does not exist")
-  void delete_shouldThrow_whenNotFound() {
-    when(resourcesAccessRules.GrantAccessFor(unknownId)).thenReturn(true);
-    when(userRepository.delete(unknownId)).thenReturn(Optional.empty());
+  @DisplayName("delete: should throw NotFoundException when target user does not exist")
+  void delete_shouldThrow_whenTargetUserNotFound() {
+    when(resourcesAccessRules.GrantAccessFor(unknownId))
+        .thenThrow(new NotFoundException(String.format("User %s not found", unknownId)));
 
     assertThatThrownBy(() -> userService.delete(unknownId))
         .isInstanceOf(NotFoundException.class)
         .hasMessageContaining(unknownId.toString());
 
-    verify(userRepository).delete(unknownId);
+    verify(userRepository, never()).deleteById(any(UUID.class));
   }
 
   @Test
@@ -79,30 +77,16 @@ class DeleteUsersByIdServiceTest {
         .isInstanceOf(ForbiddenException.class)
         .hasMessageContaining("Cannot delete user %s".formatted(otherId));
 
-    verify(userRepository, never()).delete(any(UUID.class));
+    verify(userRepository, never()).deleteById(any(UUID.class));
   }
 
   @Test
-  @DisplayName("delete: should delete when ADMIN deletes another user")
+  @DisplayName("delete: should delete when ADMIN deletes another CUSTOMER")
   void delete_shouldDelete_whenAdminDeletesOtherUser() {
     when(resourcesAccessRules.GrantAccessFor(otherId)).thenReturn(true);
-    when(userRepository.delete(otherId)).thenReturn(Optional.of(otherId));
 
     userService.delete(otherId);
 
-    verify(userRepository).delete(otherId);
-  }
-
-  @Test
-  @DisplayName("delete: should throw NotFoundException when ADMIN deletes non-existent user")
-  void delete_shouldThrow_whenAdminDeletesNonExistent() {
-    when(resourcesAccessRules.GrantAccessFor(unknownId)).thenReturn(true);
-    when(userRepository.delete(unknownId)).thenReturn(Optional.empty());
-
-    assertThatThrownBy(() -> userService.delete(unknownId))
-        .isInstanceOf(NotFoundException.class)
-        .hasMessageContaining(unknownId.toString());
-
-    verify(userRepository).delete(unknownId);
+    verify(userRepository).deleteById(otherId);
   }
 }

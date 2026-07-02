@@ -1,5 +1,6 @@
 package hei.school.library.service;
 
+import hei.school.library.config.ResourcesAccessRules;
 import hei.school.library.dto.*;
 import hei.school.library.exception.ForbiddenException;
 import hei.school.library.exception.NotFoundException;
@@ -21,6 +22,7 @@ public class UserService {
   private final UserRepository userRepository;
   private final UserMapper userMapper;
   private final DataValidator dataValidator;
+  private final ResourcesAccessRules resourcesAccessRules;
 
   @Transactional(readOnly = true)
   public PageResponse<UserResponse> findAll(String search, int page, int size) {
@@ -72,11 +74,8 @@ public class UserService {
 
   @Transactional
   public void delete(UUID id) {
-
-    if (resourcesAccessGranted(id)) {
-      userRepository
-          .delete(id)
-          .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
+    if (resourcesAccessRules.GrantAccessFor(id)) {
+      userRepository.deleteById(id);
     } else {
       throw new ForbiddenException(String.format("Cannot delete user %s", id));
     }

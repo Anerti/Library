@@ -34,7 +34,7 @@ echo "── 3) 400 — DELETE /users/{invalid} (malformed UUID)  →  400 / bad
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/users/not-a-uuid"
 echo
 
-echo "── 4) 404 — DELETE /users/{id} (already deleted)  →  404 / not found"
+echo "── 4) 404 — DELETE /users/{id} (already deleted, target now non-existent)  →  404 / not found"
 curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/users/${MARIE_ID}"
 echo
 
