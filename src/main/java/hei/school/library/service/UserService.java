@@ -2,6 +2,7 @@ package hei.school.library.service;
 
 import hei.school.library.config.ResourcesAccessRules;
 import hei.school.library.dto.*;
+import hei.school.library.entity.User;
 import hei.school.library.exception.ForbiddenException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.UserMapper;
@@ -10,8 +11,6 @@ import hei.school.library.validator.DataValidator;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,25 +33,17 @@ public class UserService {
         : userMapper.toPageResponse(userRepository.findBySearch(search, pageable), page, size);
   }
 
-  private boolean resourcesAccessGranted(UUID requestedResourceId) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    String authenticatedUserId = auth.getName();
-    String role = auth.getAuthorities().iterator().next().getAuthority().replace("ROLE_", "");
-
-    return (authenticatedUserId.equals(requestedResourceId.toString())) || role.equals("ADMIN");
-  }
-
   @Transactional(readOnly = true)
   public UserResponse findById(UUID id) {
+    User user =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
 
-    if (resourcesAccessGranted(id)) {
-      return userRepository
-          .findById(id)
-          .map(userMapper::toResponse)
-          .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
-    } else {
-      throw new ForbiddenException(String.format("Cannot read user %s", id));
+    if (resourcesAccessRules.grantAccessFor(user)) {
+      return userMapper.toResponse(user);
     }
+    throw new ForbiddenException(String.format("Cannot read user %s", id));
   }
 
   @Transactional
@@ -74,8 +65,13 @@ public class UserService {
 
   @Transactional
   public void delete(UUID id) {
-    if (resourcesAccessRules.GrantAccessFor(id)) {
-      userRepository.deleteById(id);
+    User user =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
+
+    if (resourcesAccessRules.grantAccessFor(user)) {
+      userRepository.delete(user);
     } else {
       throw new ForbiddenException(String.format("Cannot delete user %s", id));
     }
