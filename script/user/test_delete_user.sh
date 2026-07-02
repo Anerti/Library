@@ -2,7 +2,7 @@
 # Test script for DELETE /users/{id} endpoint
 # Requires seed users to exist (admin@library.com and marie@mail.com login users).
 # Requires db/user/seed_user.sql to be run first (provides John Doe, Customer Target, Admin Target).
-# Access rules: CUSTOMER can only delete own account; ADMIN can delete any user.
+# Access rules: CUSTOMER can only delete own account; ADMIN can delete CUSTOMER but not another ADMIN.
 #
 # Login user IDs (from db/auth/seed_user_for_login.sql):
 #   fcd16cd1-0f2b-460e-a6c2-3dece9e89d22  —  Marie Dupont (CUSTOMER)
@@ -23,31 +23,31 @@ MARIE_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.c
 ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 1) 403 — CUSTOMER (Marie) tries to delete another CUSTOMER (Target Customer)  →  403 / forbidden"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" DELETE "http://localhost:8080/users/${CUSTOMER_TARGET_ID}"
+curlie -H "Authorization:Bearer $MARIE_TOKEN" DELETE "http://localhost:8080/users/${CUSTOMER_TARGET_ID}"
 echo
 
 echo "── 2) 204 — CUSTOMER (Marie) deletes own account  →  204 / no content"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" DELETE "http://localhost:8080/users/${MARIE_ID}"
+curlie -H "Authorization:Bearer $MARIE_TOKEN" DELETE "http://localhost:8080/users/${MARIE_ID}"
 echo
 
 echo "── 3) 400 — DELETE /users/{invalid} (malformed UUID)  →  400 / bad request"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" DELETE "http://localhost:8080/users/not-a-uuid"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/users/not-a-uuid"
 echo
 
 echo "── 4) 404 — DELETE /users/{id} (already deleted)  →  404 / not found"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" DELETE "http://localhost:8080/users/${MARIE_ID}"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/users/${MARIE_ID}"
 echo
 
 echo "── 5) 204 — ADMIN deletes CUSTOMER (John Doe)  →  204 / no content"
-curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" DELETE "http://localhost:8080/users/${JOHN_ID}"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/users/${JOHN_ID}"
 echo
 
-echo "── 6) 204 — ADMIN deletes another ADMIN (Target Admin)  →  204 / no content"
-curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" DELETE "http://localhost:8080/users/${ADMIN_TARGET_ID}"
+echo "── 6) 403 — ADMIN tries to delete another ADMIN (Target Admin)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/users/${ADMIN_TARGET_ID}"
 echo
 
 echo "── 7) 204 — ADMIN deletes own account  →  204 / no content"
-curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" DELETE "http://localhost:8080/users/${ADMIN_ID}"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" DELETE "http://localhost:8080/users/${ADMIN_ID}"
 echo
 
 echo "── 8) 401 — DELETE /users/{id} (no token)  →  401 / unauthorized"
