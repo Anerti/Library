@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import hei.school.library.config.ResourcesAccessRules;
 import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.entity.User;
@@ -27,6 +28,7 @@ import org.springframework.data.domain.*;
 class GetUsersServiceTest {
 
   @Mock private UserRepository userRepository;
+  @Mock private ResourcesAccessRules resourcesAccessRules;
   @Mock private DataValidator dataValidator;
   private UserService userService;
   private User user;
@@ -34,7 +36,11 @@ class GetUsersServiceTest {
   @BeforeEach
   void setUp() {
     userService =
-        new UserService(userRepository, new UserMapper(new PaginationMapper()), dataValidator);
+        new UserService(
+            userRepository,
+            new UserMapper(new PaginationMapper()),
+            dataValidator,
+            resourcesAccessRules);
 
     user =
         new User(

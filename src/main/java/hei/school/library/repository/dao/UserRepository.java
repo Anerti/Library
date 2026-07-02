@@ -66,13 +66,4 @@ FROM users
 WHERE email = :email""",
       nativeQuery = true)
   Optional<User> findByEmail(@Param("email") String email);
-
-  @Query(
-      value =
-          """
-          DELETE FROM users WHERE id = :id
-          RETURNING id
-          """,
-      nativeQuery = true)
-  Optional<UUID> delete(@Param("id") UUID id);
 }
