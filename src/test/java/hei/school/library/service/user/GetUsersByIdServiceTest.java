@@ -16,23 +16,20 @@ import hei.school.library.service.UserService;
 import hei.school.library.validator.DataValidator;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
 class GetUsersByIdServiceTest {
 
   @Mock private UserRepository userRepository;
   @Mock private ResourcesAccessRules resourcesAccessRules;
-  @Mock private Authentication auth;
 
   private UserService userService;
 
@@ -67,19 +64,11 @@ class GetUsersByIdServiceTest {
             Instant.now());
   }
 
-  @AfterEach
-  void tearDown() {
-    SecurityContextHolder.clearContext();
-  }
-
   @Test
   @DisplayName("findById: should return user when CUSTOMER reads own account")
   void findById_shouldReturnUser() {
-    doReturn(existingId.toString()).when(auth).getName();
-    doReturn(List.of(new SimpleGrantedAuthority("ROLE_CUSTOMER"))).when(auth).getAuthorities();
-    SecurityContextHolder.getContext().setAuthentication(auth);
-
     when(userRepository.findById(existingId)).thenReturn(Optional.of(user));
+    when(resourcesAccessRules.grantAccessFor(user)).thenReturn(true);
 
     UserResponse result = userService.findById(existingId);
 
@@ -91,26 +80,32 @@ class GetUsersByIdServiceTest {
   @Test
   @DisplayName("findById: should return user when ADMIN reads a CUSTOMER")
   void findById_shouldReturnUser_whenAdminReadsCustomer() {
-    doReturn(existingId.toString()).when(auth).getName();
-    doReturn(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))).when(auth).getAuthorities();
-    SecurityContextHolder.getContext().setAuthentication(auth);
+    User otherUser =
+        new User(
+            otherId,
+            "Martin",
+            "Jean",
+            LocalDate.of(1990, 7, 15),
+            "jean@mail.com",
+            "secret",
+            "+261****1234",
+            Role.CUSTOMER,
+            Instant.now(),
+            Instant.now());
 
-    when(userRepository.findById(otherId)).thenReturn(Optional.of(user));
+    when(userRepository.findById(otherId)).thenReturn(Optional.of(otherUser));
+    when(resourcesAccessRules.grantAccessFor(otherUser)).thenReturn(true);
 
     UserResponse result = userService.findById(otherId);
 
-    assertThat(result.getLastName()).isEqualTo("Dupont");
-    assertThat(result.getEmail()).isEqualTo("marie@mail.com");
+    assertThat(result.getLastName()).isEqualTo("Martin");
+    assertThat(result.getEmail()).isEqualTo("jean@mail.com");
     verify(userRepository).findById(otherId);
   }
 
   @Test
   @DisplayName("findById: should throw NotFoundException when own account does not exist")
   void findById_shouldThrow_whenNotFound() {
-    doReturn(unknownId.toString()).when(auth).getName();
-    doReturn(List.of(new SimpleGrantedAuthority("ROLE_CUSTOMER"))).when(auth).getAuthorities();
-    SecurityContextHolder.getContext().setAuthentication(auth);
-
     when(userRepository.findById(unknownId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> userService.findById(unknownId))
@@ -123,24 +118,32 @@ class GetUsersByIdServiceTest {
   @Test
   @DisplayName("findById: should throw ForbiddenException when CUSTOMER accesses another user")
   void findById_shouldThrow_whenAccessingOtherUser() {
-    doReturn(existingId.toString()).when(auth).getName();
-    doReturn(List.of(new SimpleGrantedAuthority("ROLE_CUSTOMER"))).when(auth).getAuthorities();
-    SecurityContextHolder.getContext().setAuthentication(auth);
+    User otherUser =
+        new User(
+            otherId,
+            "Martin",
+            "Jean",
+            LocalDate.of(1990, 7, 15),
+            "jean@mail.com",
+            "secret",
+            "+261****1234",
+            Role.CUSTOMER,
+            Instant.now(),
+            Instant.now());
+
+    when(userRepository.findById(otherId)).thenReturn(Optional.of(otherUser));
+    when(resourcesAccessRules.grantAccessFor(otherUser)).thenReturn(false);
 
     assertThatThrownBy(() -> userService.findById(otherId))
         .isInstanceOf(ForbiddenException.class)
         .hasMessageContaining("Cannot read user %s".formatted(otherId));
 
-    verify(userRepository, never()).findById(any(UUID.class));
+    verify(userRepository).findById(otherId);
   }
 
   @Test
   @DisplayName("findById: should throw NotFoundException when ADMIN reads non-existent user")
   void findById_shouldThrow_whenAdminReadsNonExistent() {
-    doReturn(existingId.toString()).when(auth).getName();
-    doReturn(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))).when(auth).getAuthorities();
-    SecurityContextHolder.getContext().setAuthentication(auth);
-
     when(userRepository.findById(unknownId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> userService.findById(unknownId))
