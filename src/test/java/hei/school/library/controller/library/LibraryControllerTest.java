@@ -14,7 +14,6 @@ import hei.school.library.endpoint.rest.controller.LibraryController;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.service.LibraryService;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -188,81 +187,82 @@ class LibraryControllerTest {
         .andExpect(jsonPath("$.error").value("NOT_FOUND"))
         .andExpect(jsonPath("$.message").value("Library not found with id: " + id));
   }
-    @Test
-    void should_return_revenue_by_genre_with_default_params() throws Exception {
-        UUID libraryId = UUID.randomUUID();
 
-        RevenueByGenreItem item =
-                new RevenueByGenreItem(UUID.randomUUID(), "Fiction", BigDecimal.valueOf(2300.00), 45);
-        PageResponse<RevenueByGenreItem> response =
-                new PageResponse<>(List.of(item), new PaginationDto(1, 20, 1));
+  @Test
+  void should_return_revenue_by_genre_with_default_params() throws Exception {
+    UUID libraryId = UUID.randomUUID();
 
-        when(libraryService.findRevenueByGenre(eq(libraryId), any(), any(), eq("desc"), eq(1), eq(20)))
-                .thenReturn(response);
+    RevenueByGenreItem item =
+        new RevenueByGenreItem(UUID.randomUUID(), "Fiction", BigDecimal.valueOf(2300.00), 45);
+    PageResponse<RevenueByGenreItem> response =
+        new PageResponse<>(List.of(item), new PaginationDto(1, 20, 1));
 
-        mockMvc
-                .perform(get("/libraries/{libraryId}/analytics/revenue/by-genre", libraryId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(1)))
-                .andExpect(jsonPath("$.data[0].genreName").value("Fiction"))
-                .andExpect(jsonPath("$.data[0].totalRevenue").value(2300.00))
-                .andExpect(jsonPath("$.data[0].totalSold").value(45))
-                .andExpect(jsonPath("$.pagination.page").value(1))
-                .andExpect(jsonPath("$.pagination.size").value(20))
-                .andExpect(jsonPath("$.pagination.total").value(1));
+    when(libraryService.findRevenueByGenre(eq(libraryId), any(), any(), eq("desc"), eq(1), eq(20)))
+        .thenReturn(response);
 
-        verify(libraryService).findRevenueByGenre(libraryId, null, null, "desc", 1, 20);
-    }
+    mockMvc
+        .perform(get("/libraries/{libraryId}/analytics/revenue/by-genre", libraryId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data", hasSize(1)))
+        .andExpect(jsonPath("$.data[0].genreName").value("Fiction"))
+        .andExpect(jsonPath("$.data[0].totalRevenue").value(2300.00))
+        .andExpect(jsonPath("$.data[0].totalSold").value(45))
+        .andExpect(jsonPath("$.pagination.page").value(1))
+        .andExpect(jsonPath("$.pagination.size").value(20))
+        .andExpect(jsonPath("$.pagination.total").value(1));
 
-    @Test
-    void should_pass_query_params_to_service() throws Exception {
-        UUID libraryId = UUID.randomUUID();
+    verify(libraryService).findRevenueByGenre(libraryId, null, null, "desc", 1, 20);
+  }
 
-        PageResponse<RevenueByGenreItem> response =
-                new PageResponse<>(List.of(), new PaginationDto(2, 10, 0));
+  @Test
+  void should_pass_query_params_to_service() throws Exception {
+    UUID libraryId = UUID.randomUUID();
 
-        when(libraryService.findRevenueByGenre(
-                eq(libraryId), any(), any(), eq("asc"), eq(2), eq(10)))
-                .thenReturn(response);
+    PageResponse<RevenueByGenreItem> response =
+        new PageResponse<>(List.of(), new PaginationDto(2, 10, 0));
 
-        mockMvc
-                .perform(
-                        get("/libraries/{libraryId}/analytics/revenue/by-genre", libraryId)
-                                .param("from", "2026-01-01")
-                                .param("to", "2026-01-31")
-                                .param("sortOrder", "asc")
-                                .param("page", "2")
-                                .param("size", "10"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", hasSize(0)))
-                .andExpect(jsonPath("$.pagination.page").value(2));
+    when(libraryService.findRevenueByGenre(eq(libraryId), any(), any(), eq("asc"), eq(2), eq(10)))
+        .thenReturn(response);
 
-        verify(libraryService)
-                .findRevenueByGenre(
-                        libraryId,
-                        java.time.LocalDate.of(2026, 1, 1),
-                        java.time.LocalDate.of(2026, 1, 31),
-                        "asc",
-                        2,
-                        10);
-    }
+    mockMvc
+        .perform(
+            get("/libraries/{libraryId}/analytics/revenue/by-genre", libraryId)
+                .param("from", "2026-01-01")
+                .param("to", "2026-01-31")
+                .param("sortOrder", "asc")
+                .param("page", "2")
+                .param("size", "10"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data", hasSize(0)))
+        .andExpect(jsonPath("$.pagination.page").value(2));
 
-    @Test
-    void should_return_not_found_when_library_does_not_exist() throws Exception {
-        UUID libraryId = UUID.randomUUID();
+    verify(libraryService)
+        .findRevenueByGenre(
+            libraryId,
+            java.time.LocalDate.of(2026, 1, 1),
+            java.time.LocalDate.of(2026, 1, 31),
+            "asc",
+            2,
+            10);
+  }
 
-        when(libraryService.findRevenueByGenre(eq(libraryId), any(), any(), anyString(), anyInt(), anyInt()))
-                .thenThrow(new NotFoundException(String.format("Library '%s' not found", libraryId)));
+  @Test
+  void should_return_not_found_when_library_does_not_exist() throws Exception {
+    UUID libraryId = UUID.randomUUID();
 
-        mockMvc
-                .perform(get("/libraries/{libraryId}/analytics/revenue/by-genre", libraryId))
-                .andExpect(status().isNotFound());
-    }
+    when(libraryService.findRevenueByGenre(
+            eq(libraryId), any(), any(), anyString(), anyInt(), anyInt()))
+        .thenThrow(new NotFoundException(String.format("Library '%s' not found", libraryId)));
 
-    @Test
-    void should_return_bad_request_when_library_id_is_invalid_uuid() throws Exception {
-        mockMvc
-                .perform(get("/libraries/{libraryId}/analytics/revenue/by-genre", "not-a-uuid"))
-                .andExpect(status().isBadRequest());
-    }
+    mockMvc
+        .perform(get("/libraries/{libraryId}/analytics/revenue/by-genre", libraryId))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void should_return_bad_request_when_library_id_is_invalid_uuid() throws Exception {
+    mockMvc
+        .perform(get("/libraries/{libraryId}/analytics/revenue/by-genre", "not-a-uuid"))
+        .andExpect(status().isBadRequest());
+  }
 }

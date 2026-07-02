@@ -2,7 +2,6 @@ package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.dto.*;
 import hei.school.library.service.LibraryService;
-
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +57,7 @@ public class LibraryController {
       @RequestParam(defaultValue = "desc") String sortOrder,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(
-                libraryService.findRevenueByGenre(libraryId, from, to, sortOrder, page, size));
-    }
+    return ResponseEntity.ok(
+        libraryService.findRevenueByGenre(libraryId, from, to, sortOrder, page, size));
+  }
 }
