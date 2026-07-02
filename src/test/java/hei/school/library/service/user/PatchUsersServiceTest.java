@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import hei.school.library.config.ResourcesAccessRules;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.entity.User;
@@ -32,6 +33,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class PatchUsersServiceTest {
 
   @Mock private UserRepository userRepository;
+  @Mock private ResourcesAccessRules resourcesAccessRules;
 
   private UserService userService;
 
@@ -42,7 +44,8 @@ class PatchUsersServiceTest {
   void setUp() {
     userService =
         new UserService(
-            userRepository, new UserMapper(new PaginationMapper()), new DataValidator());
+            userRepository, new UserMapper(new PaginationMapper()), new DataValidator(),
+            resourcesAccessRules);
 
     existingId = UUID.randomUUID();
     now = Instant.now();

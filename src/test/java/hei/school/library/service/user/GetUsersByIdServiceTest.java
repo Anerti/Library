@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.entity.User;
 import hei.school.library.entity.enums.Role;
+import hei.school.library.config.ResourcesAccessRules;
 import hei.school.library.exception.ForbiddenException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.PaginationMapper;
@@ -30,6 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 class GetUsersByIdServiceTest {
 
   @Mock private UserRepository userRepository;
+  @Mock private ResourcesAccessRules resourcesAccessRules;
   @Mock private Authentication auth;
 
   private UserService userService;
@@ -43,7 +45,8 @@ class GetUsersByIdServiceTest {
   void setUp() {
     userService =
         new UserService(
-            userRepository, new UserMapper(new PaginationMapper()), new DataValidator());
+            userRepository, new UserMapper(new PaginationMapper()), new DataValidator(),
+            resourcesAccessRules);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
