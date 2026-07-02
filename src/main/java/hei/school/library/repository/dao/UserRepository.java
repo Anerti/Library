@@ -66,5 +66,4 @@ FROM users
 WHERE email = :email""",
       nativeQuery = true)
   Optional<User> findByEmail(@Param("email") String email);
-
 }
