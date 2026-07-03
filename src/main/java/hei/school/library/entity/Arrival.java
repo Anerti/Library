@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "arrival")
@@ -20,17 +21,11 @@ public class Arrival {
   @JoinColumn(name = "library_id", nullable = false)
   private Library library;
 
+  @Builder.Default
   @Column(nullable = false)
-  private LocalDateTime arrivalDate;
+  private LocalDateTime arrivalDate = LocalDateTime.now();
 
-  @Column(nullable = false)
+  @CreationTimestamp
+  @Column(updatable = false, nullable = false)
   private LocalDateTime createdAt;
-
-  @PrePersist
-  public void prePersist() {
-    this.createdAt = LocalDateTime.now();
-    if (this.arrivalDate == null) {
-      this.arrivalDate = LocalDateTime.now();
-    }
-  }
 }
