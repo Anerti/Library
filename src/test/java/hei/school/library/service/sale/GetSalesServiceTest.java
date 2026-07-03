@@ -46,7 +46,6 @@ class GetSalesServiceTest {
 
   private UUID libraryId;
   private UUID saleId;
-  private UUID customerId;
   private Sale sale;
   private User user;
   private Library library;
@@ -67,12 +66,12 @@ class GetSalesServiceTest {
 
     libraryId = UUID.randomUUID();
     saleId = UUID.randomUUID();
-    customerId = UUID.randomUUID();
 
     library = new Library(libraryId, "Lib A", "+261****4567", "lib@mail.com", "Antananarivo");
+    UUID userId = UUID.randomUUID();
     user =
         new User(
-            customerId,
+            userId,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
@@ -84,11 +83,11 @@ class GetSalesServiceTest {
             Instant.now());
     sale =
         new Sale(
-            saleId, Instant.now(), SaleStatus.SOLD, customerId, libraryId, null, Instant.now());
+            saleId, Instant.now(), SaleStatus.SOLD, user, library, null, Instant.now());
 
     userResponse =
         new UserResponse(
-            customerId,
+            userId,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
@@ -107,7 +106,6 @@ class GetSalesServiceTest {
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
     when(saleRepository.findByLibraryId(any(), any(), any(), any(), any(), any()))
         .thenReturn(salePage);
-    when(userRepository.findById(customerId)).thenReturn(Optional.of(user));
     when(userMapper.toResponse(user)).thenReturn(userResponse);
 
     PageResponse<SaleResponse> result =
@@ -137,7 +135,6 @@ class GetSalesServiceTest {
   void findById_shouldReturnSale() {
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
     when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
-    when(userRepository.findById(customerId)).thenReturn(Optional.of(user));
     when(userMapper.toResponse(user)).thenReturn(userResponse);
 
     SaleResponse result = saleService.findById(libraryId, saleId);

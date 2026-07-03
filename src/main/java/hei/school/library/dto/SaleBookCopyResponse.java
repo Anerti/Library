@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SaleItemResponse {
+public class SaleBookCopyResponse {
   private UUID bookCopyId;
   private UUID saleId;
   private Instant createdAt;

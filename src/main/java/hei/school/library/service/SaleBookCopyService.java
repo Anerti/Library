@@ -1,13 +1,13 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.SaleItemRequest;
-import hei.school.library.dto.SaleItemResponse;
+import hei.school.library.dto.SaleBookCopyRequest;
+import hei.school.library.dto.SaleBookCopyResponse;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
-import hei.school.library.mapper.SaleItemMapper;
-import hei.school.library.repository.dao.SaleItemRepository;
+import hei.school.library.mapper.SaleBookCopyMapper;
+import hei.school.library.repository.dao.SaleBookCopyRepository;
 import hei.school.library.repository.dao.SaleRepository;
-import hei.school.library.validator.SaleItemValidator;
+import hei.school.library.validator.SaleBookCopyValidator;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -16,27 +16,27 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
-public class SaleItemService {
+public class SaleBookCopyService {
 
-  private final SaleItemRepository saleItemRepository;
+  private final SaleBookCopyRepository saleBookCopyRepository;
   private final SaleRepository saleRepository;
-  private final SaleItemMapper saleItemMapper;
-  private final SaleItemValidator saleItemValidator;
+  private final SaleBookCopyMapper saleBookCopyMapper;
+  private final SaleBookCopyValidator saleBookCopyValidator;
 
   @Transactional(readOnly = true)
-  public List<SaleItemResponse> findBySaleId(UUID saleId) {
+  public List<SaleBookCopyResponse> findBySaleId(UUID saleId) {
     saleRepository
         .findById(saleId)
         .orElseThrow(() -> new NotFoundException("Sale " + saleId + " not found"));
 
-    return saleItemRepository.findBySaleId(saleId).stream()
-        .map(saleItemMapper::toResponse)
+    return saleBookCopyRepository.findBySaleId(saleId).stream()
+        .map(saleBookCopyMapper::toResponse)
         .toList();
   }
 
   @Transactional
-  public SaleItemResponse create(UUID saleId, SaleItemRequest request) {
-    saleItemValidator.validateCreate(request);
+  public SaleBookCopyResponse create(UUID saleId, SaleBookCopyRequest request) {
+    saleBookCopyValidator.validateCreate(request);
 
     saleRepository
         .findById(saleId)
@@ -44,13 +44,13 @@ public class SaleItemService {
 
     Integer quantity = request.getQuantity() != null ? request.getQuantity() : 1;
 
-    return saleItemMapper.toResponse(
-        saleItemRepository
+    return saleBookCopyMapper.toResponse(
+        saleBookCopyRepository
             .create(request.getBookCopyId(), saleId, quantity, request.getPrice())
             .orElseThrow(
                 () ->
                     new ConflictException(
-                        "SaleItem with bookCopyId "
+                        "SaleBookCopy with bookCopyId "
                             + request.getBookCopyId()
                             + " already exists in sale "
                             + saleId)));
@@ -62,11 +62,11 @@ public class SaleItemService {
         .findById(saleId)
         .orElseThrow(() -> new NotFoundException("Sale " + saleId + " not found"));
 
-    saleItemRepository
+    saleBookCopyRepository
         .delete(saleId, bookCopyId)
         .orElseThrow(
             () ->
                 new NotFoundException(
-                    "SaleItem with bookCopyId " + bookCopyId + " not found in sale " + saleId));
+                    "SaleBookCopy with bookCopyId " + bookCopyId + " not found in sale " + saleId));
   }
 }
