@@ -14,6 +14,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SaleBookCopy {
 
   @Id
@@ -29,7 +30,8 @@ public class SaleBookCopy {
   private Sale sale;
 
   @Column(nullable = false)
-  private Integer quantity;
+  @Builder.Default
+  private Integer quantity = 1;
 
   @Column(nullable = false, precision = 10, scale = 2)
   private BigDecimal price;
