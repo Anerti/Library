@@ -964,6 +964,18 @@ components:
           description: Format used for filtering, null when no format filter was applied
           example: POCKET
 
+    LowStockItem:
+      type: object
+      required:
+        - book
+        - total
+      properties:
+        book:
+          $ref: '#/components/schemas/BookResponse'
+        total:
+          type: integer
+          example: 2
+
     # ────────────────── Pagination ──────────────────
     Pagination:
       type: object
@@ -3587,6 +3599,80 @@ paths:
                 bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
                 total: 200
                 byFormat: PAPERBACK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /libraries/{libraryId}/analytics/low-stock:
+    get:
+      operationId: getLowStockBooks
+      summary: Low stock books
+      description: Books with total stock ≤ 3 across all formats in a library
+      tags:
+        - Analytics
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Paginated list of low stock books
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - pagination
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LowStockItem'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  - book:
+                      id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                      title: Le Petit Prince
+                      summary: Les aventures...
+                      isbn: 978-2-07-061275-8
+                      publisher: Gallimard
+                      publishedAt: "1943-04-06"
+                      createdAt: "2026-06-01T10:30:00Z"
+                      authors:
+                        - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
+                          firstName: Antoine
+                          lastName: de Saint-Exupéry
+                      genres:
+                        - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                          name: Fiction
+                    total: 2
+                pagination:
+                  page: 1
+                  size: 20
+                  total: 1
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
