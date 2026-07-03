@@ -94,7 +94,8 @@ public class PostArrivalBookCopyServiceTest {
   @Test
   @DisplayName("create : use default quantity when not provided")
   void create_shouldUseDefaultQuantity_whenNotProvided() {
-    ArrivalBookCopyRequest requestWithoutQuantity = new ArrivalBookCopyRequest(bookCopyId, 15.00, null);
+    ArrivalBookCopyRequest requestWithoutQuantity =
+        new ArrivalBookCopyRequest(bookCopyId, 15.00, null);
 
     when(arrivalRepository.findById(arrivalId)).thenReturn(Optional.of(arrival));
     when(bookCopyRepository.findById(bookCopyId)).thenReturn(Optional.of(bookCopy));

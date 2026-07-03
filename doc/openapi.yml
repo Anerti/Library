@@ -969,11 +969,15 @@ components:
       required:
         - bookId
         - stockByFormat
+        - totalCount
       properties:
         bookId:
           type: string
           format: uuid
           example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        totalCount:
+          type: integer
+          example: 3
         stockByFormat:
           type: array
           items:
@@ -3655,17 +3659,18 @@ paths:
                 type: object
                 required:
                   - data
-                  - pagination
+                  - meta
                 properties:
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/LowStockItem'
-                  pagination:
+                  meta:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
                   - bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                    totalCount: 3
                     stockByFormat:
                       - format: HARDCOVER
                         count: 1
@@ -3673,7 +3678,7 @@ paths:
                         count: 2
                       - format: POCKET
                         count: 0
-                pagination:
+                meta:
                   page: 1
                   size: 20
                   total: 1

@@ -57,7 +57,8 @@ public class ArrivalBookCopyControllerTest {
   @Test
   @DisplayName("findByArrivalId : should return 200 with list of items")
   void findByArrivalId_shouldReturn200() throws Exception {
-    when(arrivalBookCopyService.findByArrivalId(arrivalId)).thenReturn(List.of(arrivalBookCopyResponse));
+    when(arrivalBookCopyService.findByArrivalId(arrivalId))
+        .thenReturn(List.of(arrivalBookCopyResponse));
 
     mockMvc
         .perform(get("/arrivals/{arrivalId}/items", arrivalId))
@@ -160,7 +161,10 @@ public class ArrivalBookCopyControllerTest {
   void delete_shouldReturn404_whenNotFound() throws Exception {
     doThrow(
             new NotFoundException(
-                "ArrivalBookCopy not found for arrival " + arrivalId + " and bookCopy " + bookCopyId))
+                "ArrivalBookCopy not found for arrival "
+                    + arrivalId
+                    + " and bookCopy "
+                    + bookCopyId))
         .when(arrivalBookCopyService)
         .delete(arrivalId, bookCopyId);
 

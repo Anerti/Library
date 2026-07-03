@@ -17,8 +17,10 @@ public class ArrivalBookCopyController {
   private final ArrivalBookCopyService arrivalBookCopyService;
 
   @GetMapping
-  public ResponseEntity<List<ArrivalBookCopyResponse>> findByArrivalId(@PathVariable UUID arrivalId) {
-    return ResponseEntity.status(HttpStatus.OK).body(arrivalBookCopyService.findByArrivalId(arrivalId));
+  public ResponseEntity<List<ArrivalBookCopyResponse>> findByArrivalId(
+      @PathVariable UUID arrivalId) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(arrivalBookCopyService.findByArrivalId(arrivalId));
   }
 
   @PostMapping
