@@ -964,50 +964,16 @@ components:
           description: Format used for filtering, null when no format filter was applied
           example: POCKET
 
-    LowStockBook:
-      type: object
-      required:
-        - id
-        - title
-        - isbn
-        - authorIds
-        - genreIds
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-        title:
-          type: string
-          maxLength: 100
-          example: Le Petit Prince
-        isbn:
-          type: string
-          maxLength: 100
-          example: 978-2-07-061275-8
-        authorIds:
-          type: array
-          items:
-            type: string
-            format: uuid
-          example:
-            - c1d2e3f4-a5b6-7890-abcd-ef1234567890
-        genreIds:
-          type: array
-          items:
-            type: string
-            format: uuid
-          example:
-            - d1e2f3a4-b5c6-7890-abcd-ef1234567890
-
     LowStockItem:
       type: object
       required:
-        - book
+        - bookId
         - stockByFormat
       properties:
-        book:
-          $ref: '#/components/schemas/LowStockBook'
+        bookId:
+          type: string
+          format: uuid
+          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
         stockByFormat:
           type: array
           items:
@@ -3699,14 +3665,7 @@ paths:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
-                  - book:
-                      id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-                      title: Le Petit Prince
-                      isbn: 978-2-07-061275-8
-                      authorIds:
-                        - c1d2e3f4-a5b6-7890-abcd-ef1234567890
-                      genreIds:
-                        - d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                  - bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
                     stockByFormat:
                       - format: HARDCOVER
                         count: 1
