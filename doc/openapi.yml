@@ -884,18 +884,12 @@ components:
     RevenueByGenreItem:
       type: object
       required:
-        - genreId
-        - genreName
+        - genre
         - totalRevenue
         - totalSold
       properties:
-        genreId:
-          type: string
-          format: uuid
-          example: d1e2f3a4-b5c6-7890-abcd-ef1234567890
-        genreName:
-          type: string
-          example: Fiction
+        genre:
+          $ref: '#/components/schemas/GenreSummary'
         totalRevenue:
           type: number
           format: double
@@ -3357,12 +3351,14 @@ paths:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
-                  - genreId: d1e2f3a4-b5c6-7890-abcd-ef1234567890
-                    genreName: Fiction
+                  - genre:
+                      id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                      name: Fiction
                     totalRevenue: 2300.00
                     totalSold: 45
-                  - genreId: e2f3a4b5-c6d7-8901-abcd-ef1234567891
-                    genreName: Science-Fiction
+                  - genre:
+                      id: e2f3a4b5-c6d7-8901-abcd-ef1234567891
+                      name: Science-Fiction
                     totalRevenue: 1500.00
                     totalSold: 28
                 pagination:
