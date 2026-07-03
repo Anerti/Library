@@ -1,18 +1,18 @@
-package hei.school.library.service.arrivalItem;
+package hei.school.library.service.arrivalBookCopy;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import hei.school.library.dto.ArrivalItemResponse;
+import hei.school.library.dto.ArrivalBookCopyResponse;
 import hei.school.library.entity.Arrival;
-import hei.school.library.entity.ArrivalItem;
+import hei.school.library.entity.ArrivalBookCopy;
 import hei.school.library.entity.BookCopy;
 import hei.school.library.exception.NotFoundException;
-import hei.school.library.mapper.ArrivalItemMapper;
-import hei.school.library.repository.dao.ArrivalItemRepository;
+import hei.school.library.mapper.ArrivalBookCopyMapper;
+import hei.school.library.repository.dao.ArrivalBookCopyRepository;
 import hei.school.library.repository.dao.ArrivalRepository;
 import hei.school.library.repository.dao.BookCopyRepository;
-import hei.school.library.service.ArrivalItemService;
+import hei.school.library.service.ArrivalBookCopyService;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.*;
@@ -21,22 +21,22 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class GetArrivalItemServiceTest {
+public class GetArrivalBookCopyServiceTest {
 
-  @Mock private ArrivalItemRepository arrivalItemRepository;
+  @Mock private ArrivalBookCopyRepository arrivalBookCopyRepository;
 
   @Mock private ArrivalRepository arrivalRepository;
 
   @Mock private BookCopyRepository bookCopyRepository;
 
-  @Mock private ArrivalItemMapper arrivalItemMapper;
+  @Mock private ArrivalBookCopyMapper arrivalBookCopyMapper;
 
-  @InjectMocks private ArrivalItemService arrivalItemService;
+  @InjectMocks private ArrivalBookCopyService arrivalBookCopyService;
 
   private UUID arrivalId;
   private UUID bookCopyId;
-  private ArrivalItem arrivalItem;
-  private ArrivalItemResponse arrivalItemResponse;
+  private ArrivalBookCopy arrivalBookCopy;
+  private ArrivalBookCopyResponse arrivalBookCopyResponse;
 
   @BeforeEach
   void setUp() {
@@ -46,8 +46,8 @@ public class GetArrivalItemServiceTest {
     Arrival arrival = Arrival.builder().id(arrivalId).build();
     BookCopy bookCopy = BookCopy.builder().id(bookCopyId).build();
 
-    arrivalItem =
-        ArrivalItem.builder()
+    arrivalBookCopy =
+        ArrivalBookCopy.builder()
             .id(UUID.randomUUID())
             .arrival(arrival)
             .bookCopy(bookCopy)
@@ -57,8 +57,8 @@ public class GetArrivalItemServiceTest {
             .updatedAt(LocalDateTime.now())
             .build();
 
-    arrivalItemResponse =
-        ArrivalItemResponse.builder()
+    arrivalBookCopyResponse =
+        ArrivalBookCopyResponse.builder()
             .arrivalId(arrivalId)
             .bookCopyId(bookCopyId)
             .purchasePrice(15.00)
@@ -72,24 +72,24 @@ public class GetArrivalItemServiceTest {
   @DisplayName("findByArrivalId : return the list of items")
   void findByArrivalId_shouldReturnList() {
     when(arrivalRepository.existsById(arrivalId)).thenReturn(true);
-    when(arrivalItemRepository.findByArrivalId(arrivalId)).thenReturn(List.of(arrivalItem));
-    when(arrivalItemMapper.toResponse(arrivalItem)).thenReturn(arrivalItemResponse);
+    when(arrivalBookCopyRepository.findByArrivalId(arrivalId)).thenReturn(List.of(arrivalBookCopy));
+    when(arrivalBookCopyMapper.toResponse(arrivalBookCopy)).thenReturn(arrivalBookCopyResponse);
 
-    List<ArrivalItemResponse> result = arrivalItemService.findByArrivalId(arrivalId);
+    List<ArrivalBookCopyResponse> result = arrivalBookCopyService.findByArrivalId(arrivalId);
 
     assertThat(result).hasSize(1);
     assertThat(result.get(0).getArrivalId()).isEqualTo(arrivalId);
     assertThat(result.get(0).getBookCopyId()).isEqualTo(bookCopyId);
-    verify(arrivalItemRepository).findByArrivalId(arrivalId);
+    verify(arrivalBookCopyRepository).findByArrivalId(arrivalId);
   }
 
   @Test
-  @DisplayName("findByArrivalId : retrun empty list when no items")
+  @DisplayName("findByArrivalId : return empty list when no items")
   void findByArrivalId_shouldReturnEmptyList_whenNoItems() {
     when(arrivalRepository.existsById(arrivalId)).thenReturn(true);
-    when(arrivalItemRepository.findByArrivalId(arrivalId)).thenReturn(List.of());
+    when(arrivalBookCopyRepository.findByArrivalId(arrivalId)).thenReturn(List.of());
 
-    List<ArrivalItemResponse> result = arrivalItemService.findByArrivalId(arrivalId);
+    List<ArrivalBookCopyResponse> result = arrivalBookCopyService.findByArrivalId(arrivalId);
 
     assertThat(result).isEmpty();
   }
@@ -99,10 +99,10 @@ public class GetArrivalItemServiceTest {
   void findByArrivalId_shouldThrow_whenArrivalNotFound() {
     when(arrivalRepository.existsById(arrivalId)).thenReturn(false);
 
-    assertThatThrownBy(() -> arrivalItemService.findByArrivalId(arrivalId))
+    assertThatThrownBy(() -> arrivalBookCopyService.findByArrivalId(arrivalId))
         .isInstanceOf(NotFoundException.class)
         .hasMessageContaining(arrivalId.toString());
 
-    verify(arrivalItemRepository, never()).findByArrivalId(any());
+    verify(arrivalBookCopyRepository, never()).findByArrivalId(any());
   }
 }

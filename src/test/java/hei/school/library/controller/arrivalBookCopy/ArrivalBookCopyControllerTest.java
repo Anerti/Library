@@ -1,4 +1,4 @@
-package hei.school.library.controller.arrivalItem;
+package hei.school.library.controller.arrivalBookCopy;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -7,12 +7,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hei.school.library.config.JwtTokenProvider;
-import hei.school.library.dto.ArrivalItemRequest;
-import hei.school.library.dto.ArrivalItemResponse;
-import hei.school.library.endpoint.rest.controller.ArrivalItemController;
+import hei.school.library.dto.ArrivalBookCopyRequest;
+import hei.school.library.dto.ArrivalBookCopyResponse;
+import hei.school.library.endpoint.rest.controller.ArrivalBookCopyController;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
-import hei.school.library.service.ArrivalItemService;
+import hei.school.library.service.ArrivalBookCopyService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -23,28 +23,28 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest({ArrivalItemController.class, GlobalExceptionHandler.class})
+@WebMvcTest({ArrivalBookCopyController.class, GlobalExceptionHandler.class})
 @AutoConfigureMockMvc(addFilters = false)
-public class ArrivalItemControllerTest {
+public class ArrivalBookCopyControllerTest {
 
   @Autowired private MockMvc mockMvc;
 
   @Autowired private ObjectMapper objectMapper;
 
-  @MockBean private ArrivalItemService arrivalItemService;
+  @MockBean private ArrivalBookCopyService arrivalBookCopyService;
   @MockBean private JwtTokenProvider jwtTokenProvider;
 
   private UUID arrivalId;
   private UUID bookCopyId;
-  private ArrivalItemResponse arrivalItemResponse;
+  private ArrivalBookCopyResponse arrivalBookCopyResponse;
 
   @BeforeEach
   void setUp() {
     arrivalId = UUID.randomUUID();
     bookCopyId = UUID.randomUUID();
 
-    arrivalItemResponse =
-        ArrivalItemResponse.builder()
+    arrivalBookCopyResponse =
+        ArrivalBookCopyResponse.builder()
             .arrivalId(arrivalId)
             .bookCopyId(bookCopyId)
             .purchasePrice(15.00)
@@ -57,7 +57,7 @@ public class ArrivalItemControllerTest {
   @Test
   @DisplayName("findByArrivalId : should return 200 with list of items")
   void findByArrivalId_shouldReturn200() throws Exception {
-    when(arrivalItemService.findByArrivalId(arrivalId)).thenReturn(List.of(arrivalItemResponse));
+    when(arrivalBookCopyService.findByArrivalId(arrivalId)).thenReturn(List.of(arrivalBookCopyResponse));
 
     mockMvc
         .perform(get("/arrivals/{arrivalId}/items", arrivalId))
@@ -66,13 +66,13 @@ public class ArrivalItemControllerTest {
         .andExpect(jsonPath("$[0].bookCopyId").value(bookCopyId.toString()))
         .andExpect(jsonPath("$[0].quantity").value(3));
 
-    verify(arrivalItemService).findByArrivalId(arrivalId);
+    verify(arrivalBookCopyService).findByArrivalId(arrivalId);
   }
 
   @Test
   @DisplayName("findByArrivalId : should return 200 with empty list when no items")
   void findByArrivalId_shouldReturnEmptyList() throws Exception {
-    when(arrivalItemService.findByArrivalId(arrivalId)).thenReturn(List.of());
+    when(arrivalBookCopyService.findByArrivalId(arrivalId)).thenReturn(List.of());
 
     mockMvc
         .perform(get("/arrivals/{arrivalId}/items", arrivalId))
@@ -84,7 +84,7 @@ public class ArrivalItemControllerTest {
   @Test
   @DisplayName("findByArrivalId : should return 404 when arrival not found")
   void findByArrivalId_shouldReturn404_whenArrivalNotFound() throws Exception {
-    when(arrivalItemService.findByArrivalId(arrivalId))
+    when(arrivalBookCopyService.findByArrivalId(arrivalId))
         .thenThrow(new NotFoundException("Arrival with id " + arrivalId + " not found"));
 
     mockMvc.perform(get("/arrivals/{arrivalId}/items", arrivalId)).andExpect(status().isNotFound());
@@ -93,10 +93,10 @@ public class ArrivalItemControllerTest {
   @Test
   @DisplayName("create : should return 201 with created item")
   void create_shouldReturn201() throws Exception {
-    ArrivalItemRequest request = new ArrivalItemRequest(bookCopyId, 15.00, 3);
+    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, 15.00, 3);
 
-    when(arrivalItemService.create(eq(arrivalId), any(ArrivalItemRequest.class)))
-        .thenReturn(arrivalItemResponse);
+    when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
+        .thenReturn(arrivalBookCopyResponse);
 
     mockMvc
         .perform(
@@ -108,15 +108,15 @@ public class ArrivalItemControllerTest {
         .andExpect(jsonPath("$.bookCopyId").value(bookCopyId.toString()))
         .andExpect(jsonPath("$.quantity").value(3));
 
-    verify(arrivalItemService).create(eq(arrivalId), any(ArrivalItemRequest.class));
+    verify(arrivalBookCopyService).create(eq(arrivalId), any(ArrivalBookCopyRequest.class));
   }
 
   @Test
   @DisplayName("create : should return 404 when arrival not found")
   void create_shouldReturn404_whenArrivalNotFound() throws Exception {
-    ArrivalItemRequest request = new ArrivalItemRequest(bookCopyId, 15.00, 3);
+    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, 15.00, 3);
 
-    when(arrivalItemService.create(eq(arrivalId), any(ArrivalItemRequest.class)))
+    when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenThrow(new NotFoundException("Arrival with id " + arrivalId + " not found"));
 
     mockMvc
@@ -130,9 +130,9 @@ public class ArrivalItemControllerTest {
   @Test
   @DisplayName("create : should return 404 when bookCopy not found")
   void create_shouldReturn404_whenBookCopyNotFound() throws Exception {
-    ArrivalItemRequest request = new ArrivalItemRequest(bookCopyId, 15.00, 3);
+    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, 15.00, 3);
 
-    when(arrivalItemService.create(eq(arrivalId), any(ArrivalItemRequest.class)))
+    when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenThrow(new NotFoundException("BookCopy with id " + bookCopyId + " not found"));
 
     mockMvc
@@ -146,13 +146,13 @@ public class ArrivalItemControllerTest {
   @Test
   @DisplayName("delete : should return 204 when item deleted")
   void delete_shouldReturn204() throws Exception {
-    doNothing().when(arrivalItemService).delete(arrivalId, bookCopyId);
+    doNothing().when(arrivalBookCopyService).delete(arrivalId, bookCopyId);
 
     mockMvc
         .perform(delete("/arrivals/{arrivalId}/items/{bookCopyId}", arrivalId, bookCopyId))
         .andExpect(status().isNoContent());
 
-    verify(arrivalItemService).delete(arrivalId, bookCopyId);
+    verify(arrivalBookCopyService).delete(arrivalId, bookCopyId);
   }
 
   @Test
@@ -160,8 +160,8 @@ public class ArrivalItemControllerTest {
   void delete_shouldReturn404_whenNotFound() throws Exception {
     doThrow(
             new NotFoundException(
-                "ArrivalItem not found for arrival " + arrivalId + " and bookCopy " + bookCopyId))
-        .when(arrivalItemService)
+                "ArrivalBookCopy not found for arrival " + arrivalId + " and bookCopy " + bookCopyId))
+        .when(arrivalBookCopyService)
         .delete(arrivalId, bookCopyId);
 
     mockMvc

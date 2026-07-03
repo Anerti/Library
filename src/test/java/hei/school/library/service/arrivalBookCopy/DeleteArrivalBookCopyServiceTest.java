@@ -1,17 +1,17 @@
-package hei.school.library.service.arrivalItem;
+package hei.school.library.service.arrivalBookCopy;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import hei.school.library.entity.Arrival;
-import hei.school.library.entity.ArrivalItem;
+import hei.school.library.entity.ArrivalBookCopy;
 import hei.school.library.entity.BookCopy;
 import hei.school.library.exception.NotFoundException;
-import hei.school.library.mapper.ArrivalItemMapper;
-import hei.school.library.repository.dao.ArrivalItemRepository;
+import hei.school.library.mapper.ArrivalBookCopyMapper;
+import hei.school.library.repository.dao.ArrivalBookCopyRepository;
 import hei.school.library.repository.dao.ArrivalRepository;
 import hei.school.library.repository.dao.BookCopyRepository;
-import hei.school.library.service.ArrivalItemService;
+import hei.school.library.service.ArrivalBookCopyService;
 import java.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,21 +19,21 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class DeleteArrivalItemServiceTest {
+public class DeleteArrivalBookCopyServiceTest {
 
-  @Mock private ArrivalItemRepository arrivalItemRepository;
+  @Mock private ArrivalBookCopyRepository arrivalBookCopyRepository;
 
   @Mock private ArrivalRepository arrivalRepository;
 
   @Mock private BookCopyRepository bookCopyRepository;
 
-  @Mock private ArrivalItemMapper arrivalItemMapper;
+  @Mock private ArrivalBookCopyMapper arrivalBookCopyMapper;
 
-  @InjectMocks private ArrivalItemService arrivalItemService;
+  @InjectMocks private ArrivalBookCopyService arrivalBookCopyService;
 
   private UUID arrivalId;
   private UUID bookCopyId;
-  private ArrivalItem arrivalItem;
+  private ArrivalBookCopy arrivalBookCopy;
 
   @BeforeEach
   void setUp() {
@@ -43,8 +43,8 @@ public class DeleteArrivalItemServiceTest {
     Arrival arrival = Arrival.builder().id(arrivalId).build();
     BookCopy bookCopy = BookCopy.builder().id(bookCopyId).build();
 
-    arrivalItem =
-        ArrivalItem.builder()
+    arrivalBookCopy =
+        ArrivalBookCopy.builder()
             .id(UUID.randomUUID())
             .arrival(arrival)
             .bookCopy(bookCopy)
@@ -56,25 +56,25 @@ public class DeleteArrivalItemServiceTest {
   @Test
   @DisplayName("delete : should delete when item exists")
   void delete_shouldDelete_whenExists() {
-    when(arrivalItemRepository.findByArrivalIdAndBookCopyId(arrivalId, bookCopyId))
-        .thenReturn(Optional.of(arrivalItem));
+    when(arrivalBookCopyRepository.findByArrivalIdAndBookCopyId(arrivalId, bookCopyId))
+        .thenReturn(Optional.of(arrivalBookCopy));
 
-    arrivalItemService.delete(arrivalId, bookCopyId);
+    arrivalBookCopyService.delete(arrivalId, bookCopyId);
 
-    verify(arrivalItemRepository).delete(arrivalItem);
+    verify(arrivalBookCopyRepository).delete(arrivalBookCopy);
   }
 
   @Test
   @DisplayName("delete : should throw NotFoundException when item does not exist")
   void delete_shouldThrow_whenNotFound() {
-    when(arrivalItemRepository.findByArrivalIdAndBookCopyId(arrivalId, bookCopyId))
+    when(arrivalBookCopyRepository.findByArrivalIdAndBookCopyId(arrivalId, bookCopyId))
         .thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> arrivalItemService.delete(arrivalId, bookCopyId))
+    assertThatThrownBy(() -> arrivalBookCopyService.delete(arrivalId, bookCopyId))
         .isInstanceOf(NotFoundException.class)
         .hasMessageContaining(arrivalId.toString())
         .hasMessageContaining(bookCopyId.toString());
 
-    verify(arrivalItemRepository, never()).delete(any());
+    verify(arrivalBookCopyRepository, never()).delete(any());
   }
 }
