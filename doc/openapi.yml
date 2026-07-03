@@ -967,14 +967,24 @@ components:
     LowStockItem:
       type: object
       required:
-        - book
-        - total
+        - bookcopy
+        - stockByFormat
       properties:
-        book:
-          $ref: '#/components/schemas/BookResponse'
-        total:
-          type: integer
-          example: 2
+        bookcopy:
+          $ref: '#/components/schemas/BookCopyResponse'
+        stockByFormat:
+          type: array
+          items:
+            type: object
+            required:
+              - format
+              - count
+            properties:
+              format:
+                $ref: '#/components/schemas/BookCopyFormat'
+              count:
+                type: integer
+                example: 1
 
     # ────────────────── Pagination ──────────────────
     Pagination:
@@ -3653,22 +3663,22 @@ paths:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
-                  - book:
-                      id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-                      title: Le Petit Prince
-                      summary: Les aventures...
-                      isbn: 978-2-07-061275-8
-                      publisher: Gallimard
-                      publishedAt: "1943-04-06"
-                      createdAt: "2026-06-01T10:30:00Z"
-                      authors:
-                        - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
-                          firstName: Antoine
-                          lastName: de Saint-Exupéry
-                      genres:
-                        - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
-                          name: Fiction
-                    total: 2
+                  - bookcopy:
+                      id: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+                      price: 25.0
+                      format: PAPERBACK
+                      libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                      bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                      status: AVAILABLE
+                      pageNumber: 120
+                      updatedAt: "2026-06-15T14:30:00Z"
+                    stockByFormat:
+                      - format: HARDCOVER
+                        count: 1
+                      - format: PAPERBACK
+                        count: 2
+                      - format: POCKET
+                        count: 0
                 pagination:
                   page: 1
                   size: 20
