@@ -80,9 +80,7 @@ class PatchSalesServiceTest {
             Role.CUSTOMER,
             Instant.now(),
             Instant.now());
-    sale =
-        new Sale(
-            saleId, Instant.now(), SaleStatus.BOOKED, user, library, null, Instant.now());
+    sale = new Sale(saleId, Instant.now(), SaleStatus.BOOKED, user, library, null, Instant.now());
 
     userResponse =
         new UserResponse(
@@ -103,14 +101,7 @@ class PatchSalesServiceTest {
     SaleUpdateRequest request = new SaleUpdateRequest(SaleStatus.SOLD, null);
 
     Sale updated =
-        new Sale(
-            saleId,
-            sale.getSaleDate(),
-            SaleStatus.SOLD,
-            user,
-            library,
-            null,
-            Instant.now());
+        new Sale(saleId, sale.getSaleDate(), SaleStatus.SOLD, user, library, null, Instant.now());
 
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
     when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));

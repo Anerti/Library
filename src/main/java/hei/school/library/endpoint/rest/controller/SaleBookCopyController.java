@@ -25,7 +25,8 @@ public class SaleBookCopyController {
   @PostMapping
   public ResponseEntity<SaleBookCopyResponse> create(
       @PathVariable UUID saleId, @RequestBody SaleBookCopyRequest request) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(saleBookCopyService.create(saleId, request));
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(saleBookCopyService.create(saleId, request));
   }
 
   @DeleteMapping("/{bookCopyId}")

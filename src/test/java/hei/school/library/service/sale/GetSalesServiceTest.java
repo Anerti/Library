@@ -81,9 +81,7 @@ class GetSalesServiceTest {
             Role.CUSTOMER,
             Instant.now(),
             Instant.now());
-    sale =
-        new Sale(
-            saleId, Instant.now(), SaleStatus.SOLD, user, library, null, Instant.now());
+    sale = new Sale(saleId, Instant.now(), SaleStatus.SOLD, user, library, null, Instant.now());
 
     userResponse =
         new UserResponse(

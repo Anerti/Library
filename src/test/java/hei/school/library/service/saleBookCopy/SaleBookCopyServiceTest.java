@@ -51,7 +51,8 @@ class SaleBookCopyServiceTest {
   void setUp() {
     saleBookCopyMapper = new SaleBookCopyMapper();
     saleBookCopyService =
-        new SaleBookCopyService(saleBookCopyRepository, saleRepository, saleBookCopyMapper, saleBookCopyValidator);
+        new SaleBookCopyService(
+            saleBookCopyRepository, saleRepository, saleBookCopyMapper, saleBookCopyValidator);
 
     saleId = UUID.randomUUID();
     bookCopyId = UUID.randomUUID();
@@ -63,13 +64,7 @@ class SaleBookCopyServiceTest {
 
     sale =
         new Sale(
-            saleId,
-            Instant.now(),
-            SaleStatus.BOOKED,
-            saleUser,
-            saleLibrary,
-            null,
-            Instant.now());
+            saleId, Instant.now(), SaleStatus.BOOKED, saleUser, saleLibrary, null, Instant.now());
 
     bookCopy = new BookCopy();
     bookCopy.setId(bookCopyId);
@@ -110,7 +105,8 @@ class SaleBookCopyServiceTest {
   @DisplayName("create: should save and return DTO")
   void create_shouldSaveAndReturnDto() {
     when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
-    when(saleBookCopyRepository.create(any(), any(), any(), any())).thenReturn(Optional.of(saleBookCopy));
+    when(saleBookCopyRepository.create(any(), any(), any(), any()))
+        .thenReturn(Optional.of(saleBookCopy));
 
     SaleBookCopyResponse result = saleBookCopyService.create(saleId, validRequest);
 
