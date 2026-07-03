@@ -967,11 +967,13 @@ components:
     LowStockItem:
       type: object
       required:
-        - book
+        - bookId
         - stockByFormat
       properties:
-        book:
-          $ref: '#/components/schemas/BookResponse'
+        bookId:
+          type: string
+          format: uuid
+          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
         stockByFormat:
           type: array
           items:
@@ -3663,21 +3665,7 @@ paths:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
-                  - book:
-                      id: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-                      title: Le Petit Prince
-                      summary: Les aventures d'un petit garçon venu d'ailleurs...
-                      isbn: 978-2-07-061275-8
-                      publisher: Gallimard
-                      publishedAt: "1943-04-06"
-                      createdAt: "2026-06-01T10:30:00Z"
-                      authors:
-                        - id: c1d2e3f4-a5b6-7890-abcd-ef1234567890
-                          firstName: Antoine
-                          lastName: de Saint-Exupéry
-                      genres:
-                        - id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
-                          name: Fiction
+                  - bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
                     stockByFormat:
                       - format: HARDCOVER
                         count: 1
