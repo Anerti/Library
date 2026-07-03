@@ -1,14 +1,14 @@
 package hei.school.library.validator;
 
-import hei.school.library.dto.SaleItemRequest;
+import hei.school.library.dto.SaleBookCopyRequest;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.math.BigDecimal;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SaleItemValidator {
+public class SaleBookCopyValidator {
 
-  public void validateCreate(SaleItemRequest request) {
+  public void validateCreate(SaleBookCopyRequest request) {
     if (request.getBookCopyId() == null) {
       throw new UnprocessableEntityException("bookCopyId is required.");
     }

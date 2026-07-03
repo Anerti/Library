@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SaleItemRequest {
+public class SaleBookCopyRequest {
   private UUID bookCopyId;
   private Integer quantity;
   private BigDecimal price;

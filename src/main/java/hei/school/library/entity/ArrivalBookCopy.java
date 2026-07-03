@@ -4,14 +4,16 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "arrival_item")
+@Table(name = "arrival_book_copy")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ArrivalItem {
+public class ArrivalBookCopy {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,20 +34,11 @@ public class ArrivalItem {
   @Builder.Default
   private Integer quantity = 1;
 
-  @Column(name = "created_at", updatable = false)
+  @CreationTimestamp
+  @Column(name = "created_at", updatable = false, nullable = false)
   private LocalDateTime createdAt;
 
-  @Column(name = "updated_at")
+  @UpdateTimestamp
+  @Column(name = "updated_at", nullable = false)
   private LocalDateTime updatedAt;
-
-  @PrePersist
-  public void onCreate() {
-    this.createdAt = LocalDateTime.now();
-    this.updatedAt = LocalDateTime.now();
-  }
-
-  @PreUpdate
-  public void onUpdate() {
-    this.updatedAt = LocalDateTime.now();
-  }
 }

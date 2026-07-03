@@ -1,13 +1,13 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.ArrivalItemRequest;
-import hei.school.library.dto.ArrivalItemResponse;
+import hei.school.library.dto.ArrivalBookCopyRequest;
+import hei.school.library.dto.ArrivalBookCopyResponse;
 import hei.school.library.entity.Arrival;
-import hei.school.library.entity.ArrivalItem;
+import hei.school.library.entity.ArrivalBookCopy;
 import hei.school.library.entity.BookCopy;
 import hei.school.library.exception.NotFoundException;
-import hei.school.library.mapper.ArrivalItemMapper;
-import hei.school.library.repository.dao.ArrivalItemRepository;
+import hei.school.library.mapper.ArrivalBookCopyMapper;
+import hei.school.library.repository.dao.ArrivalBookCopyRepository;
 import hei.school.library.repository.dao.ArrivalRepository;
 import hei.school.library.repository.dao.BookCopyRepository;
 import java.util.List;
@@ -17,22 +17,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ArrivalItemService {
-  private final ArrivalItemRepository arrivalItemRepository;
+public class ArrivalBookCopyService {
+  private final ArrivalBookCopyRepository arrivalBookCopyRepository;
   private final ArrivalRepository arrivalRepository;
   private final BookCopyRepository bookCopyRepository;
-  private final ArrivalItemMapper arrivalItemMapper;
+  private final ArrivalBookCopyMapper arrivalBookCopyMapper;
 
-  public List<ArrivalItemResponse> findByArrivalId(UUID arrivalId) {
+  public List<ArrivalBookCopyResponse> findByArrivalId(UUID arrivalId) {
     if (!arrivalRepository.existsById(arrivalId)) {
       throw new NotFoundException("Arrival with id " + arrivalId + " not found");
     }
-    return arrivalItemRepository.findByArrivalId(arrivalId).stream()
-        .map(arrivalItemMapper::toResponse)
+    return arrivalBookCopyRepository.findByArrivalId(arrivalId).stream()
+        .map(arrivalBookCopyMapper::toResponse)
         .toList();
   }
 
-  public ArrivalItemResponse create(UUID arrivalId, ArrivalItemRequest request) {
+  public ArrivalBookCopyResponse create(UUID arrivalId, ArrivalBookCopyRequest request) {
     Arrival arrival =
         arrivalRepository
             .findById(arrivalId)
@@ -47,29 +47,29 @@ public class ArrivalItemService {
                     new NotFoundException(
                         "BookCopy with id " + request.getBookCopyId() + " not found"));
 
-    ArrivalItem item =
-        ArrivalItem.builder()
+    ArrivalBookCopy item =
+        ArrivalBookCopy.builder()
             .arrival(arrival)
             .bookCopy(bookCopy)
             .purchasePrice(request.getPurchasePrice())
             .quantity(request.getQuantity() != null ? request.getQuantity() : 1)
             .build();
 
-    return arrivalItemMapper.toResponse(arrivalItemRepository.save(item));
+    return arrivalBookCopyMapper.toResponse(arrivalBookCopyRepository.save(item));
   }
 
   public void delete(UUID arrivalId, UUID bookCopyId) {
-    ArrivalItem item =
-        arrivalItemRepository
+    ArrivalBookCopy item =
+        arrivalBookCopyRepository
             .findByArrivalIdAndBookCopyId(arrivalId, bookCopyId)
             .orElseThrow(
                 () ->
                     new NotFoundException(
-                        "ArrivalItem not found for arrival "
+                        "ArrivalBookCopy not found for arrival "
                             + arrivalId
                             + " and bookCopy "
                             + bookCopyId));
 
-    arrivalItemRepository.delete(item);
+    arrivalBookCopyRepository.delete(item);
   }
 }

@@ -1,13 +1,13 @@
 package hei.school.library.mapper;
 
-import hei.school.library.dto.ArrivalItemResponse;
-import hei.school.library.entity.ArrivalItem;
+import hei.school.library.dto.ArrivalBookCopyResponse;
+import hei.school.library.entity.ArrivalBookCopy;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ArrivalItemMapper {
-  public ArrivalItemResponse toResponse(ArrivalItem item) {
-    return ArrivalItemResponse.builder()
+public class ArrivalBookCopyMapper {
+  public ArrivalBookCopyResponse toResponse(ArrivalBookCopy item) {
+    return ArrivalBookCopyResponse.builder()
         .bookCopyId(item.getBookCopy().getId())
         .arrivalId(item.getArrival().getId())
         .createdAt(item.getCreatedAt())

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS library (
 
 CREATE TABLE IF NOT EXISTS genre (
     id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    name       VARCHAR(100) NOT NULL UNIQUE,
+    name       VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS author (
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS users (
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'sale_status') THEN
-    CREATE TYPE sale_status AS ENUM ('PENDING', 'SOLD', 'BOOKED', 'CANCELED', 'EXPIRED');
+    CREATE TYPE sale_status AS ENUM ('PENDING', 'SOLD', 'BOOKED', 'EXPIRED');
   END IF;
 END
 $$;
@@ -77,5 +77,33 @@ CREATE TABLE IF NOT EXISTS sale (
     library_id       UUID         NOT NULL REFERENCES library(id),
     expiration_date  TIMESTAMP,
     created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sale_book_copy (
+    id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    book_copy_id    UUID         NOT NULL REFERENCES book_copy(id),
+    sale_id         UUID         NOT NULL REFERENCES sale(id),
+    quantity        INT          NOT NULL DEFAULT 1,
+    price           NUMERIC(10,2) NOT NULL,
+    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_sale_book_copy UNIQUE (book_copy_id, sale_id)
+);
+
+CREATE TABLE IF NOT EXISTS arrival (
+    id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at      TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    arrival_date    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    library_id      UUID        NOT NULL REFERENCES library(id)
+);
+
+CREATE TABLE IF NOT EXISTS arrival_book_copy (
+    id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    arrival_id      UUID         NOT NULL REFERENCES arrival(id),
+    book_copy_id    UUID         NOT NULL REFERENCES book_copy(id),
+    purchase_price  NUMERIC      NOT NULL,
+    quantity        INT          NOT NULL DEFAULT 1,
+    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_arrival_book_copy UNIQUE (book_copy_id, arrival_id)
 );
 

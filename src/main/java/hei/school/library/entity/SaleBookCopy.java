@@ -14,20 +14,24 @@ import org.hibernate.annotations.CreationTimestamp;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaleItem {
+@Builder
+public class SaleBookCopy {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
-  @Column(name = "book_copy_id", nullable = false)
-  private UUID bookCopyId;
+  @ManyToOne
+  @JoinColumn(name = "book_copy_id", nullable = false)
+  private BookCopy bookCopy;
 
-  @Column(name = "sale_id", nullable = false)
-  private UUID saleId;
+  @ManyToOne
+  @JoinColumn(name = "sale_id", nullable = false)
+  private Sale sale;
 
   @Column(nullable = false)
-  private Integer quantity;
+  @Builder.Default
+  private Integer quantity = 1;
 
   @Column(nullable = false, precision = 10, scale = 2)
   private BigDecimal price;

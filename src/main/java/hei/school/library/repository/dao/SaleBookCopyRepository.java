@@ -1,6 +1,6 @@
 package hei.school.library.repository.dao;
 
-import hei.school.library.entity.SaleItem;
+import hei.school.library.entity.SaleBookCopy;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SaleItemRepository extends JpaRepository<SaleItem, UUID> {
+public interface SaleBookCopyRepository extends JpaRepository<SaleBookCopy, UUID> {
 
   @Query(
       value =
@@ -21,7 +21,7 @@ public interface SaleItemRepository extends JpaRepository<SaleItem, UUID> {
           WHERE sale_id = :saleId
           """,
       nativeQuery = true)
-  List<SaleItem> findBySaleId(@Param("saleId") UUID saleId);
+  List<SaleBookCopy> findBySaleId(@Param("saleId") UUID saleId);
 
   @Query(
       value =
@@ -32,7 +32,7 @@ public interface SaleItemRepository extends JpaRepository<SaleItem, UUID> {
           RETURNING id, book_copy_id, sale_id, quantity, price, created_at
           """,
       nativeQuery = true)
-  Optional<SaleItem> create(
+  Optional<SaleBookCopy> create(
       @Param("bookCopyId") UUID bookCopyId,
       @Param("saleId") UUID saleId,
       @Param("quantity") Integer quantity,

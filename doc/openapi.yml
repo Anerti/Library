@@ -884,18 +884,12 @@ components:
     RevenueByGenreItem:
       type: object
       required:
-        - genreId
-        - genreName
+        - genre
         - totalRevenue
         - totalSold
       properties:
-        genreId:
-          type: string
-          format: uuid
-          example: d1e2f3a4-b5c6-7890-abcd-ef1234567890
-        genreName:
-          type: string
-          example: Fiction
+        genre:
+          $ref: '#/components/schemas/GenreSummary'
         totalRevenue:
           type: number
           format: double
@@ -947,39 +941,56 @@ components:
           format: double
           example: 75.00
 
-    StockResponse:
+    BookStockResponse:
       type: object
       required:
-        - totalCopies
-        - availableCopies
-        - soldOutCopies
+        - bookId
+        - total
       properties:
-        totalCopies:
+        bookId:
+          type: string
+          format: uuid
+          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        total:
           type: integer
           example: 200
-        availableCopies:
-          type: integer
-          example: 150
-        soldOutCopies:
-          type: integer
-          example: 50
         byFormat:
+          type: string
+          nullable: true
+          enum:
+            - HARDCOVER
+            - PAPERBACK
+            - POCKET
+          description: Format used for filtering, null when no format filter was applied
+          example: POCKET
+
+    LowStockItem:
+      type: object
+      required:
+        - bookId
+        - stockByFormat
+        - totalCount
+      properties:
+        bookId:
+          type: string
+          format: uuid
+          example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+        totalCount:
+          type: integer
+          example: 3
+        stockByFormat:
           type: array
           items:
             type: object
             required:
               - format
-              - total
-              - available
+              - count
             properties:
               format:
                 $ref: '#/components/schemas/BookCopyFormat'
-              total:
+              count:
                 type: integer
-                example: 80
-              available:
-                type: integer
-                example: 60
+                example: 1
 
     # ────────────────── Pagination ──────────────────
     Pagination:
@@ -3358,25 +3369,27 @@ paths:
                 type: object
                 required:
                   - data
-                  - pagination
+                  - meta
                 properties:
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/RevenueByGenreItem'
-                  pagination:
+                  meta:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
-                  - genreId: d1e2f3a4-b5c6-7890-abcd-ef1234567890
-                    genreName: Fiction
+                  - genre:
+                      id: d1e2f3a4-b5c6-7890-abcd-ef1234567890
+                      name: Fiction
                     totalRevenue: 2300.00
                     totalSold: 45
-                  - genreId: e2f3a4b5-c6d7-8901-abcd-ef1234567891
-                    genreName: Science-Fiction
+                  - genre:
+                      id: e2f3a4b5-c6d7-8901-abcd-ef1234567891
+                      name: Science-Fiction
                     totalRevenue: 1500.00
                     totalSold: 28
-                pagination:
+                meta:
                   page: 1
                   size: 20
                   total: 2
@@ -3557,7 +3570,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /libraries/{libraryId}/analytics/stock:
+  /libraries/{libraryId}/analytics/stock/{bookcopy}:
     get:
       operationId: getStockOverview
       summary: Books in stock
@@ -3572,27 +3585,103 @@ paths:
             type: string
             format: uuid
             example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: bookcopy
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: f1a2b3c4-d5e6-7890-abcd-ef1234567890
+          description: Book ID to get stock for
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - ALL
+              - HARDCOVER
+              - PAPERBACK
+              - POCKET
+          description: Filter stock by physical format, or ALL for all formats
       responses:
         '200':
           description: Stock overview
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StockResponse'
+                $ref: '#/components/schemas/BookStockResponse'
               example:
-                totalCopies: 200
-                availableCopies: 150
-                soldOutCopies: 50
-                byFormat:
-                  - format: HARDCOVER
-                    total: 30
-                    available: 20
-                  - format: PAPERBACK
-                    total: 120
-                    available: 90
-                  - format: POCKET
-                    total: 50
-                    available: 40
+                bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                total: 200
+                byFormat: PAPERBACK
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /libraries/{libraryId}/analytics/low-stock:
+    get:
+      operationId: getLowStockBooks
+      summary: Low stock books
+      description: Books with total stock ≤ 3 across all formats in a library
+      tags:
+        - Analytics
+      parameters:
+        - name: libraryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+            example: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+            example: 20
+      responses:
+        '200':
+          description: Paginated list of low stock books
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                  - meta
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LowStockItem'
+                  meta:
+                    $ref: '#/components/schemas/Pagination'
+              example:
+                data:
+                  - bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                    totalCount: 3
+                    stockByFormat:
+                      - format: HARDCOVER
+                        count: 1
+                      - format: PAPERBACK
+                        count: 2
+                      - format: POCKET
+                        count: 0
+                meta:
+                  page: 1
+                  size: 20
+                  total: 1
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':

@@ -25,11 +25,13 @@ public class Sale {
   @Enumerated(EnumType.STRING)
   private SaleStatus status;
 
-  @Column(name = "user_id", nullable = false)
-  private UUID userId;
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-  @Column(nullable = false)
-  private UUID libraryId;
+  @ManyToOne
+  @JoinColumn(name = "library_id", nullable = false)
+  private Library library;
 
   @Column private Instant expirationDate;
 
