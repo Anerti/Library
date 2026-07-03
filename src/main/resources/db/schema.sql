@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS library (
 
 CREATE TABLE IF NOT EXISTS genre (
     id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-    name       VARCHAR(100) NOT NULL UNIQUE,
+    name       VARCHAR(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS author (
