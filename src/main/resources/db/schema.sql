@@ -89,6 +89,13 @@ CREATE TABLE IF NOT EXISTS sale_book_copy (
     CONSTRAINT uq_sale_book_copy UNIQUE (book_copy_id, sale_id)
 );
 
+CREATE TABLE IF NOT EXISTS arrival (
+    id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    created_at      TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    arrival_date    TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    library_id      UUID        NOT NULL REFERENCES library(id)
+);
+
 CREATE TABLE IF NOT EXISTS arrival_book_copy (
     id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
     arrival_id      UUID         NOT NULL REFERENCES arrival(id),
