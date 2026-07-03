@@ -3341,13 +3341,13 @@ paths:
                 type: object
                 required:
                   - data
-                  - pagination
+                  - meta
                 properties:
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/RevenueByGenreItem'
-                  pagination:
+                  meta:
                     $ref: '#/components/schemas/Pagination'
               example:
                 data:
@@ -3361,7 +3361,7 @@ paths:
                       name: Science-Fiction
                     totalRevenue: 1500.00
                     totalSold: 28
-                pagination:
+                meta:
                   page: 1
                   size: 20
                   total: 2
