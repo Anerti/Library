@@ -2,6 +2,7 @@ package hei.school.library.validator;
 
 import hei.school.library.dto.LoginRequest;
 import hei.school.library.dto.RegisterRequest;
+import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,12 @@ public class UserValidator {
     dataValidator.checkNull("email", request.getEmail());
     dataValidator.validateEmail(request.getEmail());
     dataValidator.checkNull("password", request.getPassword());
+  }
+
+  public void validateUserPatch(UserUpdateRequest request) {
+    dataValidator.validateName("lastName", request.getLastName());
+    dataValidator.validateName("firstName", request.getFirstName());
+    dataValidator.validateEmail(request.getEmail());
+    dataValidator.validatePhone(request.getPhone());
   }
 }

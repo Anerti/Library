@@ -3,12 +3,15 @@ package hei.school.library.service;
 import hei.school.library.config.ResourcesAccessRules;
 import hei.school.library.dto.*;
 import hei.school.library.entity.User;
+import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.ForbiddenException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.validator.DataValidator;
 import java.util.UUID;
+
+import hei.school.library.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ public class UserService {
   private final UserMapper userMapper;
   private final DataValidator dataValidator;
   private final ResourcesAccessRules resourcesAccessRules;
+  private final UserValidator userValidator;
 
   @Transactional(readOnly = true)
   public PageResponse<UserResponse> findAll(String search, int page, int size) {
@@ -48,19 +52,25 @@ public class UserService {
 
   @Transactional
   public UserResponse update(UUID id, UserUpdateRequest request) {
-    dataValidator.validateUserUpdate(request);
-    dataValidator.validateUserPatchFields(request);
+    userValidator.validateUserPatch(request);
 
-    return userRepository
-        .patch(
-            id,
-            request.getLastName(),
-            request.getFirstName(),
-            request.getBirthDate(),
-            request.getEmail(),
-            request.getPhone())
-        .map(userMapper::toResponse)
-        .orElseThrow(() -> new NotFoundException("User " + id + " not found"));
+    User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
+
+    if(resourcesAccessRules.grantAccessFor(user)) {
+      return userRepository
+              .patch(
+                      id,
+                      request.getLastName(),
+                      request.getFirstName(),
+                      request.getBirthDate(),
+                      request.getEmail(),
+                      request.getPhone())
+              .map(userMapper::toResponse)
+              .orElseThrow(() -> new ConflictException(String.format("email %s already in use", request.getEmail())));
+    }
+    else {
+      throw new ForbiddenException(String.format("Cannot update user %s", id));
+    }
   }
 
   @Transactional
