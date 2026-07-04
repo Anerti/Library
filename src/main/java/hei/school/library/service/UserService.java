@@ -55,22 +55,29 @@ public class UserService {
   public UserResponse update(UUID id, UserUpdateRequest request) {
     userValidator.validateUserPatch(request);
 
-    User user = userRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
+    User user =
+        userRepository
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException(String.format("User %s not found", id)));
 
-    if(resourcesAccessRules.grantAccessFor(user)) {
+    if (resourcesAccessRules.grantAccessFor(user)) {
+      userRepository.patch(
+          id,
+          request.getLastName(),
+          request.getFirstName(),
+          request.getBirthDate(),
+          request.getPhone());
+
       return userRepository
-              .patch(
-                      id,
-                      request.getLastName(),
-                      request.getFirstName(),
-                      request.getBirthDate(),
-                      request.getPhone())
-              .map(userMapper::toResponse)
-              .orElseThrow(() -> new InternalServerErrorException("An error Occurred during the update, please try again later"));
+          .findById(id)
+          .map(userMapper::toResponse)
+          .orElseThrow(
+              () ->
+                  new InternalServerErrorException(
+                      "An error occurred during the update, please try again later"));
     }
-    else {
-      throw new ForbiddenException(String.format("Cannot update user %s", id));
-    }
+
+    throw new ForbiddenException(String.format("Cannot update user %s", id));
   }
 
   @Transactional

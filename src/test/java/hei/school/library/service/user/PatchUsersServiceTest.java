@@ -4,9 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -92,19 +93,20 @@ class PatchUsersServiceTest {
             now,
             now);
 
-    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser));
+    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser), Optional.of(updated));
     when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
-    when(userRepository.patch(
-            eq(existingId), isNull(), eq("Marie Claire"), isNull(), isNull()))
-        .thenReturn(Optional.of(updated));
+    doNothing()
+        .when(userRepository)
+        .patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
     assertThat(result.getFirstName()).isEqualTo("Marie Claire");
     assertThat(result.getLastName()).isEqualTo("Dupont");
     assertThat(result.getEmail()).isEqualTo("marie@mail.com");
+    verify(userRepository, times(2)).findById(existingId);
     verify(userRepository)
-        .patch(eq(existingId), isNull(), eq("Marie Claire"), isNull(), isNull());
+        .patch(eq(existingId), any(), eq("Marie Claire"), any(), any());
   }
 
   @Test
@@ -125,10 +127,11 @@ class PatchUsersServiceTest {
             now,
             now);
 
-    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser));
+    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser), Optional.of(updated));
     when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
-    when(userRepository.patch(eq(existingId), eq("Martin"), isNull(), isNull(), isNull()))
-        .thenReturn(Optional.of(updated));
+    doNothing()
+        .when(userRepository)
+        .patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -155,11 +158,11 @@ class PatchUsersServiceTest {
             now,
             now);
 
-    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser));
+    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser), Optional.of(updated));
     when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
-    when(userRepository.patch(
-            eq(existingId), isNull(), isNull(), isNull(), eq("+261 34 12 340 00")))
-        .thenReturn(Optional.of(updated));
+    doNothing()
+        .when(userRepository)
+        .patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -186,11 +189,11 @@ class PatchUsersServiceTest {
             now,
             now);
 
-    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser));
+    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser), Optional.of(updated));
     when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
-    when(userRepository.patch(
-            eq(existingId), isNull(), isNull(), eq(newBirthDate), isNull()))
-        .thenReturn(Optional.of(updated));
+    doNothing()
+        .when(userRepository)
+        .patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -201,8 +204,7 @@ class PatchUsersServiceTest {
   @DisplayName("update: should update all fields at once")
   void update_shouldUpdateAllFields() {
     UserUpdateRequest request =
-        new UserUpdateRequest(
-            "Martin", "Jean", LocalDate.of(1988, 1, 1), "+261 34 12 349 99");
+        new UserUpdateRequest("Martin", "Jean", LocalDate.of(1988, 1, 1), "+261 34 12 349 99");
 
     User updated =
         new User(
@@ -217,15 +219,11 @@ class PatchUsersServiceTest {
             now,
             now);
 
-    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser));
+    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser), Optional.of(updated));
     when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
-    when(userRepository.patch(
-            eq(existingId),
-            eq("Martin"),
-            eq("Jean"),
-            eq(LocalDate.of(1988, 1, 1)),
-            eq("+261 34 12 349 99")))
-        .thenReturn(Optional.of(updated));
+    doNothing()
+        .when(userRepository)
+        .patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -250,8 +248,7 @@ class PatchUsersServiceTest {
         .hasMessageContaining(unknownId.toString());
 
     verify(userRepository).findById(unknownId);
-    verify(userRepository, never())
-        .patch(any(), any(), any(), any(), any());
+    verify(userRepository, never()).patch(any(), any(), any(), any(), any());
   }
 
   @Test
@@ -267,8 +264,7 @@ class PatchUsersServiceTest {
         .hasMessageContaining(existingId.toString());
 
     verify(userRepository).findById(existingId);
-    verify(userRepository, never())
-        .patch(any(), any(), any(), any(), any());
+    verify(userRepository, never()).patch(any(), any(), any(), any(), any());
   }
 
   @Test

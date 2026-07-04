@@ -35,6 +35,7 @@ WHERE (:search IS NULL OR :search = ''
       nativeQuery = true)
   Page<User> findBySearch(@Param("search") String search, Pageable pageable);
 
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query(
       value =
           """
@@ -46,10 +47,9 @@ SET
   phone = COALESCE(:phone, phone),
   updated_at = NOW()
 WHERE id = :id
-RETURNING id, last_name, first_name, birth_date, email, phone, password, role, created_at, updated_at
 """,
       nativeQuery = true)
-  Optional<User> patch(
+  void patch(
       @Param("id") UUID id,
       @Param("lastName") String lastName,
       @Param("firstName") String firstName,
