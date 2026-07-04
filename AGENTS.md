@@ -74,7 +74,6 @@ Library/
     │   │       ├── BookCopyController.java
     │   │       ├── CustomerController.java
     │   │       ├── GenreController.java
-    │   │       ├── GetStockBookCopyController.java
     │   │       ├── LibraryController.java
     │   │       ├── SaleController.java
     │   │       ├── SaleItemController.java
@@ -201,7 +200,6 @@ Library/
             │   ├── DeleteBookCopyServiceTest.java
             │   ├── GetBookCopyByIdServiceTest.java
             │   ├── GetBookCopyServiceTest.java
-            │   ├── GetStockBookCopyServiceTest.java
             │   ├── PatchBookCopyServiceTest.java
             │   └── PostBookCopyServiceTest.java
             ├── customer/

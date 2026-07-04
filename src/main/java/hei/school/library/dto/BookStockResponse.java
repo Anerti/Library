@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class BookStockResponse {
   private UUID bookId;
-  private Integer total;
+  private long total;
   private BookCopyFormat byFormat;
 }

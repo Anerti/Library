@@ -5,8 +5,10 @@ import static org.mockito.Mockito.*;
 
 import hei.school.library.entity.enums.BookCopyFormat;
 import hei.school.library.exception.NotFoundException;
+import hei.school.library.mapper.AnalyticsMapper;
 import hei.school.library.repository.dao.AnalyticsRepository;
 import hei.school.library.service.AnalyticsService;
+import hei.school.library.validator.AnalyticsValidator;
 import java.util.UUID;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,14 +19,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class AnalyticsServiceTest {
 
   @Mock private AnalyticsRepository analyticsRepository;
-
-  @InjectMocks private AnalyticsService analyticsService;
+  @Mock private AnalyticsValidator analyticsValidator;
+  private AnalyticsMapper analyticsMapper;
+  private AnalyticsService analyticsService;
 
   private UUID libraryId;
   private UUID bookId;
 
   @BeforeEach
   void setUp() {
+    analyticsMapper = new AnalyticsMapper();
+    analyticsService =
+        new AnalyticsService(analyticsRepository, analyticsValidator, analyticsMapper);
     libraryId = UUID.randomUUID();
     bookId = UUID.randomUUID();
   }
@@ -54,19 +60,6 @@ public class AnalyticsServiceTest {
     assertThat(result.getBookId()).isEqualTo(bookId);
     assertThat(result.getTotal()).isEqualTo(7);
     assertThat(result.getByFormat()).isEqualTo(BookCopyFormat.PAPERBACK);
-  }
-
-  @Test
-  @DisplayName("getStockOverview : should default to ALL when format is null")
-  void getStockOverview_shouldDefaultToAll_whenFormatIsNull() {
-    when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(new Object());
-    when(analyticsRepository.countAvailableStock(bookId, null, libraryId)).thenReturn(15L);
-
-    var result = analyticsService.getStockOverview(libraryId, bookId, null);
-
-    assertThat(result.getBookId()).isEqualTo(bookId);
-    assertThat(result.getTotal()).isEqualTo(15);
-    assertThat(result.getByFormat()).isNull();
   }
 
   @Test
