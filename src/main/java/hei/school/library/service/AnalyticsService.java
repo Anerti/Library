@@ -27,11 +27,10 @@ public class AnalyticsService {
     }
 
     BookCopyFormat responseFormat = !"ALL".equals(format) ? BookCopyFormat.valueOf(format) : null;
-    String formatParam = responseFormat != null ? responseFormat.name() : null;
 
     return analyticsMapper.toStockResponse(
         bookId,
-        analyticsRepository.countAvailableStock(bookId, formatParam, libraryId),
+        analyticsRepository.countAvailableStock(bookId, responseFormat != null ? responseFormat.name() : null, libraryId),
         responseFormat);
   }
 }
