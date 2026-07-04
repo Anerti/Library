@@ -9,10 +9,6 @@ import org.springframework.stereotype.Component;
 public class AnalyticsMapper {
 
   public BookStockResponse toStockResponse(UUID bookId, long total, BookCopyFormat byFormat) {
-    return BookStockResponse.builder()
-        .bookId(bookId)
-        .total(total)
-        .byFormat(byFormat)
-        .build();
+    return BookStockResponse.builder().bookId(bookId).total(total).byFormat(byFormat).build();
   }
 }

@@ -105,8 +105,7 @@ class SaleBookCopyServiceTest {
   @DisplayName("create: should save and return DTO")
   void create_shouldSaveAndReturnDto() {
     when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
-    when(saleBookCopyRepository.create(any(), any(), any()))
-        .thenReturn(Optional.of(saleBookCopy));
+    when(saleBookCopyRepository.create(any(), any(), any())).thenReturn(Optional.of(saleBookCopy));
 
     SaleBookCopyResponse result = saleBookCopyService.create(saleId, validRequest);
 

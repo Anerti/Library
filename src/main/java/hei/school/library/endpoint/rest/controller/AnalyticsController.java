@@ -22,6 +22,7 @@ public class AnalyticsController {
       @PathVariable UUID libraryId,
       @PathVariable UUID bookId,
       @RequestParam(defaultValue = "ALL") String format) {
-    return ResponseEntity.status(HttpStatus.OK).body(analyticsService.getStockOverview(libraryId, bookId, format));
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(analyticsService.getStockOverview(libraryId, bookId, format));
   }
 }

@@ -5,9 +5,8 @@ import hei.school.library.entity.enums.BookCopyFormat;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AnalyticsMapper;
 import hei.school.library.repository.dao.AnalyticsRepository;
-import java.util.UUID;
-
 import hei.school.library.validator.AnalyticsValidator;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +22,15 @@ public class AnalyticsService {
     analyticsValidator.validateFormat(format);
 
     if (analyticsRepository.checkBookCopyLink(libraryId, bookId) == null) {
-      throw new NotFoundException(String.format(
-          "Library %s or Book %s not found", libraryId, bookId));
+      throw new NotFoundException(
+          String.format("Library %s or Book %s not found", libraryId, bookId));
     }
 
     BookCopyFormat responseFormat = !"ALL".equals(format) ? BookCopyFormat.valueOf(format) : null;
 
-    return analyticsMapper.toStockResponse(bookId, analyticsRepository.countAvailableStock(bookId, responseFormat, libraryId), responseFormat);
+    return analyticsMapper.toStockResponse(
+        bookId,
+        analyticsRepository.countAvailableStock(bookId, responseFormat, libraryId),
+        responseFormat);
   }
 }

@@ -75,12 +75,12 @@ public class AnalyticsServiceTest {
   }
 
   @Test
-  @DisplayName("getStockOverview : should throw NotFoundException when no book_copy links library and book")
+  @DisplayName(
+      "getStockOverview : should throw NotFoundException when no book_copy links library and book")
   void getStockOverview_shouldThrow_whenNoLinkExists() {
     when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(null);
 
-    assertThatThrownBy(
-            () -> analyticsService.getStockOverview(libraryId, bookId, "ALL"))
+    assertThatThrownBy(() -> analyticsService.getStockOverview(libraryId, bookId, "ALL"))
         .isInstanceOf(NotFoundException.class)
         .hasMessageContaining(libraryId.toString())
         .hasMessageContaining(bookId.toString());
