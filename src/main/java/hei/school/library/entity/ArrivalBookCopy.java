@@ -31,10 +31,6 @@ public class ArrivalBookCopy {
   @Column(nullable = false)
   private BigDecimal purchasePrice;
 
-  @Column(nullable = false)
-  @Builder.Default
-  private Integer quantity = 1;
-
   @CreationTimestamp
   @Column(name = "created_at", updatable = false, nullable = false)
   private LocalDateTime createdAt;

@@ -42,11 +42,9 @@ public class SaleBookCopyService {
         .findById(saleId)
         .orElseThrow(() -> new NotFoundException("Sale " + saleId + " not found"));
 
-    Integer quantity = request.getQuantity() != null ? request.getQuantity() : 1;
-
     return saleBookCopyMapper.toResponse(
         saleBookCopyRepository
-            .create(request.getBookCopyId(), saleId, quantity, request.getPrice())
+            .create(request.getBookCopyId(), saleId, request.getPrice())
             .orElseThrow(
                 () ->
                     new ConflictException(

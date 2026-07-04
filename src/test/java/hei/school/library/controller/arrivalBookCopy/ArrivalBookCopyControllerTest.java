@@ -49,7 +49,6 @@ public class ArrivalBookCopyControllerTest {
             .arrivalId(arrivalId)
             .bookCopyId(bookCopyId)
             .purchasePrice(BigDecimal.valueOf(15.00))
-            .quantity(3)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
@@ -65,8 +64,7 @@ public class ArrivalBookCopyControllerTest {
         .perform(get("/arrivals/{arrivalId}/items", arrivalId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].arrivalId").value(arrivalId.toString()))
-        .andExpect(jsonPath("$[0].bookCopyId").value(bookCopyId.toString()))
-        .andExpect(jsonPath("$[0].quantity").value(3));
+        .andExpect(jsonPath("$[0].bookCopyId").value(bookCopyId.toString()));
 
     verify(arrivalBookCopyService).findByArrivalId(arrivalId);
   }
@@ -96,7 +94,7 @@ public class ArrivalBookCopyControllerTest {
   @DisplayName("create : should return 201 with created item")
   void create_shouldReturn201() throws Exception {
     ArrivalBookCopyRequest request =
-        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
+        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00));
 
     when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenReturn(arrivalBookCopyResponse);
@@ -108,8 +106,7 @@ public class ArrivalBookCopyControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.arrivalId").value(arrivalId.toString()))
-        .andExpect(jsonPath("$.bookCopyId").value(bookCopyId.toString()))
-        .andExpect(jsonPath("$.quantity").value(3));
+        .andExpect(jsonPath("$.bookCopyId").value(bookCopyId.toString()));
 
     verify(arrivalBookCopyService).create(eq(arrivalId), any(ArrivalBookCopyRequest.class));
   }
@@ -118,7 +115,7 @@ public class ArrivalBookCopyControllerTest {
   @DisplayName("create : should return 404 when arrival not found")
   void create_shouldReturn404_whenArrivalNotFound() throws Exception {
     ArrivalBookCopyRequest request =
-        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
+        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00));
 
     when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenThrow(new NotFoundException("Arrival with id " + arrivalId + " not found"));
@@ -135,7 +132,7 @@ public class ArrivalBookCopyControllerTest {
   @DisplayName("create : should return 404 when bookCopy not found")
   void create_shouldReturn404_whenBookCopyNotFound() throws Exception {
     ArrivalBookCopyRequest request =
-        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
+        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00));
 
     when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenThrow(new NotFoundException("BookCopy with id " + bookCopyId + " not found"));

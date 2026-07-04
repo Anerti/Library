@@ -10,6 +10,5 @@ import lombok.*;
 @Setter
 public class SaleBookCopyRequest {
   private UUID bookCopyId;
-  private Integer quantity;
   private BigDecimal price;
 }

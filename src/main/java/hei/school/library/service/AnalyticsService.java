@@ -18,12 +18,12 @@ public class AnalyticsService {
   private final BookRepository bookRepository;
   private final AnalyticsRepository analyticsRepository;
 
-  public BookStockResponse getStockOverview(UUID libraryId, UUID bookId, String format) {
+  public BookStockResponse getStockOverview(UUID libraryId, UUID bookCopyId, String format) {
     if (!libraryRepository.existsById(libraryId)) {
       throw new NotFoundException("Library with id " + libraryId + " not found");
     }
-    if (!bookRepository.existsById(bookId)) {
-      throw new NotFoundException("Book with id " + bookId + " not found");
+    if (!bookRepository.existsById(bookCopyId)) {
+      throw new NotFoundException("Book with id " + bookCopyId + " not found");
     }
 
     BookCopyFormat formatEnum = null;
@@ -33,10 +33,10 @@ public class AnalyticsService {
       responseFormat = formatEnum;
     }
 
-    long total = analyticsRepository.countAvailableStock(bookId, formatEnum, libraryId);
+    long total = analyticsRepository.countAvailableStock(bookCopyId, formatEnum, libraryId);
 
     return BookStockResponse.builder()
-        .bookId(bookId)
+        .bookId(bookCopyId)
         .total((int) total)
         .byFormat(responseFormat)
         .build();

@@ -52,7 +52,6 @@ public class ArrivalBookCopyService {
             .arrival(arrival)
             .bookCopy(bookCopy)
             .purchasePrice(request.getPurchasePrice())
-            .quantity(request.getQuantity() != null ? request.getQuantity() : 1)
             .build();
 
     return arrivalBookCopyMapper.toResponse(arrivalBookCopyRepository.save(item));

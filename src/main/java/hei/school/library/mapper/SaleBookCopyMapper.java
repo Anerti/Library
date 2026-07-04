@@ -12,7 +12,6 @@ public class SaleBookCopyMapper {
         .bookCopyId(saleBookCopy.getBookCopy().getId())
         .saleId(saleBookCopy.getSale().getId())
         .createdAt(saleBookCopy.getCreatedAt())
-        .quantity(saleBookCopy.getQuantity())
         .price(saleBookCopy.getPrice())
         .build();
   }

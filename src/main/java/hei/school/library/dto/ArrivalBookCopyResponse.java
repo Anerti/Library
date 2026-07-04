@@ -17,6 +17,5 @@ public class ArrivalBookCopyResponse {
   private UUID arrivalId;
   private LocalDateTime createdAt;
   private BigDecimal purchasePrice;
-  private Integer quantity;
   private LocalDateTime updatedAt;
 }

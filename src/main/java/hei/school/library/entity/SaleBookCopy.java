@@ -29,10 +29,6 @@ public class SaleBookCopy {
   @JoinColumn(name = "sale_id", nullable = false)
   private Sale sale;
 
-  @Column(nullable = false)
-  @Builder.Default
-  private Integer quantity = 1;
-
   @Column(nullable = false, precision = 10, scale = 2)
   private BigDecimal price;
 

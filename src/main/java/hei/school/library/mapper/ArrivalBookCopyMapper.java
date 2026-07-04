@@ -12,7 +12,6 @@ public class ArrivalBookCopyMapper {
         .arrivalId(item.getArrival().getId())
         .createdAt(item.getCreatedAt())
         .purchasePrice(item.getPurchasePrice())
-        .quantity(item.getQuantity())
         .updatedAt(item.getUpdatedAt())
         .build();
   }
