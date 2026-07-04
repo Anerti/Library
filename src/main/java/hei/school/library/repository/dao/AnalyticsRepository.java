@@ -37,4 +37,15 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
       @Param("bookId") UUID bookId,
       @Param("format") BookCopyFormat format,
       @Param("libraryId") UUID libraryId);
+
+  @Query(
+      value =
+          """
+          SELECT DISTINCT(book_copy.library_id, book_copy.book_id)
+          FROM book_copy
+          WHERE library_id = CAST(:libraryId AS uuid)
+            AND book_id = CAST(:bookId AS uuid)
+          """,
+      nativeQuery = true)
+  Object checkBookCopyLink(@Param("libraryId") UUID libraryId, @Param("bookId") UUID bookId);
 }
