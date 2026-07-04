@@ -54,7 +54,17 @@ public class UserValidator {
   public void validateUserPatch(UserUpdateRequest request) {
     dataValidator.validateName("lastName", request.getLastName());
     dataValidator.validateName("firstName", request.getFirstName());
-    dataValidator.validateEmail(request.getEmail());
     dataValidator.validatePhone(request.getPhone());
+
+    if (request.getBirthDate() != null) {
+      if (request.getBirthDate().isAfter(LocalDate.now())) {
+        throw new UnprocessableEntityException("BirthDate cannot be in the future.");
+      }
+
+      if (request.getBirthDate().plusYears(12).isAfter(LocalDate.now())) {
+        throw new UnprocessableEntityException(
+            "You must be at least 12 years old to create an account.");
+      }
+    }
   }
 }

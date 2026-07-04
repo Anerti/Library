@@ -5,6 +5,7 @@ import hei.school.library.dto.*;
 import hei.school.library.entity.User;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.ForbiddenException;
+import hei.school.library.exception.InternalServerErrorException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
@@ -63,10 +64,9 @@ public class UserService {
                       request.getLastName(),
                       request.getFirstName(),
                       request.getBirthDate(),
-                      request.getEmail(),
                       request.getPhone())
               .map(userMapper::toResponse)
-              .orElseThrow(() -> new ConflictException(String.format("email %s already in use", request.getEmail())));
+              .orElseThrow(() -> new InternalServerErrorException("An error Occurred during the update, please try again later"));
     }
     else {
       throw new ForbiddenException(String.format("Cannot update user %s", id));

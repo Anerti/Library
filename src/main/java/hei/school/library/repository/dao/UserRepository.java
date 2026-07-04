@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -42,11 +43,10 @@ SET
   last_name = COALESCE(:lastName, last_name),
   first_name = COALESCE(:firstName, first_name),
   birth_date = COALESCE(:birthDate, birth_date),
-  email = COALESCE(:email, email),
   phone = COALESCE(:phone, phone),
   updated_at = NOW()
 WHERE id = :id
-RETURNING id, last_name, first_name, birth_date, email, phone, role, created_at, updated_at
+RETURNING id, last_name, first_name, birth_date, email, phone, password, role, created_at, updated_at
 """,
       nativeQuery = true)
   Optional<User> patch(
@@ -54,7 +54,6 @@ RETURNING id, last_name, first_name, birth_date, email, phone, role, created_at,
       @Param("lastName") String lastName,
       @Param("firstName") String firstName,
       @Param("birthDate") LocalDate birthDate,
-      @Param("email") String email,
       @Param("phone") String phone);
 
   @Query(
