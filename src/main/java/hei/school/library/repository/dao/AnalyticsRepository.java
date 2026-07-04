@@ -1,7 +1,6 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.BookCopy;
-import hei.school.library.entity.enums.BookCopyFormat;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,7 +34,7 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
       nativeQuery = true)
   long countAvailableStock(
       @Param("bookId") UUID bookId,
-      @Param("format") BookCopyFormat format,
+      @Param("format") String format,
       @Param("libraryId") UUID libraryId);
 
   @Query(

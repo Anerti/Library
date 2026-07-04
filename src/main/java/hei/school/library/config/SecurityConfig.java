@@ -34,6 +34,7 @@ public class SecurityConfig {
                 auth.requestMatchers("/auth/**")
                     .permitAll()
                     .requestMatchers("/ping")
+
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/libraries")
                     .permitAll()
@@ -43,6 +44,7 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/libraries/{libraryId}")
                     .hasRole("ADMIN")
+
                     .requestMatchers(HttpMethod.GET, "/books", "/books/{id}")
                     .permitAll()
                     .requestMatchers(HttpMethod.POST, "/books")
@@ -116,6 +118,8 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/sales/{saleId}/items/{bookCopyId}")
                     .hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/libraries/{libraryId}/analytics/stock/{bookId}")
+                    .permitAll()
                     .anyRequest()
                     .authenticated())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
