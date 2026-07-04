@@ -14,6 +14,7 @@ import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.service.UserService;
 import hei.school.library.validator.DataValidator;
+import hei.school.library.validator.UserValidator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -30,6 +31,7 @@ class GetUsersByIdServiceTest {
 
   @Mock private UserRepository userRepository;
   @Mock private ResourcesAccessRules resourcesAccessRules;
+  @Mock private UserValidator userValidator;
 
   private UserService userService;
 
@@ -45,7 +47,8 @@ class GetUsersByIdServiceTest {
             userRepository,
             new UserMapper(new PaginationMapper()),
             new DataValidator(),
-            resourcesAccessRules);
+            resourcesAccessRules,
+            userValidator);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();

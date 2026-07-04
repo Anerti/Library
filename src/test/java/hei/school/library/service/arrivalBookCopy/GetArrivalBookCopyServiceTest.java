@@ -13,6 +13,7 @@ import hei.school.library.repository.dao.ArrivalBookCopyRepository;
 import hei.school.library.repository.dao.ArrivalRepository;
 import hei.school.library.repository.dao.BookCopyRepository;
 import hei.school.library.service.ArrivalBookCopyService;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.*;
@@ -51,7 +52,7 @@ public class GetArrivalBookCopyServiceTest {
             .id(UUID.randomUUID())
             .arrival(arrival)
             .bookCopy(bookCopy)
-            .purchasePrice(15.00)
+            .purchasePrice(BigDecimal.valueOf(15.00))
             .quantity(3)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
@@ -61,7 +62,7 @@ public class GetArrivalBookCopyServiceTest {
         ArrivalBookCopyResponse.builder()
             .arrivalId(arrivalId)
             .bookCopyId(bookCopyId)
-            .purchasePrice(15.00)
+            .purchasePrice(BigDecimal.valueOf(15.00))
             .quantity(3)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())

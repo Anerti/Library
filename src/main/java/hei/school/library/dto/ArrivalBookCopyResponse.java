@@ -1,5 +1,6 @@
 package hei.school.library.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ public class ArrivalBookCopyResponse {
   private UUID bookCopyId;
   private UUID arrivalId;
   private LocalDateTime createdAt;
-  private Double purchasePrice;
+  private BigDecimal purchasePrice;
   private Integer quantity;
   private LocalDateTime updatedAt;
 }

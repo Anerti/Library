@@ -539,11 +539,6 @@ components:
           type: string
           format: date
           example: "1995-08-12"
-        email:
-          type: string
-          format: email
-          maxLength: 100
-          example: faly.randria@email.com
         phone:
           type: string
           maxLength: 30

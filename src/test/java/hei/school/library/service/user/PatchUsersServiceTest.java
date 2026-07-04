@@ -2,8 +2,12 @@ package hei.school.library.service.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -11,6 +15,8 @@ import hei.school.library.config.ResourcesAccessRules;
 import hei.school.library.dto.UserResponse;
 import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.entity.User;
+import hei.school.library.entity.enums.Role;
+import hei.school.library.exception.ForbiddenException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.PaginationMapper;
@@ -18,6 +24,7 @@ import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.service.UserService;
 import hei.school.library.validator.DataValidator;
+import hei.school.library.validator.UserValidator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -34,11 +41,13 @@ class PatchUsersServiceTest {
 
   @Mock private UserRepository userRepository;
   @Mock private ResourcesAccessRules resourcesAccessRules;
+  @Mock private UserValidator userValidator;
 
   private UserService userService;
 
   private UUID existingId;
   private Instant now;
+  private User existingUser;
 
   @BeforeEach
   void setUp() {
@@ -47,66 +56,79 @@ class PatchUsersServiceTest {
             userRepository,
             new UserMapper(new PaginationMapper()),
             new DataValidator(),
-            resourcesAccessRules);
+            resourcesAccessRules,
+            userValidator);
 
     existingId = UUID.randomUUID();
     now = Instant.now();
-  }
-
-  private static User user(
-      UUID id,
-      String lastName,
-      String firstName,
-      LocalDate birthDate,
-      String email,
-      String phone,
-      Instant now) {
-    return new User(id, lastName, firstName, birthDate, email, "secret", phone, null, now, now);
+    existingUser =
+        new User(
+            existingId,
+            "Dupont",
+            "Marie",
+            LocalDate.of(1995, 3, 10),
+            "marie@mail.com",
+            "secret",
+            "+261****4567",
+            Role.CUSTOMER,
+            now,
+            now);
   }
 
   @Test
   @DisplayName("update: should update firstName only and return DTO")
   void update_shouldUpdateFirstNameOnly() {
-    UserUpdateRequest request = new UserUpdateRequest(null, "Marie Claire", null, null, null);
+    UserUpdateRequest request = new UserUpdateRequest(null, "Marie Claire", null, null);
 
     User updated =
-        user(
+        new User(
             existingId,
             "Dupont",
             "Marie Claire",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
+            "secret",
             "+261****4567",
+            Role.CUSTOMER,
+            now,
             now);
-    when(userRepository.patch(
-            eq(existingId), isNull(), eq("Marie Claire"), isNull(), isNull(), isNull()))
-        .thenReturn(Optional.of(updated));
+
+    when(userRepository.findById(existingId))
+        .thenReturn(Optional.of(existingUser), Optional.of(updated));
+    when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
+    doNothing().when(userRepository).patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
     assertThat(result.getFirstName()).isEqualTo("Marie Claire");
     assertThat(result.getLastName()).isEqualTo("Dupont");
     assertThat(result.getEmail()).isEqualTo("marie@mail.com");
-    verify(userRepository)
-        .patch(eq(existingId), isNull(), eq("Marie Claire"), isNull(), isNull(), isNull());
+    verify(userRepository, times(2)).findById(existingId);
+    verify(userRepository).patch(eq(existingId), any(), eq("Marie Claire"), any(), any());
   }
 
   @Test
   @DisplayName("update: should update lastName only and return DTO")
   void update_shouldUpdateLastNameOnly() {
-    UserUpdateRequest request = new UserUpdateRequest("Martin", null, null, null, null);
+    UserUpdateRequest request = new UserUpdateRequest("Martin", null, null, null);
 
     User updated =
-        user(
+        new User(
             existingId,
             "Martin",
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
+            "secret",
             "+261****4567",
+            Role.CUSTOMER,
+            now,
             now);
-    when(userRepository.patch(eq(existingId), eq("Martin"), isNull(), isNull(), isNull(), isNull()))
-        .thenReturn(Optional.of(updated));
+
+    when(userRepository.findById(existingId))
+        .thenReturn(Optional.of(existingUser), Optional.of(updated));
+    when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
+    doNothing().when(userRepository).patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -116,46 +138,27 @@ class PatchUsersServiceTest {
   }
 
   @Test
-  @DisplayName("update: should update email only and return DTO")
-  void update_shouldUpdateEmailOnly() {
-    UserUpdateRequest request = new UserUpdateRequest(null, null, null, "new@mail.com", null);
-
-    User updated =
-        user(
-            existingId,
-            "Dupont",
-            "Marie",
-            LocalDate.of(1995, 3, 10),
-            "new@mail.com",
-            "+261****4567",
-            now);
-    when(userRepository.patch(
-            eq(existingId), isNull(), isNull(), isNull(), eq("new@mail.com"), isNull()))
-        .thenReturn(Optional.of(updated));
-
-    UserResponse result = userService.update(existingId, request);
-
-    assertThat(result.getEmail()).isEqualTo("new@mail.com");
-    assertThat(result.getLastName()).isEqualTo("Dupont");
-  }
-
-  @Test
   @DisplayName("update: should update phone only and return DTO")
   void update_shouldUpdatePhoneOnly() {
-    UserUpdateRequest request = new UserUpdateRequest(null, null, null, null, "+261 34 12 340 00");
+    UserUpdateRequest request = new UserUpdateRequest(null, null, null, "+261 34 12 340 00");
 
     User updated =
-        user(
+        new User(
             existingId,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
             "marie@mail.com",
+            "secret",
             "+261 34 12 340 00",
+            Role.CUSTOMER,
+            now,
             now);
-    when(userRepository.patch(
-            eq(existingId), isNull(), isNull(), isNull(), isNull(), eq("+261 34 12 340 00")))
-        .thenReturn(Optional.of(updated));
+
+    when(userRepository.findById(existingId))
+        .thenReturn(Optional.of(existingUser), Optional.of(updated));
+    when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
+    doNothing().when(userRepository).patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -167,13 +170,25 @@ class PatchUsersServiceTest {
   @DisplayName("update: should update birthDate only and return DTO")
   void update_shouldUpdateBirthDateOnly() {
     LocalDate newBirthDate = LocalDate.of(1990, 7, 15);
-    UserUpdateRequest request = new UserUpdateRequest(null, null, newBirthDate, null, null);
+    UserUpdateRequest request = new UserUpdateRequest(null, null, newBirthDate, null);
 
     User updated =
-        user(existingId, "Dupont", "Marie", newBirthDate, "marie@mail.com", "+261****4567", now);
-    when(userRepository.patch(
-            eq(existingId), isNull(), isNull(), eq(newBirthDate), isNull(), isNull()))
-        .thenReturn(Optional.of(updated));
+        new User(
+            existingId,
+            "Dupont",
+            "Marie",
+            newBirthDate,
+            "marie@mail.com",
+            "secret",
+            "+261****4567",
+            Role.CUSTOMER,
+            now,
+            now);
+
+    when(userRepository.findById(existingId))
+        .thenReturn(Optional.of(existingUser), Optional.of(updated));
+    when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
+    doNothing().when(userRepository).patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -184,33 +199,32 @@ class PatchUsersServiceTest {
   @DisplayName("update: should update all fields at once")
   void update_shouldUpdateAllFields() {
     UserUpdateRequest request =
-        new UserUpdateRequest(
-            "Martin", "Jean", LocalDate.of(1988, 1, 1), "jean@mail.com", "+261 34 12 349 99");
+        new UserUpdateRequest("Martin", "Jean", LocalDate.of(1988, 1, 1), "+261 34 12 349 99");
 
     User updated =
-        user(
+        new User(
             existingId,
             "Martin",
             "Jean",
             LocalDate.of(1988, 1, 1),
-            "jean@mail.com",
+            "marie@mail.com",
+            "secret",
             "+261 34 12 349 99",
+            Role.CUSTOMER,
+            now,
             now);
-    when(userRepository.patch(
-            eq(existingId),
-            eq("Martin"),
-            eq("Jean"),
-            eq(LocalDate.of(1988, 1, 1)),
-            eq("jean@mail.com"),
-            eq("+261 34 12 349 99")))
-        .thenReturn(Optional.of(updated));
+
+    when(userRepository.findById(existingId))
+        .thenReturn(Optional.of(existingUser), Optional.of(updated));
+    when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
+    doNothing().when(userRepository).patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
     assertThat(result.getLastName()).isEqualTo("Martin");
     assertThat(result.getFirstName()).isEqualTo("Jean");
     assertThat(result.getBirthDate()).isEqualTo(LocalDate.of(1988, 1, 1));
-    assertThat(result.getEmail()).isEqualTo("jean@mail.com");
+    assertThat(result.getEmail()).isEqualTo("marie@mail.com");
     assertThat(result.getPhone()).isEqualTo("+261 34 12 349 99");
   }
 
@@ -218,44 +232,41 @@ class PatchUsersServiceTest {
   @DisplayName("update: should throw NotFoundException when user not found")
   void update_shouldThrow_whenNotFound() {
     UUID unknownId = UUID.randomUUID();
-    when(userRepository.patch(eq(unknownId), eq("test"), isNull(), isNull(), isNull(), isNull()))
-        .thenReturn(Optional.empty());
+    when(userRepository.findById(unknownId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(
-            () ->
-                userService.update(
-                    unknownId, new UserUpdateRequest("test", null, null, null, null)))
-        .isInstanceOf(NotFoundException.class);
+            () -> userService.update(unknownId, new UserUpdateRequest("test", null, null, null)))
+        .isInstanceOf(NotFoundException.class)
+        .hasMessageContaining(unknownId.toString());
 
-    verify(userRepository).patch(eq(unknownId), eq("test"), isNull(), isNull(), isNull(), isNull());
+    verify(userRepository).findById(unknownId);
+    verify(userRepository, never()).patch(any(), any(), any(), any(), any());
   }
 
   @Test
-  @DisplayName("update: should throw UnprocessableEntityException when all fields are null")
-  void update_shouldThrow_whenAllFieldsNull() {
-    UserUpdateRequest emptyRequest = new UserUpdateRequest();
+  @DisplayName("update: should throw ForbiddenException when user lacks access")
+  void update_shouldThrow_whenForbidden() {
+    UserUpdateRequest request = new UserUpdateRequest("Martin", null, null, null);
 
-    assertThatThrownBy(() -> userService.update(existingId, emptyRequest))
-        .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessage("At least one field is required.");
-  }
-
-  @Test
-  @DisplayName("update: should throw UnprocessableEntityException when birthDate is in the future")
-  void update_shouldThrow_whenBirthDateInFuture() {
-    UserUpdateRequest request =
-        new UserUpdateRequest(null, null, LocalDate.now().plusDays(1), null, null);
+    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser));
+    when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(false);
 
     assertThatThrownBy(() -> userService.update(existingId, request))
-        .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessage("birthDate cannot be in the future.");
+        .isInstanceOf(ForbiddenException.class)
+        .hasMessageContaining(existingId.toString());
+
+    verify(userRepository).findById(existingId);
+    verify(userRepository, never()).patch(any(), any(), any(), any(), any());
   }
 
   @Test
-  @DisplayName(
-      "update: should throw UnprocessableEntityException when lastName contains invalid characters")
+  @DisplayName("update: should propagate UnprocessableEntityException when lastName is invalid")
   void update_shouldThrow_whenLastNameInvalid() {
-    UserUpdateRequest request = new UserUpdateRequest("Dupont123", null, null, null, null);
+    UserUpdateRequest request = new UserUpdateRequest("Dupont123", null, null, null);
+
+    doThrow(new UnprocessableEntityException("lastName field contain forbidden characters."))
+        .when(userValidator)
+        .validateUserPatch(request);
 
     assertThatThrownBy(() -> userService.update(existingId, request))
         .isInstanceOf(UnprocessableEntityException.class)
@@ -263,19 +274,13 @@ class PatchUsersServiceTest {
   }
 
   @Test
-  @DisplayName("update: should throw UnprocessableEntityException when email has invalid format")
-  void update_shouldThrow_whenEmailInvalid() {
-    UserUpdateRequest request = new UserUpdateRequest(null, null, null, "not-an-email", null);
-
-    assertThatThrownBy(() -> userService.update(existingId, request))
-        .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessageContaining("Invalid email format");
-  }
-
-  @Test
-  @DisplayName("update: should throw UnprocessableEntityException when phone has invalid format")
+  @DisplayName("update: should propagate UnprocessableEntityException when phone is invalid")
   void update_shouldThrow_whenPhoneInvalid() {
-    UserUpdateRequest request = new UserUpdateRequest(null, null, null, null, "not-a-phone");
+    UserUpdateRequest request = new UserUpdateRequest(null, null, null, "not-a-phone");
+
+    doThrow(new UnprocessableEntityException("Invalid phone format: 'not-a-phone'"))
+        .when(userValidator)
+        .validateUserPatch(request);
 
     assertThatThrownBy(() -> userService.update(existingId, request))
         .isInstanceOf(UnprocessableEntityException.class)

@@ -12,6 +12,7 @@ import hei.school.library.repository.dao.ArrivalBookCopyRepository;
 import hei.school.library.repository.dao.ArrivalRepository;
 import hei.school.library.repository.dao.BookCopyRepository;
 import hei.school.library.service.ArrivalBookCopyService;
+import java.math.BigDecimal;
 import java.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,7 +49,7 @@ public class DeleteArrivalBookCopyServiceTest {
             .id(UUID.randomUUID())
             .arrival(arrival)
             .bookCopy(bookCopy)
-            .purchasePrice(15.00)
+            .purchasePrice(BigDecimal.valueOf(15.00))
             .quantity(3)
             .build();
   }

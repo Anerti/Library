@@ -13,6 +13,7 @@ import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.service.UserService;
 import hei.school.library.validator.DataValidator;
+import hei.school.library.validator.UserValidator;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ class DeleteUsersByIdServiceTest {
 
   @Mock private UserRepository userRepository;
   @Mock private ResourcesAccessRules resourcesAccessRules;
+  @Mock private UserValidator userValidator;
 
   private UserService userService;
 
@@ -43,7 +45,8 @@ class DeleteUsersByIdServiceTest {
             userRepository,
             new UserMapper(new PaginationMapper()),
             new DataValidator(),
-            resourcesAccessRules);
+            resourcesAccessRules,
+            userValidator);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();

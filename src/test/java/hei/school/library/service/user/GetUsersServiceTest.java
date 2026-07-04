@@ -14,6 +14,7 @@ import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.service.UserService;
 import hei.school.library.validator.DataValidator;
+import hei.school.library.validator.UserValidator;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +31,7 @@ class GetUsersServiceTest {
   @Mock private UserRepository userRepository;
   @Mock private ResourcesAccessRules resourcesAccessRules;
   @Mock private DataValidator dataValidator;
+  @Mock private UserValidator userValidator;
   private UserService userService;
   private User user;
 
@@ -40,7 +42,8 @@ class GetUsersServiceTest {
             userRepository,
             new UserMapper(new PaginationMapper()),
             dataValidator,
-            resourcesAccessRules);
+            resourcesAccessRules,
+            userValidator);
 
     user =
         new User(

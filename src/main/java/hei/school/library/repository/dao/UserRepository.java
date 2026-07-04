@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -34,6 +35,7 @@ WHERE (:search IS NULL OR :search = ''
       nativeQuery = true)
   Page<User> findBySearch(@Param("search") String search, Pageable pageable);
 
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query(
       value =
           """
@@ -42,19 +44,16 @@ SET
   last_name = COALESCE(:lastName, last_name),
   first_name = COALESCE(:firstName, first_name),
   birth_date = COALESCE(:birthDate, birth_date),
-  email = COALESCE(:email, email),
   phone = COALESCE(:phone, phone),
   updated_at = NOW()
 WHERE id = :id
-RETURNING id, last_name, first_name, birth_date, email, phone, role, created_at, updated_at
 """,
       nativeQuery = true)
-  Optional<User> patch(
+  void patch(
       @Param("id") UUID id,
       @Param("lastName") String lastName,
       @Param("firstName") String firstName,
       @Param("birthDate") LocalDate birthDate,
-      @Param("email") String email,
       @Param("phone") String phone);
 
   @Query(
