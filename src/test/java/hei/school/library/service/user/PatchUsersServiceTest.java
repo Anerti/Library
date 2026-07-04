@@ -93,11 +93,10 @@ class PatchUsersServiceTest {
             now,
             now);
 
-    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser), Optional.of(updated));
+    when(userRepository.findById(existingId))
+        .thenReturn(Optional.of(existingUser), Optional.of(updated));
     when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
-    doNothing()
-        .when(userRepository)
-        .patch(eq(existingId), any(), any(), any(), any());
+    doNothing().when(userRepository).patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -105,8 +104,7 @@ class PatchUsersServiceTest {
     assertThat(result.getLastName()).isEqualTo("Dupont");
     assertThat(result.getEmail()).isEqualTo("marie@mail.com");
     verify(userRepository, times(2)).findById(existingId);
-    verify(userRepository)
-        .patch(eq(existingId), any(), eq("Marie Claire"), any(), any());
+    verify(userRepository).patch(eq(existingId), any(), eq("Marie Claire"), any(), any());
   }
 
   @Test
@@ -127,11 +125,10 @@ class PatchUsersServiceTest {
             now,
             now);
 
-    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser), Optional.of(updated));
+    when(userRepository.findById(existingId))
+        .thenReturn(Optional.of(existingUser), Optional.of(updated));
     when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
-    doNothing()
-        .when(userRepository)
-        .patch(eq(existingId), any(), any(), any(), any());
+    doNothing().when(userRepository).patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -158,11 +155,10 @@ class PatchUsersServiceTest {
             now,
             now);
 
-    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser), Optional.of(updated));
+    when(userRepository.findById(existingId))
+        .thenReturn(Optional.of(existingUser), Optional.of(updated));
     when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
-    doNothing()
-        .when(userRepository)
-        .patch(eq(existingId), any(), any(), any(), any());
+    doNothing().when(userRepository).patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -189,11 +185,10 @@ class PatchUsersServiceTest {
             now,
             now);
 
-    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser), Optional.of(updated));
+    when(userRepository.findById(existingId))
+        .thenReturn(Optional.of(existingUser), Optional.of(updated));
     when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
-    doNothing()
-        .when(userRepository)
-        .patch(eq(existingId), any(), any(), any(), any());
+    doNothing().when(userRepository).patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -219,11 +214,10 @@ class PatchUsersServiceTest {
             now,
             now);
 
-    when(userRepository.findById(existingId)).thenReturn(Optional.of(existingUser), Optional.of(updated));
+    when(userRepository.findById(existingId))
+        .thenReturn(Optional.of(existingUser), Optional.of(updated));
     when(resourcesAccessRules.grantAccessFor(existingUser)).thenReturn(true);
-    doNothing()
-        .when(userRepository)
-        .patch(eq(existingId), any(), any(), any(), any());
+    doNothing().when(userRepository).patch(eq(existingId), any(), any(), any(), any());
 
     UserResponse result = userService.update(existingId, request);
 
@@ -241,9 +235,7 @@ class PatchUsersServiceTest {
     when(userRepository.findById(unknownId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(
-            () ->
-                userService.update(
-                    unknownId, new UserUpdateRequest("test", null, null, null)))
+            () -> userService.update(unknownId, new UserUpdateRequest("test", null, null, null)))
         .isInstanceOf(NotFoundException.class)
         .hasMessageContaining(unknownId.toString());
 

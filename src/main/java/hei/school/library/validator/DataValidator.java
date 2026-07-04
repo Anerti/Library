@@ -1,8 +1,6 @@
 package hei.school.library.validator;
 
-import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.exception.UnprocessableEntityException;
-import java.time.LocalDate;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
@@ -141,5 +139,4 @@ public class DataValidator {
       }
     }
   }
-
 }

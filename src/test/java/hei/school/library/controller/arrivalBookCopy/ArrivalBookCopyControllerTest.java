@@ -95,7 +95,8 @@ public class ArrivalBookCopyControllerTest {
   @Test
   @DisplayName("create : should return 201 with created item")
   void create_shouldReturn201() throws Exception {
-    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
+    ArrivalBookCopyRequest request =
+        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
 
     when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenReturn(arrivalBookCopyResponse);
@@ -116,7 +117,8 @@ public class ArrivalBookCopyControllerTest {
   @Test
   @DisplayName("create : should return 404 when arrival not found")
   void create_shouldReturn404_whenArrivalNotFound() throws Exception {
-    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
+    ArrivalBookCopyRequest request =
+        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
 
     when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenThrow(new NotFoundException("Arrival with id " + arrivalId + " not found"));
@@ -132,7 +134,8 @@ public class ArrivalBookCopyControllerTest {
   @Test
   @DisplayName("create : should return 404 when bookCopy not found")
   void create_shouldReturn404_whenBookCopyNotFound() throws Exception {
-    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
+    ArrivalBookCopyRequest request =
+        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
 
     when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenThrow(new NotFoundException("BookCopy with id " + bookCopyId + " not found"));

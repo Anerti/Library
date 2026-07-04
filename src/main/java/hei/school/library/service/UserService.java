@@ -3,16 +3,14 @@ package hei.school.library.service;
 import hei.school.library.config.ResourcesAccessRules;
 import hei.school.library.dto.*;
 import hei.school.library.entity.User;
-import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.ForbiddenException;
 import hei.school.library.exception.InternalServerErrorException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.UserMapper;
 import hei.school.library.repository.dao.UserRepository;
 import hei.school.library.validator.DataValidator;
-import java.util.UUID;
-
 import hei.school.library.validator.UserValidator;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
