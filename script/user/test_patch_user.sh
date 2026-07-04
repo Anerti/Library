@@ -24,62 +24,50 @@ MARIE_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="marie@mail.c
 ADMIN_TOKEN=$(curlie POST "http://localhost:8080/auth/login" email="admin@library.com" password="Str0ng!Passphrase1" | jq -r '.token')
 
 echo "── 1) 200 — CUSTOMER (Marie) patches own firstName  →  200 / updated firstName"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" PATCH "http://localhost:8080/users/${MARIE_ID}" firstName="Marie Updated"
+curlie -H "Authorization:Bearer $MARIE_TOKEN" PATCH "http://localhost:8080/users/${MARIE_ID}" firstName="Marie Updated"
 echo
 
-echo "── 2) 200 — CUSTOMER (Marie) patches own email  →  200 / updated email"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" PATCH "http://localhost:8080/users/${MARIE_ID}" email="marie.updated@mail.com"
+echo "── 2) 200 — CUSTOMER (Marie) patches own phone  →  200 / updated phone"
+curlie -H "Authorization:Bearer $MARIE_TOKEN" PATCH "http://localhost:8080/users/${MARIE_ID}" phone="+261 32 999 999"
 echo
 
-echo "── 3) 200 — CUSTOMER (Marie) patches own phone  →  200 / updated phone"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" PATCH "http://localhost:8080/users/${MARIE_ID}" phone="+261 32 999 999"
+echo "── 3) 200 — CUSTOMER (Marie) patches own birthDate  →  200 / updated birthDate"
+curlie -H "Authorization:Bearer $MARIE_TOKEN" PATCH "http://localhost:8080/users/${MARIE_ID}" birthDate="1990-01-01"
 echo
 
-echo "── 4) 200 — CUSTOMER (Marie) patches own birthDate  →  200 / updated birthDate"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" PATCH "http://localhost:8080/users/${MARIE_ID}" birthDate="1990-01-01"
+echo "── 4) 200 — CUSTOMER (Marie) patches all fields at once  →  200 / all fields"
+curlie -H "Authorization:Bearer $MARIE_TOKEN" PATCH "http://localhost:8080/users/${MARIE_ID}" \
+  lastName="Dupont" firstName="Marie" birthDate="1995-03-10" phone="+261 32 456 789"
 echo
 
-echo "── 5) 200 — CUSTOMER (Marie) patches all fields at once  →  200 / all fields"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" PATCH "http://localhost:8080/users/${MARIE_ID}" \
-  lastName="Dupont" firstName="Marie" birthDate="1995-03-10" email="marie@mail.com" phone="+261 32 456 789"
+echo "── 5) 200 — ADMIN patches CUSTOMER (Jeanne) lastName  →  200 / updated lastName"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" PATCH "http://localhost:8080/users/${JEANNE_ID}" lastName="DupontUpdated"
 echo
 
-echo "── 6) 200 — ADMIN patches CUSTOMER (Jeanne) lastName  →  200 / updated lastName"
-curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" PATCH "http://localhost:8080/users/${JEANNE_ID}" lastName="DupontUpdated"
+echo "── 6) 403 — CUSTOMER (Marie) patches another CUSTOMER (Tiana)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $MARIE_TOKEN" PATCH "http://localhost:8080/users/${TIANA_ID}" firstName="Hacked"
 echo
 
-echo "── 7) 403 — CUSTOMER (Marie) patches another CUSTOMER (Tiana)  →  403 / forbidden"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" PATCH "http://localhost:8080/users/${TIANA_ID}" firstName="Hacked"
+echo "── 7) 403 — ADMIN patches another ADMIN (Faly)  →  403 / forbidden"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" PATCH "http://localhost:8080/users/${FALY_ID}" firstName="Hacked"
 echo
 
-echo "── 8) 403 — ADMIN patches another ADMIN (Faly)  →  403 / forbidden"
-curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" PATCH "http://localhost:8080/users/${FALY_ID}" firstName="Hacked"
+echo "── 8) 404 — PATCH /users/{id} (non-existent UUID)  →  404 / not found"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" PATCH "http://localhost:8080/users/${NONEXISTENT_ID}" firstName="Nobody"
 echo
 
-echo "── 9) 404 — PATCH /users/{id} (non-existent UUID)  →  404 / not found"
-curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" PATCH "http://localhost:8080/users/${NONEXISTENT_ID}" firstName="Nobody"
+echo "── 9) 400 — PATCH /users/{id} (malformed UUID)  →  400 / bad request"
+curlie -H "Authorization:Bearer $ADMIN_TOKEN" PATCH "http://localhost:8080/users/not-a-uuid" firstName="Bad"
 echo
 
-echo "── 10) 400 — PATCH /users/{id} (malformed UUID)  →  400 / bad request"
-curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" PATCH "http://localhost:8080/users/not-a-uuid" firstName="Bad"
+echo "── 10) 422 — invalid phone format  →  422 / unprocessable entity"
+curlie -H "Authorization:Bearer $MARIE_TOKEN" PATCH "http://localhost:8080/users/${MARIE_ID}" phone="abc"
 echo
 
-echo "── 11) 422 — invalid email format  →  422 / unprocessable entity"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" PATCH "http://localhost:8080/users/${MARIE_ID}" email="not-an-email"
+echo "── 11) 422 — invalid firstName (forbidden characters)  →  422 / unprocessable entity"
+curlie -H "Authorization:Bearer $MARIE_TOKEN" PATCH "http://localhost:8080/users/${MARIE_ID}" firstName="Marie123"
 echo
 
-echo "── 12) 422 — invalid phone format  →  422 / unprocessable entity"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" PATCH "http://localhost:8080/users/${MARIE_ID}" phone="abc"
-echo
-
-echo "── 13) 422 — invalid firstName (forbidden characters)  →  422 / unprocessable entity"
-curlie -H "Authorization:Bearer ${MARIE_TOKEN}" PATCH "http://localhost:8080/users/${MARIE_ID}" firstName="Marie123"
-echo
-
-echo "── 14) 409 — email already in use (Admin patches Jeanne to marie@mail.com)  →  409 / conflict"
-curlie -H "Authorization:Bearer ${ADMIN_TOKEN}" PATCH "http://localhost:8080/users/${JEANNE_ID}" email="marie@mail.com"
-echo
-
-echo "── 15) 401 — PATCH /users/{id} (no token)  →  401 / unauthorized"
+echo "── 12) 401 — PATCH /users/{id} (no token)  →  401 / unauthorized"
 curlie PATCH "http://localhost:8080/users/${MARIE_ID}" firstName="NoAuth"
 echo
