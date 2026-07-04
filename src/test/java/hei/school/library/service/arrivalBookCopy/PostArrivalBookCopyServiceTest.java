@@ -51,7 +51,7 @@ public class PostArrivalBookCopyServiceTest {
     arrival = Arrival.builder().id(arrivalId).build();
     bookCopy = BookCopy.builder().id(bookCopyId).build();
 
-    request = new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
+    request = new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00));
 
     arrivalBookCopy =
         ArrivalBookCopy.builder()
@@ -59,7 +59,6 @@ public class PostArrivalBookCopyServiceTest {
             .arrival(arrival)
             .bookCopy(bookCopy)
             .purchasePrice(BigDecimal.valueOf(15.00))
-            .quantity(3)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
@@ -69,7 +68,6 @@ public class PostArrivalBookCopyServiceTest {
             .arrivalId(arrivalId)
             .bookCopyId(bookCopyId)
             .purchasePrice(BigDecimal.valueOf(15.00))
-            .quantity(3)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
@@ -88,24 +86,7 @@ public class PostArrivalBookCopyServiceTest {
     assertThat(result).isNotNull();
     assertThat(result.getArrivalId()).isEqualTo(arrivalId);
     assertThat(result.getBookCopyId()).isEqualTo(bookCopyId);
-    assertThat(result.getQuantity()).isEqualTo(3);
     verify(arrivalBookCopyRepository).save(any(ArrivalBookCopy.class));
-  }
-
-  @Test
-  @DisplayName("create : use default quantity when not provided")
-  void create_shouldUseDefaultQuantity_whenNotProvided() {
-    ArrivalBookCopyRequest requestWithoutQuantity =
-        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), null);
-
-    when(arrivalRepository.findById(arrivalId)).thenReturn(Optional.of(arrival));
-    when(bookCopyRepository.findById(bookCopyId)).thenReturn(Optional.of(bookCopy));
-    when(arrivalBookCopyRepository.save(any(ArrivalBookCopy.class))).thenReturn(arrivalBookCopy);
-    when(arrivalBookCopyMapper.toResponse(arrivalBookCopy)).thenReturn(arrivalBookCopyResponse);
-
-    arrivalBookCopyService.create(arrivalId, requestWithoutQuantity);
-
-    verify(arrivalBookCopyRepository).save(argThat(item -> item.getQuantity() == 1));
   }
 
   @Test

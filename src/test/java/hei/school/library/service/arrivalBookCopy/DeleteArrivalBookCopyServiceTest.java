@@ -50,7 +50,6 @@ public class DeleteArrivalBookCopyServiceTest {
             .arrival(arrival)
             .bookCopy(bookCopy)
             .purchasePrice(BigDecimal.valueOf(15.00))
-            .quantity(3)
             .build();
   }
 

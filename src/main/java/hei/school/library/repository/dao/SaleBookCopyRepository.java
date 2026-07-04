@@ -16,7 +16,7 @@ public interface SaleBookCopyRepository extends JpaRepository<SaleBookCopy, UUID
   @Query(
       value =
           """
-          SELECT id, book_copy_id, sale_id, quantity, price, created_at
+          SELECT id, book_copy_id, sale_id, price, created_at
           FROM sale_book_copy
           WHERE sale_id = :saleId
           """,
@@ -26,16 +26,15 @@ public interface SaleBookCopyRepository extends JpaRepository<SaleBookCopy, UUID
   @Query(
       value =
           """
-          INSERT INTO sale_book_copy (book_copy_id, sale_id, quantity, price)
-          VALUES (:bookCopyId, :saleId, :quantity, :price)
+          INSERT INTO sale_book_copy (book_copy_id, sale_id, price)
+          VALUES (:bookCopyId, :saleId, :price)
           ON CONFLICT (book_copy_id, sale_id) DO NOTHING
-          RETURNING id, book_copy_id, sale_id, quantity, price, created_at
+          RETURNING id, book_copy_id, sale_id, price, created_at
           """,
       nativeQuery = true)
   Optional<SaleBookCopy> create(
       @Param("bookCopyId") UUID bookCopyId,
       @Param("saleId") UUID saleId,
-      @Param("quantity") Integer quantity,
       @Param("price") BigDecimal price);
 
   @Query(

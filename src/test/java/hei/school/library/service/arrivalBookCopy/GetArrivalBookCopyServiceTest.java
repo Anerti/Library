@@ -53,7 +53,6 @@ public class GetArrivalBookCopyServiceTest {
             .arrival(arrival)
             .bookCopy(bookCopy)
             .purchasePrice(BigDecimal.valueOf(15.00))
-            .quantity(3)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();
@@ -63,7 +62,6 @@ public class GetArrivalBookCopyServiceTest {
             .arrivalId(arrivalId)
             .bookCopyId(bookCopyId)
             .purchasePrice(BigDecimal.valueOf(15.00))
-            .quantity(3)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build();

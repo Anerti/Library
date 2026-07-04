@@ -110,10 +110,8 @@ CREATE TABLE IF NOT EXISTS sale_book_copy (
     id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
     book_copy_id    UUID         NOT NULL REFERENCES book_copy(id),
     sale_id         UUID         NOT NULL REFERENCES sale(id),
-    quantity        INT          NOT NULL DEFAULT 1,
     price           NUMERIC(10,2) NOT NULL,
-    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_sale_book_copy UNIQUE (book_copy_id, sale_id)
+    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS arrival (
@@ -128,9 +126,7 @@ CREATE TABLE IF NOT EXISTS arrival_book_copy (
     arrival_id      UUID         NOT NULL REFERENCES arrival(id),
     book_copy_id    UUID         NOT NULL REFERENCES book_copy(id),
     purchase_price  NUMERIC      NOT NULL,
-    quantity        INT          NOT NULL DEFAULT 1,
     created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_arrival_book_copy UNIQUE (book_copy_id, arrival_id)
+    updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
