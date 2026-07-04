@@ -1,6 +1,7 @@
 package hei.school.library.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.*;
@@ -28,7 +29,7 @@ public class ArrivalBookCopy {
   private BookCopy bookCopy;
 
   @Column(nullable = false)
-  private Double purchasePrice;
+  private BigDecimal purchasePrice;
 
   @Column(nullable = false)
   @Builder.Default

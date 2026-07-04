@@ -13,6 +13,7 @@ import hei.school.library.endpoint.rest.controller.ArrivalBookCopyController;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.service.ArrivalBookCopyService;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -47,7 +48,7 @@ public class ArrivalBookCopyControllerTest {
         ArrivalBookCopyResponse.builder()
             .arrivalId(arrivalId)
             .bookCopyId(bookCopyId)
-            .purchasePrice(15.00)
+            .purchasePrice(BigDecimal.valueOf(15.00))
             .quantity(3)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
@@ -94,7 +95,7 @@ public class ArrivalBookCopyControllerTest {
   @Test
   @DisplayName("create : should return 201 with created item")
   void create_shouldReturn201() throws Exception {
-    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, 15.00, 3);
+    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
 
     when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenReturn(arrivalBookCopyResponse);
@@ -115,7 +116,7 @@ public class ArrivalBookCopyControllerTest {
   @Test
   @DisplayName("create : should return 404 when arrival not found")
   void create_shouldReturn404_whenArrivalNotFound() throws Exception {
-    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, 15.00, 3);
+    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
 
     when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenThrow(new NotFoundException("Arrival with id " + arrivalId + " not found"));
@@ -131,7 +132,7 @@ public class ArrivalBookCopyControllerTest {
   @Test
   @DisplayName("create : should return 404 when bookCopy not found")
   void create_shouldReturn404_whenBookCopyNotFound() throws Exception {
-    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, 15.00, 3);
+    ArrivalBookCopyRequest request = new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
 
     when(arrivalBookCopyService.create(eq(arrivalId), any(ArrivalBookCopyRequest.class)))
         .thenThrow(new NotFoundException("BookCopy with id " + bookCopyId + " not found"));

@@ -14,6 +14,7 @@ import hei.school.library.repository.dao.ArrivalBookCopyRepository;
 import hei.school.library.repository.dao.ArrivalRepository;
 import hei.school.library.repository.dao.BookCopyRepository;
 import hei.school.library.service.ArrivalBookCopyService;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import org.junit.jupiter.api.*;
@@ -50,14 +51,14 @@ public class PostArrivalBookCopyServiceTest {
     arrival = Arrival.builder().id(arrivalId).build();
     bookCopy = BookCopy.builder().id(bookCopyId).build();
 
-    request = new ArrivalBookCopyRequest(bookCopyId, 15.00, 3);
+    request = new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), 3);
 
     arrivalBookCopy =
         ArrivalBookCopy.builder()
             .id(UUID.randomUUID())
             .arrival(arrival)
             .bookCopy(bookCopy)
-            .purchasePrice(15.00)
+            .purchasePrice(BigDecimal.valueOf(15.00))
             .quantity(3)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
@@ -67,7 +68,7 @@ public class PostArrivalBookCopyServiceTest {
         ArrivalBookCopyResponse.builder()
             .arrivalId(arrivalId)
             .bookCopyId(bookCopyId)
-            .purchasePrice(15.00)
+            .purchasePrice(BigDecimal.valueOf(15.00))
             .quantity(3)
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
@@ -95,7 +96,7 @@ public class PostArrivalBookCopyServiceTest {
   @DisplayName("create : use default quantity when not provided")
   void create_shouldUseDefaultQuantity_whenNotProvided() {
     ArrivalBookCopyRequest requestWithoutQuantity =
-        new ArrivalBookCopyRequest(bookCopyId, 15.00, null);
+        new ArrivalBookCopyRequest(bookCopyId, BigDecimal.valueOf(15.00), null);
 
     when(arrivalRepository.findById(arrivalId)).thenReturn(Optional.of(arrival));
     when(bookCopyRepository.findById(bookCopyId)).thenReturn(Optional.of(bookCopy));
