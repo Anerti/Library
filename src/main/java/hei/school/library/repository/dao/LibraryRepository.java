@@ -20,8 +20,42 @@ public interface LibraryRepository extends JpaRepository<Library, UUID> {
           WHERE (:search IS NULL OR :search = ''
             OR name ILIKE '%' || :search || '%'
             OR email ILIKE '%' || :search || '%'
+            OR phone ILIKE '%' || :search || '%'
+            OR address ILIKE '%' || :search || '%')
+          """,
+      countQuery =
+          """
+          SELECT COUNT(id) FROM library
+          WHERE (:search IS NULL OR :search = ''
+            OR name ILIKE '%' || :search || '%'
+            OR email ILIKE '%' || :search || '%'
+            OR phone ILIKE '%' || :search || '%'
             OR address ILIKE '%' || :search || '%')
           """,
       nativeQuery = true)
-  Optional<Page<Library>> searchLibraries(@Param("search") String search, Pageable pageable);
+  Page<Library> searchLibraries(@Param("search") String search, Pageable pageable);
+
+  @Query(
+      value =
+          """
+          INSERT INTO library (name, phone, email, address)
+          VALUES (:name, :phone, :email, :address)
+          ON CONFLICT DO NOTHING
+          RETURNING id, name, phone, email, address
+          """,
+      nativeQuery = true)
+  Optional<Library> insertLibraryIgnoreConflict(
+      @Param("name") String name,
+      @Param("phone") String phone,
+      @Param("email") String email,
+      @Param("address") String address);
+
+  @Query(
+      value =
+          """
+          DELETE FROM library WHERE id = :id
+          RETURNING id
+          """,
+      nativeQuery = true)
+  Optional<UUID> deleteByIdAndReturn(@Param("id") UUID id);
 }

@@ -4,11 +4,14 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import hei.school.library.dto.AuthorRequest;
 import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.AuthorUpdateRequest;
 import hei.school.library.entity.Author;
+import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AuthorMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.service.AuthorService;
 import hei.school.library.validator.AuthorValidator;
@@ -36,13 +39,39 @@ public class AuthorServiceTest {
 
   @BeforeEach
   public void setUp() {
-    authorMapper = new AuthorMapper();
+    authorMapper = new AuthorMapper(new PaginationMapper());
     authorService =
         new AuthorService(authorRepository, authorValidator, authorMapper, dataValidator);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
     author = Author.builder().id(existingId).firstName("Jean").lastName("Paul").build();
+  }
+
+  @Test
+  @DisplayName("create: should call validator and return DTO")
+  void create_shouldCallValidatorAndReturnDto() {
+    AuthorRequest request = new AuthorRequest("Jean", "Paul");
+
+    when(authorRepository.create("Jean", "Paul")).thenReturn(Optional.of(author));
+
+    AuthorResponse result = authorService.create(request);
+
+    assertThat(result.getFirstName()).isEqualTo("Jean");
+    assertThat(result.getLastName()).isEqualTo("Paul");
+    verify(authorValidator).validateCreation(request);
+  }
+
+  @Test
+  @DisplayName("create: should throw ConflictException on duplicate")
+  void create_shouldThrow_whenDuplicate() {
+    AuthorRequest request = new AuthorRequest("Jean", "Paul");
+
+    when(authorRepository.create("Jean", "Paul")).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> authorService.create(request)).isInstanceOf(ConflictException.class);
+
+    verify(authorValidator).validateCreation(request);
   }
 
   @Test
@@ -53,8 +82,8 @@ public class AuthorServiceTest {
     Author updated =
         Author.builder().id(existingId).firstName("Jean").lastName("Paul Updated").build();
 
-    when(authorRepository.findById(existingId)).thenReturn(Optional.of(author));
-    when(authorRepository.save(any(Author.class))).thenReturn(updated);
+    when(authorRepository.update(existingId, "Jean", "Paul Updated"))
+        .thenReturn(Optional.of(updated));
 
     AuthorResponse result = authorService.update(existingId, updateReq);
 
@@ -65,11 +94,13 @@ public class AuthorServiceTest {
   @Test
   @DisplayName("update: should throw NotFoundException when absent")
   void update_shouldThrow_whenNotFound() {
-    when(authorRepository.findById(unknownId)).thenReturn(Optional.empty());
+    AuthorUpdateRequest updateReq = new AuthorUpdateRequest("Jean", "Paul Updated");
 
-    assertThatThrownBy(() -> authorService.update(unknownId, new AuthorUpdateRequest()))
+    when(authorRepository.update(unknownId, "Jean", "Paul Updated")).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> authorService.update(unknownId, updateReq))
         .isInstanceOf(NotFoundException.class);
 
-    verify(authorRepository, never()).save(any(Author.class));
+    verify(authorRepository).update(unknownId, "Jean", "Paul Updated");
   }
 }

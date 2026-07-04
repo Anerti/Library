@@ -5,10 +5,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import hei.school.library.dto.AuthorResponse;
-import hei.school.library.dto.PageResponse;
+import hei.school.library.dto.AuthorListResponse;
 import hei.school.library.entity.Author;
 import hei.school.library.mapper.AuthorMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.service.AuthorService;
 import hei.school.library.validator.AuthorValidator;
@@ -37,7 +37,7 @@ class GetAuthorsServiceTest {
 
   @BeforeEach
   void setUp() {
-    AuthorMapper authorMapper = new AuthorMapper();
+    AuthorMapper authorMapper = new AuthorMapper(new PaginationMapper());
     authorService =
         new AuthorService(authorRepository, authorValidator, authorMapper, dataValidator);
 
@@ -51,13 +51,13 @@ class GetAuthorsServiceTest {
     Page<Author> authorPage = new PageImpl<>(List.of(author));
     when(authorRepository.findAll(any(Pageable.class))).thenReturn(authorPage);
 
-    PageResponse<AuthorResponse> result = authorService.findAll(null, 1, 20);
+    AuthorListResponse result = authorService.findAll(null, 1, 20);
 
     assertThat(result.getData()).hasSize(1);
     assertThat(result.getData().getFirst().getFirstName()).isEqualTo("Jean");
-    assertThat(result.getPagination().getTotal()).isEqualTo(1);
-    assertThat(result.getPagination().getPage()).isEqualTo(1);
-    assertThat(result.getPagination().getSize()).isEqualTo(20);
+    assertThat(result.getMeta().getTotal()).isEqualTo(1);
+    assertThat(result.getMeta().getPage()).isEqualTo(1);
+    assertThat(result.getMeta().getSize()).isEqualTo(20);
     verify(authorRepository).findAll(any(Pageable.class));
   }
 
@@ -67,7 +67,7 @@ class GetAuthorsServiceTest {
     Page<Author> authorPage = new PageImpl<>(List.of(author));
     when(authorRepository.findBySearch(any(), any(Pageable.class))).thenReturn(authorPage);
 
-    PageResponse<AuthorResponse> result = authorService.findAll("Jean", 1, 20);
+    AuthorListResponse result = authorService.findAll("Jean", 1, 20);
 
     assertThat(result.getData()).hasSize(1);
     assertThat(result.getData().getFirst().getFirstName()).isEqualTo("Jean");

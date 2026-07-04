@@ -1,15 +1,19 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.*;
-import hei.school.library.entity.Author;
+import hei.school.library.dto.AuthorListResponse;
+import hei.school.library.dto.AuthorRequest;
+import hei.school.library.dto.AuthorResponse;
+import hei.school.library.dto.AuthorUpdateRequest;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AuthorMapper;
 import hei.school.library.repository.dao.AuthorRepository;
 import hei.school.library.validator.AuthorValidator;
 import hei.school.library.validator.DataValidator;
+import java.sql.SQLException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +25,11 @@ public class AuthorService {
   private final AuthorValidator authorValidator;
   private final AuthorMapper authorMapper;
   private final DataValidator dataValidator;
+  private static final String SQL_STATE_VIOLATION = "23505";
 
   @Transactional(readOnly = true)
-  public PageResponse<AuthorResponse> findAll(String search, int page, int size) {
+  public AuthorListResponse findAll(String search, int page, int size) {
+    dataValidator.validateName("search", search);
     PageRequest pageable = PageRequest.of(page - 1, size);
 
     return (search == null || search.isBlank())
@@ -36,13 +42,12 @@ public class AuthorService {
     return authorRepository
         .findById(id)
         .map(authorMapper::toResponse)
-        .orElseThrow(() -> new NotFoundException("Author " + id + " not found"));
+        .orElseThrow(() -> new NotFoundException(String.format("Author %s not found.", id)));
   }
 
   @Transactional
   public AuthorResponse create(AuthorRequest authorRequest) {
-    dataValidator.validateName("firstName", authorRequest.getFirstName());
-    dataValidator.validateName("lastName", authorRequest.getLastName());
+    authorValidator.validateCreation(authorRequest);
 
     return authorMapper.toResponse(
         authorRepository
@@ -60,24 +65,25 @@ public class AuthorService {
   @Transactional
   public AuthorResponse update(UUID id, AuthorUpdateRequest authorUpdateRequest) {
     authorValidator.validateUpdate(authorUpdateRequest);
-    Author author =
-        authorRepository
-            .findById(id)
-            .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
 
-    if (authorUpdateRequest.getFirstName() != null) {
-      author.setFirstName(authorUpdateRequest.getFirstName());
+    try {
+      return authorMapper.toResponse(
+          authorRepository
+              .update(id, authorUpdateRequest.getFirstName(), authorUpdateRequest.getLastName())
+              .orElseThrow(() -> new NotFoundException(String.format("Author %s not found.", id))));
+    } catch (DataIntegrityViolationException e) {
+      if (e.getRootCause() instanceof SQLException sqlEx
+          && SQL_STATE_VIOLATION.equals(sqlEx.getSQLState())) {
+        throw new ConflictException("Author already exists.");
+      }
+      throw e;
     }
-    if (authorUpdateRequest.getLastName() != null) {
-      author.setLastName(authorUpdateRequest.getLastName());
-    }
-    return authorMapper.toResponse(authorRepository.save(author));
   }
 
   @Transactional
   public void delete(UUID id) {
     authorRepository
         .delete(id)
-        .orElseThrow(() -> new NotFoundException("Author with id " + id + " not found"));
+        .orElseThrow(() -> new NotFoundException(String.format("Author %s not found.", id)));
   }
 }

@@ -1,9 +1,9 @@
 package hei.school.library.endpoint.rest.controller;
 
+import hei.school.library.dto.AuthorListResponse;
 import hei.school.library.dto.AuthorRequest;
 import hei.school.library.dto.AuthorResponse;
 import hei.school.library.dto.AuthorUpdateRequest;
-import hei.school.library.dto.PageResponse;
 import hei.school.library.service.AuthorService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class AuthorController {
   private final AuthorService authorService;
 
   @GetMapping
-  public ResponseEntity<PageResponse<AuthorResponse>> findAll(
+  public ResponseEntity<AuthorListResponse> findAll(
       @RequestParam(required = false) String search,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
@@ -46,8 +46,7 @@ public class AuthorController {
   @PatchMapping("/{id}")
   public ResponseEntity<AuthorResponse> update(
       @PathVariable UUID id, @RequestBody AuthorUpdateRequest authorUpdateRequest) {
-    var author = authorService.update(id, authorUpdateRequest);
-    return ResponseEntity.status(HttpStatus.OK).body(author);
+    return ResponseEntity.status(HttpStatus.OK).body(authorService.update(id, authorUpdateRequest));
   }
 
   @DeleteMapping("/{id}")

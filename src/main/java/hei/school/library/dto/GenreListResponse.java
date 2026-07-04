@@ -1,8 +1,9 @@
 package hei.school.library.dto;
 
-import java.util.UUID;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -10,8 +11,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Setter
-public class AuthorReponse {
-  private UUID id;
-  private String firstName;
-  private String lastName;
+@Getter
+public class GenreListResponse {
+
+  private List<GenreResponse> data;
+  private PaginationDto meta;
 }

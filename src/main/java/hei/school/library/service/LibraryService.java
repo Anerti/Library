@@ -1,52 +1,77 @@
 package hei.school.library.service;
 
+import hei.school.library.dto.LibraryListResponse;
+import hei.school.library.dto.LibraryRequest;
 import hei.school.library.dto.LibraryResponse;
+import hei.school.library.dto.PaginationDto;
 import hei.school.library.entity.Library;
+import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
+import hei.school.library.mapper.LibraryMapper;
+import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.validator.DataValidator;
+import hei.school.library.validator.LibraryValidator;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class LibraryService {
 
   private final LibraryRepository repository;
   private final DataValidator dataValidator;
+  private final LibraryMapper libraryMapper;
+  private final PaginationMapper paginationMapper;
+  private final LibraryValidator libraryValidator;
 
-  public LibraryService(LibraryRepository repository, DataValidator dataValidator) {
-    this.repository = repository;
-    this.dataValidator = dataValidator;
+  @Transactional(readOnly = true)
+  public LibraryListResponse listLibraries(String search, int page, int size) {
+    dataValidator.validateString("search", search);
+
+    Page<Library> libraryPage = repository.searchLibraries(search, PageRequest.of(page - 1, size));
+
+    List<LibraryResponse> data =
+        libraryPage.getContent().stream().map(libraryMapper::toResponse).toList();
+
+    PaginationDto meta = paginationMapper.toPaginationDto(libraryPage, page, size);
+
+    return LibraryListResponse.builder().data(data.isEmpty() ? null : data).meta(meta).build();
+  }
+
+  @Transactional
+  public LibraryResponse createLibrary(LibraryRequest request) {
+    libraryValidator.validateCreation(request);
+
+    return libraryMapper.toResponse(
+        repository
+            .insertLibraryIgnoreConflict(
+                request.getName(), request.getPhone(), request.getEmail(), request.getAddress())
+            .orElseThrow(
+                () ->
+                    new ConflictException(
+                        String.format(
+                            "Library with this email %s, phone %s, or address %s already exists",
+                            request.getEmail(), request.getPhone(), request.getAddress()))));
   }
 
   @Transactional(readOnly = true)
-  public Map<String, Object> listLibraries(String search, int page, int size) {
-    dataValidator.validateString("search", search);
-    Page<Library> libraryPage =
+  public LibraryResponse getLibrary(UUID id) {
+    return libraryMapper.toResponse(
         repository
-            .searchLibraries(search, PageRequest.of(page - 1, size))
-            .orElseThrow(() -> new NotFoundException("Library not found."));
+            .findById(id)
+            .orElseThrow(() -> new NotFoundException(String.format("Library %s not found.", id))));
+  }
 
-    List<LibraryResponse> data =
-        libraryPage.stream()
-            .map(
-                lib ->
-                    new LibraryResponse(
-                        lib.getId(),
-                        lib.getName(),
-                        lib.getPhone(),
-                        lib.getEmail(),
-                        lib.getAddress()))
-            .toList();
-
-    return Map.of(
-        "data",
-        data,
-        "pagination",
-        Map.of("page", page, "size", size, "total", libraryPage.getTotalElements()));
+  @Transactional
+  public void deleteLibrary(UUID id) {
+    repository
+        .deleteByIdAndReturn(id)
+        .orElseThrow(() -> new NotFoundException(String.format("Library %s not found.", id)));
   }
 }
