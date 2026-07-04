@@ -28,6 +28,33 @@ CREATE TABLE IF NOT EXISTS book (
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'book_copy_format') THEN
+CREATE TYPE book_copy_format AS ENUM ('HARDCOVER', 'PAPERBACK', 'POCKET');
+END IF;
+END
+$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'book_copy_status') THEN
+CREATE TYPE book_copy_status AS ENUM ('AVAILABLE', 'SOLD_OUT');
+END IF;
+END
+$$;
+
+CREATE TABLE IF NOT EXISTS book_copy (
+    id          UUID               PRIMARY KEY DEFAULT gen_random_uuid(),
+    price       NUMERIC            NOT NULL,
+    format      book_copy_format   NOT NULL,
+    library_id  UUID               NOT NULL REFERENCES library(id),
+    book_id     UUID               NOT NULL REFERENCES book(id),
+    status      book_copy_status   NOT NULL DEFAULT 'AVAILABLE',
+    page_number INT                NOT NULL,
+    updated_at  TIMESTAMP          NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS author_book (
     book_id    UUID NOT NULL REFERENCES book (id) ON DELETE CASCADE,
     author_id  UUID NOT NULL REFERENCES author (id) ON DELETE CASCADE,
