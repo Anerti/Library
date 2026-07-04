@@ -17,11 +17,11 @@ public class AnalyticsController {
 
   private final AnalyticsService analyticsService;
 
-  @GetMapping("/libraries/{libraryId}/analytics/stock/{bookCopyId}")
+  @GetMapping("/libraries/{libraryId}/analytics/stock/{bookId}")
   public ResponseEntity<BookStockResponse> getStockOverview(
       @PathVariable UUID libraryId,
-      @PathVariable UUID bookCopyId,
+      @PathVariable UUID bookId,
       @RequestParam(defaultValue = "ALL") String format) {
-    return ResponseEntity.status(HttpStatus.OK).body(analyticsService.getStockOverview(libraryId, bookCopyId, format));
+    return ResponseEntity.status(HttpStatus.OK).body(analyticsService.getStockOverview(libraryId, bookId, format));
   }
 }

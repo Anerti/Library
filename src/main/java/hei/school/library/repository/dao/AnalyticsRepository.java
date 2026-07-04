@@ -18,15 +18,15 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
             (SELECT COUNT(DISTINCT abc.book_copy_id)
              FROM arrival_book_copy abc
              JOIN book_copy bc ON bc.id = abc.book_copy_id
-             WHERE bc.id = CAST(:bookCopyId AS uuid)
+             WHERE bc.book_id = CAST(:bookId AS uuid)
              AND bc.library_id = CAST(:libraryId AS uuid)
              AND (:format IS NULL OR bc.format = CAST(:format AS book_copy_format)))
-            -
-            (SELECT COUNT(DISTINCT sbc.book_copy_id)
+             -
+             (SELECT COUNT(DISTINCT sbc.book_copy_id)
              FROM sale_book_copy sbc
              JOIN book_copy bc ON bc.id = sbc.book_copy_id
              JOIN sale s ON s.id = sbc.sale_id
-             WHERE bc.id = CAST(:bookCopyId AS uuid)
+             WHERE bc.book_id = CAST(:bookId AS uuid)
              AND bc.library_id = CAST(:libraryId AS uuid)
              AND (:format IS NULL OR bc.format = CAST(:format AS book_copy_format))
              AND s.status = 'SOLD'),
@@ -34,7 +34,7 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
           """,
       nativeQuery = true)
   long countAvailableStock(
-      @Param("bookId") UUID bookCopyId,
+      @Param("bookId") UUID bookId,
       @Param("format") BookCopyFormat format,
       @Param("libraryId") UUID libraryId);
 }

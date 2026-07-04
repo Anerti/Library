@@ -3565,7 +3565,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /libraries/{libraryId}/analytics/stock/{bookcopy}:
+  /libraries/{libraryId}/analytics/stock/{bookId}:
     get:
       operationId: getStockOverview
       summary: Books in stock
@@ -3580,7 +3580,7 @@ paths:
             type: string
             format: uuid
             example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-        - name: bookcopy
+        - name: bookId
           in: path
           required: true
           schema:
