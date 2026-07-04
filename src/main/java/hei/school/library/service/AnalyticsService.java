@@ -30,7 +30,8 @@ public class AnalyticsService {
 
     return analyticsMapper.toStockResponse(
         bookId,
-        analyticsRepository.countAvailableStock(bookId, responseFormat != null ? responseFormat.name() : null, libraryId),
+        analyticsRepository.countAvailableStock(
+            bookId, responseFormat != null ? responseFormat.name() : null, libraryId),
         responseFormat);
   }
 }

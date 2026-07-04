@@ -52,8 +52,7 @@ public class AnalyticsServiceTest {
   @DisplayName("getStockOverview : should return stock for a specific format")
   void getStockOverview_shouldReturnStock_forSpecificFormat() {
     when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(new Object());
-    when(analyticsRepository.countAvailableStock(bookId, "PAPERBACK", libraryId))
-        .thenReturn(7L);
+    when(analyticsRepository.countAvailableStock(bookId, "PAPERBACK", libraryId)).thenReturn(7L);
 
     var result = analyticsService.getStockOverview(libraryId, bookId, "PAPERBACK");
 
@@ -66,8 +65,7 @@ public class AnalyticsServiceTest {
   @DisplayName("getStockOverview : should return zero when no copies available")
   void getStockOverview_shouldReturnZero_whenNoCopies() {
     when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(new Object());
-    when(analyticsRepository.countAvailableStock(bookId, "POCKET", libraryId))
-        .thenReturn(0L);
+    when(analyticsRepository.countAvailableStock(bookId, "POCKET", libraryId)).thenReturn(0L);
 
     var result = analyticsService.getStockOverview(libraryId, bookId, "POCKET");
 
