@@ -54,8 +54,7 @@ public class LowStockAnalyticsServiceTest {
     rows.add(row);
 
     when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(new Object());
-    when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null))
-        .thenReturn(rows);
+    when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null)).thenReturn(rows);
     when(analyticsMapper.toLowStockResponse(row)).thenReturn(response);
 
     List<BookLowStockResponse> result =
@@ -72,8 +71,7 @@ public class LowStockAnalyticsServiceTest {
   @DisplayName("getLowStockBooks : should return empty list when no low stock rows")
   void getLowStockBooks_shouldReturnEmptyList_whenNoLowStock() {
     when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(new Object());
-    when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null))
-        .thenReturn(List.of());
+    when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null)).thenReturn(List.of());
 
     List<BookLowStockResponse> result =
         analyticsService.getLowStockBooks(libraryId, bookId, 3, null);
@@ -91,15 +89,12 @@ public class LowStockAnalyticsServiceTest {
         .when(analyticsValidator)
         .validateThreshold(-1);
 
-    assertThatThrownBy(
-            () -> analyticsService.getLowStockBooks(libraryId, bookId, -1, null))
+    assertThatThrownBy(() -> analyticsService.getLowStockBooks(libraryId, bookId, -1, null))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Threshold must be greater than 0");
 
-    verify(analyticsRepository, never())
-        .checkBookCopyLink(any(), any());
-    verify(analyticsRepository, never())
-        .findLowStockBooks(any(), any(), anyInt(), any());
+    verify(analyticsRepository, never()).checkBookCopyLink(any(), any());
+    verify(analyticsRepository, never()).findLowStockBooks(any(), any(), anyInt(), any());
   }
 
   @Test
@@ -119,8 +114,7 @@ public class LowStockAnalyticsServiceTest {
     rows.add(row);
 
     when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(new Object());
-    when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null))
-        .thenReturn(rows);
+    when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null)).thenReturn(rows);
     when(analyticsMapper.toLowStockResponse(row)).thenReturn(response);
 
     List<BookLowStockResponse> result =
@@ -132,21 +126,19 @@ public class LowStockAnalyticsServiceTest {
   }
 
   @Test
-  @DisplayName("getLowStockBooks : should throw UnprocessableEntityException when format is invalid")
+  @DisplayName(
+      "getLowStockBooks : should throw UnprocessableEntityException when format is invalid")
   void getLowStockBooks_shouldThrow_whenFormatIsInvalid() {
     doThrow(new UnprocessableEntityException("Invalid format"))
         .when(analyticsValidator)
         .validateFormat("INVALID");
 
-    assertThatThrownBy(
-            () -> analyticsService.getLowStockBooks(libraryId, bookId, 3, "INVALID"))
+    assertThatThrownBy(() -> analyticsService.getLowStockBooks(libraryId, bookId, 3, "INVALID"))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Invalid format");
 
-    verify(analyticsRepository, never())
-        .checkBookCopyLink(any(), any());
-    verify(analyticsRepository, never())
-        .findLowStockBooks(any(), any(), anyInt(), any());
+    verify(analyticsRepository, never()).checkBookCopyLink(any(), any());
+    verify(analyticsRepository, never()).findLowStockBooks(any(), any(), anyInt(), any());
   }
 
   @Test
@@ -154,15 +146,13 @@ public class LowStockAnalyticsServiceTest {
   void getLowStockBooks_shouldThrow_whenLibraryOrBookNotFound() {
     when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(null);
 
-    assertThatThrownBy(
-            () -> analyticsService.getLowStockBooks(libraryId, bookId, 3, null))
+    assertThatThrownBy(() -> analyticsService.getLowStockBooks(libraryId, bookId, 3, null))
         .isInstanceOf(NotFoundException.class)
         .hasMessageContaining("Library")
         .hasMessageContaining("Book");
 
     verify(analyticsValidator).validateThreshold(3);
     verify(analyticsValidator).validateFormat(null);
-    verify(analyticsRepository, never())
-        .findLowStockBooks(any(), any(), anyInt(), any());
+    verify(analyticsRepository, never()).findLowStockBooks(any(), any(), anyInt(), any());
   }
 }

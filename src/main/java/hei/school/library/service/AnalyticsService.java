@@ -4,7 +4,6 @@ import hei.school.library.dto.BookLowStockResponse;
 import hei.school.library.dto.BookStockResponse;
 import hei.school.library.entity.enums.BookCopyFormat;
 import hei.school.library.exception.NotFoundException;
-import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.AnalyticsMapper;
 import hei.school.library.repository.dao.AnalyticsRepository;
 import hei.school.library.validator.AnalyticsValidator;
@@ -45,11 +44,10 @@ public class AnalyticsService {
 
     if (analyticsRepository.checkBookCopyLink(libraryId, bookId) == null) {
       throw new NotFoundException(
-              String.format("Library %s or Book %s not found", libraryId, bookId));
+          String.format("Library %s or Book %s not found", libraryId, bookId));
     }
 
-    return analyticsRepository.findLowStockBooks(libraryId, bookId, threshold, format)
-        .stream()
+    return analyticsRepository.findLowStockBooks(libraryId, bookId, threshold, format).stream()
         .map(analyticsMapper::toLowStockResponse)
         .toList();
   }
