@@ -43,6 +43,11 @@ public class AnalyticsService {
     analyticsValidator.validateThreshold(threshold);
     analyticsValidator.validateFormat(format);
 
+    if (analyticsRepository.checkBookCopyLink(libraryId, bookId) == null) {
+      throw new NotFoundException(
+              String.format("Library %s or Book %s not found", libraryId, bookId));
+    }
+
     return analyticsRepository.findLowStockBooks(libraryId, bookId, threshold, format)
         .stream()
         .map(analyticsMapper::toLowStockResponse)

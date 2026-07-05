@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import hei.school.library.dto.BookLowStockResponse;
 import hei.school.library.entity.enums.BookCopyFormat;
+import hei.school.library.exception.NotFoundException;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.AnalyticsMapper;
 import hei.school.library.repository.dao.AnalyticsRepository;
@@ -52,6 +53,7 @@ public class LowStockAnalyticsServiceTest {
     List<Object[]> rows = new ArrayList<>();
     rows.add(row);
 
+    when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(new Object());
     when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null))
         .thenReturn(rows);
     when(analyticsMapper.toLowStockResponse(row)).thenReturn(response);
@@ -69,6 +71,7 @@ public class LowStockAnalyticsServiceTest {
   @Test
   @DisplayName("getLowStockBooks : should return empty list when no low stock rows")
   void getLowStockBooks_shouldReturnEmptyList_whenNoLowStock() {
+    when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(new Object());
     when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null))
         .thenReturn(List.of());
 
@@ -94,6 +97,8 @@ public class LowStockAnalyticsServiceTest {
         .hasMessageContaining("Threshold must be greater than 0");
 
     verify(analyticsRepository, never())
+        .checkBookCopyLink(any(), any());
+    verify(analyticsRepository, never())
         .findLowStockBooks(any(), any(), anyInt(), any());
   }
 
@@ -113,6 +118,7 @@ public class LowStockAnalyticsServiceTest {
     List<Object[]> rows = new ArrayList<>();
     rows.add(row);
 
+    when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(new Object());
     when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null))
         .thenReturn(rows);
     when(analyticsMapper.toLowStockResponse(row)).thenReturn(response);
@@ -137,6 +143,25 @@ public class LowStockAnalyticsServiceTest {
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Invalid format");
 
+    verify(analyticsRepository, never())
+        .checkBookCopyLink(any(), any());
+    verify(analyticsRepository, never())
+        .findLowStockBooks(any(), any(), anyInt(), any());
+  }
+
+  @Test
+  @DisplayName("getLowStockBooks : should throw NotFoundException when library or book not found")
+  void getLowStockBooks_shouldThrow_whenLibraryOrBookNotFound() {
+    when(analyticsRepository.checkBookCopyLink(libraryId, bookId)).thenReturn(null);
+
+    assertThatThrownBy(
+            () -> analyticsService.getLowStockBooks(libraryId, bookId, 3, null))
+        .isInstanceOf(NotFoundException.class)
+        .hasMessageContaining("Library")
+        .hasMessageContaining("Book");
+
+    verify(analyticsValidator).validateThreshold(3);
+    verify(analyticsValidator).validateFormat(null);
     verify(analyticsRepository, never())
         .findLowStockBooks(any(), any(), anyInt(), any());
   }
