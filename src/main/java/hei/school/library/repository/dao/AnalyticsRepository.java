@@ -13,7 +13,7 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
 
   @Query(
       value =
-"""
+          """
 
                 SELECT COALESCE(
   (SELECT COUNT(abc.book_copy_id)
@@ -41,7 +41,7 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
 
   @Query(
       value =
-"""
+          """
 
                 SELECT DISTINCT(book_copy.library_id, book_copy.book_id)
 FROM book_copy
@@ -59,7 +59,6 @@ WHERE library_id = CAST(:libraryId AS uuid)
                   bc.book_id,
                   bc.library_id,
                   bc.format,
-                  -- On calcule le stock une seule fois ici
                   (SELECT COUNT(abc.book_copy_id)
                    FROM arrival_book_copy abc
                    JOIN book_copy bc2 ON bc2.id = abc.book_copy_id
