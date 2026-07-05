@@ -24,13 +24,13 @@ INSERT INTO library (id, name, phone, email, address)
 VALUES ('0391f892-a6fc-41d0-8253-925b76bd72a0', 'Low Stock Analytics Library', '+261 34 99 888 77', 'low-stock@analytics.mg', '42 Test Boulevard')
 ON CONFLICT DO NOTHING;
 
--- Genres
+-- Genres (re-use UUIDs from seed_genre_for_list.sql to stay consistent)
 INSERT INTO genre (id, name)
 VALUES
-    ('986cc805-ec89-4af2-8e09-1b48207bd020', 'Fantasy'),
-    ('5f7ee196-241d-4808-9a44-404d557d08e6', 'Science Fiction'),
-    ('3127d1de-4008-4266-a63b-25b8a6421d03', 'Mystery')
-ON CONFLICT DO NOTHING;
+    ('258d3b83-4a83-4138-8070-73c94b92cf86', 'Fantasy'),
+    ('b9349104-765d-4965-8100-de8d265b6ef7', 'Science Fiction'),
+    ('37149c8b-5691-450c-b753-78cd9867a4a3', 'Mystery')
+ON CONFLICT (name) DO NOTHING;
 
 -- Authors
 INSERT INTO author (id, first_name, last_name)
@@ -38,7 +38,7 @@ VALUES
     ('b9bfe13b-318a-4721-af70-3e1650a5edbb', 'Elena', 'Harper'),
     ('c19c6f39-5f48-4b75-a59e-5e329809114b', 'James', 'Moriarty'),
     ('c9883920-1186-4cdb-98e3-60fc50928a0e', 'Lin', 'Wei')
-ON CONFLICT DO NOTHING;
+ON CONFLICT ON CONSTRAINT uq_author_name DO NOTHING;
 
 -- Books
 INSERT INTO book (id, title, summary, isbn, publisher, published_at, created_at)
@@ -59,15 +59,15 @@ ON CONFLICT DO NOTHING;
 -- Book-genre links
 INSERT INTO book_genre (book_id, genre_id)
 VALUES
-    ('1a1019e7-7c60-47d1-b52a-88dfff652e42', '986cc805-ec89-4af2-8e09-1b48207bd020'),
-    ('edc27d44-b8da-4c1b-ba7c-a64e994b46ca', '5f7ee196-241d-4808-9a44-404d557d08e6'),
-    ('3dbe25a8-86f5-41fd-adec-21e6626c86e2', '3127d1de-4008-4266-a63b-25b8a6421d03')
+    ('1a1019e7-7c60-47d1-b52a-88dfff652e42', '258d3b83-4a83-4138-8070-73c94b92cf86'),
+    ('edc27d44-b8da-4c1b-ba7c-a64e994b46ca', 'b9349104-765d-4965-8100-de8d265b6ef7'),
+    ('3dbe25a8-86f5-41fd-adec-21e6626c86e2', '37149c8b-5691-450c-b753-78cd9867a4a3')
 ON CONFLICT DO NOTHING;
 
 -- Book copies (3 per book, one per format)
 INSERT INTO book_copy (id, price, format, library_id, book_id, status, page_number, updated_at)
 VALUES
-    ('daaaaa406-c73a-474c-adda-bf59a954ab2b', 12.99, 'PAPERBACK'::book_copy_format, '0391f892-a6fc-41d0-8253-925b76bd72a0', '1a1019e7-7c60-47d1-b52a-88dfff652e42', 'AVAILABLE', 250, CURRENT_TIMESTAMP),
+    ('9c66752f-3d05-47d5-a4f9-1db85309cfa4', 12.99, 'PAPERBACK'::book_copy_format, '0391f892-a6fc-41d0-8253-925b76bd72a0', '1a1019e7-7c60-47d1-b52a-88dfff652e42', 'AVAILABLE', 250, CURRENT_TIMESTAMP),
     ('52fd7943-5d10-4263-a7c4-a49b934babfd', 24.99, 'HARDCOVER'::book_copy_format, '0391f892-a6fc-41d0-8253-925b76bd72a0', '1a1019e7-7c60-47d1-b52a-88dfff652e42', 'AVAILABLE', 250, CURRENT_TIMESTAMP),
     ('abbecf98-b8e0-43f2-8b1e-3c832dbc8eba', 8.99,  'POCKET'::book_copy_format,    '0391f892-a6fc-41d0-8253-925b76bd72a0', '1a1019e7-7c60-47d1-b52a-88dfff652e42', 'AVAILABLE', 250, CURRENT_TIMESTAMP),
     ('5d1d867e-7811-4bf5-beb8-7c0759cd2890', 14.99, 'PAPERBACK'::book_copy_format, '0391f892-a6fc-41d0-8253-925b76bd72a0', 'edc27d44-b8da-4c1b-ba7c-a64e994b46ca', 'AVAILABLE', 320, CURRENT_TIMESTAMP),
@@ -96,7 +96,7 @@ ON CONFLICT DO NOTHING;
 
 INSERT INTO arrival_book_copy (id, arrival_id, book_copy_id, purchase_price, created_at, updated_at)
 VALUES
-    ('94349427-62e9-444d-81ef-a685d51d5508', '749f1f7c-cbaa-4d2b-93af-62d2eb609952', 'daaaaa406-c73a-474c-adda-bf59a954ab2b', 7.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('94349427-62e9-444d-81ef-a685d51d5508', '749f1f7c-cbaa-4d2b-93af-62d2eb609952', '9c66752f-3d05-47d5-a4f9-1db85309cfa4', 7.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('39e3c1ff-5d6e-4407-a04b-285c52d44c9c', '749f1f7c-cbaa-4d2b-93af-62d2eb609952', '52fd7943-5d10-4263-a7c4-a49b934babfd', 14.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('d5c10a18-3630-4fbe-834d-8f50c9e754e5', '749f1f7c-cbaa-4d2b-93af-62d2eb609952', 'abbecf98-b8e0-43f2-8b1e-3c832dbc8eba', 4.50, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('390b31b9-ccf5-46b5-ba80-7e3e5c4855da', '749f1f7c-cbaa-4d2b-93af-62d2eb609952', '5d1d867e-7811-4bf5-beb8-7c0759cd2890', 8.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
