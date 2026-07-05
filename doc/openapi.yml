@@ -3615,11 +3615,11 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /libraries/{libraryId}/analytics/low-stock:
+  /libraries/{libraryId}/analytics/low-stock/book/{bookId}:
     get:
-      operationId: getLowStockBooks
-      summary: Low stock books
-      description: Books with total stock below a configurable threshold (default 3) across all formats in a library
+      operationId: getLowStockBook
+      summary: Low stock for a book
+      description: Stock for a specific book in a library, broken down by format, filtered by threshold
       tags:
         - Analytics
       parameters:
@@ -3630,21 +3630,13 @@ paths:
             type: string
             format: uuid
             example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-        - name: page
-          in: query
+        - name: bookId
+          in: path
+          required: true
           schema:
-            type: integer
-            minimum: 1
-            default: 1
-            example: 1
-        - name: size
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 20
-            example: 20
+            type: string
+            format: uuid
+            example: b1c2d3e4-f5a6-7890-abcd-ef1234567890
         - name: threshold
           in: query
           required: false
@@ -3654,71 +3646,40 @@ paths:
             default: 3
             example: 3
           description: Maximum stock count to be considered "low stock" (defaults to 3)
-        - name: title
+        - name: format
           in: query
           required: false
           schema:
-            type: string
-            maxLength: 100
-          description: Free-text search on book title
-        - name: isbn
-          in: query
-          required: false
-          schema:
-            type: string
-            maxLength: 100
-            example: 978-2-07-061275-8
-          description: Exact ISBN match
-        - name: genre
-          in: query
-          required: false
-          schema:
-            type: string
-            maxLength: 100
-          description: Exact genre name match
-        - name: author
-          in: query
-          required: false
-          schema:
-            type: string
-            maxLength: 100
-          description: Free-text search on author first or last name
+            $ref: '#/components/schemas/BookCopyFormat'
+          description: Filter by physical format
       responses:
         '200':
-          description: Paginated list of low stock books
+          description: Low stock overview for the book
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - data
-                  - meta
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/LowStockItem'
-                  meta:
-                    $ref: '#/components/schemas/Pagination'
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookLowStockResponse'
               example:
-                data:
-                  - bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
-                    totalCount: 3
-                    stockByFormat:
-                      - format: HARDCOVER
-                        count: 1
-                      - format: PAPERBACK
-                        count: 2
-                      - format: POCKET
-                        count: 0
-                meta:
-                  page: 1
-                  size: 20
-                  total: 1
+                - bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                  libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  format: HARDCOVER
+                  stock: 1
+                - bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                  libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  format: PAPERBACK
+                  stock: 2
+                - bookId: b1c2d3e4-f5a6-7890-abcd-ef1234567890
+                  libraryId: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  format: POCKET
+                  stock: 0
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
 
   /libraries/{libraryId}/analytics/sale/booked:
     get:
