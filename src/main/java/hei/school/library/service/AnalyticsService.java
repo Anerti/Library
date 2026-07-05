@@ -38,12 +38,12 @@ public class AnalyticsService {
         responseFormat);
   }
 
-  public List<BookLowStockResponse> getLowStockBooks(UUID libraryId, int threshold) {
-    if (threshold < 0) {
-      throw new UnprocessableEntityException("Threshold must be positive");
-    }
+  public List<BookLowStockResponse> getLowStockBooks(
+      UUID libraryId, int threshold, String genre, String author, String title, String isbn) {
+    analyticsValidator.validateFilters(threshold, genre, author, title, isbn);
 
-    return analyticsRepository.findLowStockBooks(libraryId, threshold).stream()
+    return analyticsRepository.findLowStockBooks(libraryId, threshold, genre, author, title, isbn)
+        .stream()
         .map(analyticsMapper::toLowStockResponse)
         .toList();
   }

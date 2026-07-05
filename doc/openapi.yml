@@ -3619,7 +3619,7 @@ paths:
     get:
       operationId: getLowStockBooks
       summary: Low stock books
-      description: Books with total stock ≤ 3 across all formats in a library
+      description: Books with total stock below a configurable threshold (default 3) across all formats in a library
       tags:
         - Analytics
       parameters:
@@ -3645,6 +3645,44 @@ paths:
             maximum: 100
             default: 20
             example: 20
+        - name: threshold
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 3
+            example: 3
+          description: Maximum stock count to be considered "low stock" (defaults to 3)
+        - name: title
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+          description: Free-text search on book title
+        - name: isbn
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+            example: 978-2-07-061275-8
+          description: Exact ISBN match
+        - name: genre
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+          description: Exact genre name match
+        - name: author
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 100
+          description: Free-text search on author first or last name
       responses:
         '200':
           description: Paginated list of low stock books

@@ -52,35 +52,47 @@ public class LowStockAnalyticsServiceTest {
     List<Object[]> rows = new ArrayList<>();
     rows.add(row);
 
-    when(analyticsRepository.findLowStockBooks(libraryId, 3)).thenReturn(rows);
+    when(analyticsRepository.findLowStockBooks(libraryId, 3, null, null, null, null))
+        .thenReturn(rows);
     when(analyticsMapper.toLowStockResponse(row)).thenReturn(response);
 
-    List<BookLowStockResponse> result = analyticsService.getLowStockBooks(libraryId, 3);
+    List<BookLowStockResponse> result =
+        analyticsService.getLowStockBooks(libraryId, 3, null, null, null, null);
 
     assertThat(result).hasSize(1);
     assertThat(result.getFirst().getStock()).isEqualTo(2L);
     assertThat(result.getFirst().getFormat()).isEqualTo(BookCopyFormat.PAPERBACK);
+    verify(analyticsValidator).validateFilters(3, null, null, null, null);
   }
 
   @Test
   @DisplayName("getLowStockBooks : should return empty list when no low stock books")
   void getLowStockBooks_shouldReturnEmptyList_whenNoLowStock() {
-    when(analyticsRepository.findLowStockBooks(libraryId, 3)).thenReturn(List.of());
+    when(analyticsRepository.findLowStockBooks(libraryId, 3, null, null, null, null))
+        .thenReturn(List.of());
 
-    List<BookLowStockResponse> result = analyticsService.getLowStockBooks(libraryId, 3);
+    List<BookLowStockResponse> result =
+        analyticsService.getLowStockBooks(libraryId, 3, null, null, null, null);
 
     assertThat(result).isEmpty();
+    verify(analyticsValidator).validateFilters(3, null, null, null, null);
   }
 
   @Test
   @DisplayName(
       "getLowStockBooks : should throw UnprocessableEntityException when threshold is negative")
   void getLowStockBooks_shouldThrow_whenThresholdIsNegative() {
-    assertThatThrownBy(() -> analyticsService.getLowStockBooks(libraryId, -1))
-        .isInstanceOf(UnprocessableEntityException.class)
-        .hasMessageContaining("Threshold must be positive");
+    doThrow(new UnprocessableEntityException("Threshold must be greater than 0"))
+        .when(analyticsValidator)
+        .validateFilters(-1, null, null, null, null);
 
-    verify(analyticsRepository, never()).findLowStockBooks(any(), anyInt());
+    assertThatThrownBy(
+            () -> analyticsService.getLowStockBooks(libraryId, -1, null, null, null, null))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessageContaining("Threshold must be greater than 0");
+
+    verify(analyticsRepository, never())
+        .findLowStockBooks(any(), anyInt(), any(), any(), any(), any());
   }
 
   @Test
@@ -99,11 +111,14 @@ public class LowStockAnalyticsServiceTest {
     List<Object[]> rows = new ArrayList<>();
     rows.add(row);
 
-    when(analyticsRepository.findLowStockBooks(libraryId, 3)).thenReturn(rows);
+    when(analyticsRepository.findLowStockBooks(libraryId, 3, null, null, null, null))
+        .thenReturn(rows);
     when(analyticsMapper.toLowStockResponse(row)).thenReturn(response);
 
-    List<BookLowStockResponse> result = analyticsService.getLowStockBooks(libraryId, 3);
+    List<BookLowStockResponse> result =
+        analyticsService.getLowStockBooks(libraryId, 3, null, null, null, null);
 
     assertThat(result.getFirst().getStock()).isEqualTo(0L);
+    verify(analyticsValidator).validateFilters(3, null, null, null, null);
   }
 }

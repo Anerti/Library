@@ -54,35 +54,50 @@ WHERE library_id = CAST(:libraryId AS uuid)
   @Query(
       value =
           """
-          WITH book_stock AS (
-              SELECT
-                  bc.book_id,
-                  bc.library_id,
-                  bc.format,
-                  (SELECT COUNT(abc.book_copy_id)
-                   FROM arrival_book_copy abc
-                   JOIN book_copy bc2 ON bc2.id = abc.book_copy_id
-                   WHERE bc2.book_id = bc.book_id
-                     AND bc2.library_id = bc.library_id
-                     AND bc2.format = bc.format)
-                  -
-                  (SELECT COUNT(sbc.book_copy_id)
-                   FROM sale_book_copy sbc
-                   JOIN book_copy bc3 ON bc3.id = sbc.book_copy_id
-                   JOIN sale s ON s.id = sbc.sale_id
-                   WHERE bc3.book_id = bc.book_id
-                     AND bc3.library_id = bc.library_id
-                     AND bc3.format = bc.format
-                     AND s.status = 'SOLD') AS stock
-              FROM book_copy bc
-              WHERE bc.library_id = CAST(:libraryId AS uuid)
-              GROUP BY bc.book_id, bc.library_id, bc.format
+          WITH arrival_count AS (
+              SELECT book_copy_id, COUNT(book_copy_id) AS cnt
+              FROM arrival_book_copy
+              GROUP BY book_copy_id
+          ),
+          sold_count AS (
+              SELECT sbc.book_copy_id, COUNT(sbc.book_copy_id) AS cnt
+              FROM sale_book_copy sbc
+              JOIN sale s ON s.id = sbc.sale_id AND s.status = 'SOLD'
+              GROUP BY sbc.book_copy_id
           )
-          SELECT book_id, library_id, format, stock
-          FROM book_stock
-          WHERE stock <= :threshold
+          SELECT
+              bc.book_id,
+              bc.library_id,
+              bc.format,
+              COALESCE(ac.cnt, 0) - COALESCE(sc.cnt, 0) AS stock
+          FROM book_copy bc
+          JOIN book b ON b.id = bc.book_id
+          LEFT JOIN arrival_count ac ON ac.book_copy_id = bc.id
+          LEFT JOIN sold_count sc ON sc.book_copy_id = bc.id
+          WHERE bc.library_id = CAST(:libraryId AS uuid)
+            AND (:title IS NULL OR b.title ILIKE '%' || CAST(:title AS text) || '%')
+            AND (:isbn IS NULL OR b.isbn = CAST(:isbn AS text))
+            AND (:genre IS NULL OR EXISTS (
+                SELECT 1 FROM book_genre bg
+                JOIN genre g ON g.id = bg.genre_id
+                WHERE bg.book_id = bc.book_id AND g.name = CAST(:genre AS text)
+            ))
+            AND (:author IS NULL OR EXISTS (
+                SELECT 1 FROM author_book ab
+                JOIN author a ON a.id = ab.author_id
+                WHERE ab.book_id = bc.book_id
+                AND (a.last_name ILIKE '%' || CAST(:author AS text) || '%'
+                     OR a.first_name ILIKE '%' || CAST(:author AS text) || '%')
+            ))
+          GROUP BY bc.book_id, bc.library_id, bc.format, ac.cnt, sc.cnt
+          HAVING COALESCE(ac.cnt, 0) - COALESCE(sc.cnt, 0) <= :threshold
           """,
       nativeQuery = true)
   List<Object[]> findLowStockBooks(
-      @Param("libraryId") UUID libraryId, @Param("threshold") int threshold);
+      @Param("libraryId") UUID libraryId,
+      @Param("threshold") int threshold,
+      @Param("title") String title,
+      @Param("isbn") String isbn,
+      @Param("genre") String genre,
+      @Param("author") String author);
 }
