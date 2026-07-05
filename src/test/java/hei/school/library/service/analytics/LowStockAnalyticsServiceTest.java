@@ -37,7 +37,7 @@ public class LowStockAnalyticsServiceTest {
   }
 
   @Test
-  @DisplayName("getLowStockBooks : should return books with stock <= threshold")
+  @DisplayName("getLowStockBooks : should return format rows with stock <= threshold")
   void getLowStockBooks_shouldReturnLowStockBooks() {
     Object[] row = {bookId.toString(), libraryId.toString(), "PAPERBACK", 2L};
 
@@ -52,30 +52,32 @@ public class LowStockAnalyticsServiceTest {
     List<Object[]> rows = new ArrayList<>();
     rows.add(row);
 
-    when(analyticsRepository.findLowStockBooks(libraryId, 3, null, null, null, null))
+    when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null))
         .thenReturn(rows);
     when(analyticsMapper.toLowStockResponse(row)).thenReturn(response);
 
     List<BookLowStockResponse> result =
-        analyticsService.getLowStockBooks(libraryId, 3, null, null, null, null);
+        analyticsService.getLowStockBooks(libraryId, bookId, 3, null);
 
     assertThat(result).hasSize(1);
     assertThat(result.getFirst().getStock()).isEqualTo(2L);
     assertThat(result.getFirst().getFormat()).isEqualTo(BookCopyFormat.PAPERBACK);
-    verify(analyticsValidator).validateFilters(3, null, null, null, null);
+    verify(analyticsValidator).validateThreshold(3);
+    verify(analyticsValidator).validateFormat(null);
   }
 
   @Test
-  @DisplayName("getLowStockBooks : should return empty list when no low stock books")
+  @DisplayName("getLowStockBooks : should return empty list when no low stock rows")
   void getLowStockBooks_shouldReturnEmptyList_whenNoLowStock() {
-    when(analyticsRepository.findLowStockBooks(libraryId, 3, null, null, null, null))
+    when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null))
         .thenReturn(List.of());
 
     List<BookLowStockResponse> result =
-        analyticsService.getLowStockBooks(libraryId, 3, null, null, null, null);
+        analyticsService.getLowStockBooks(libraryId, bookId, 3, null);
 
     assertThat(result).isEmpty();
-    verify(analyticsValidator).validateFilters(3, null, null, null, null);
+    verify(analyticsValidator).validateThreshold(3);
+    verify(analyticsValidator).validateFormat(null);
   }
 
   @Test
@@ -84,19 +86,19 @@ public class LowStockAnalyticsServiceTest {
   void getLowStockBooks_shouldThrow_whenThresholdIsNegative() {
     doThrow(new UnprocessableEntityException("Threshold must be greater than 0"))
         .when(analyticsValidator)
-        .validateFilters(-1, null, null, null, null);
+        .validateThreshold(-1);
 
     assertThatThrownBy(
-            () -> analyticsService.getLowStockBooks(libraryId, -1, null, null, null, null))
+            () -> analyticsService.getLowStockBooks(libraryId, bookId, -1, null))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Threshold must be greater than 0");
 
     verify(analyticsRepository, never())
-        .findLowStockBooks(any(), anyInt(), any(), any(), any(), any());
+        .findLowStockBooks(any(), any(), anyInt(), any());
   }
 
   @Test
-  @DisplayName("getLowStockBooks : should return books with stock = 0")
+  @DisplayName("getLowStockBooks : should return rows with stock = 0")
   void getLowStockBooks_shouldReturnBooks_withZeroStock() {
     Object[] row = {bookId.toString(), libraryId.toString(), "HARDCOVER", 0L};
 
@@ -111,14 +113,31 @@ public class LowStockAnalyticsServiceTest {
     List<Object[]> rows = new ArrayList<>();
     rows.add(row);
 
-    when(analyticsRepository.findLowStockBooks(libraryId, 3, null, null, null, null))
+    when(analyticsRepository.findLowStockBooks(libraryId, bookId, 3, null))
         .thenReturn(rows);
     when(analyticsMapper.toLowStockResponse(row)).thenReturn(response);
 
     List<BookLowStockResponse> result =
-        analyticsService.getLowStockBooks(libraryId, 3, null, null, null, null);
+        analyticsService.getLowStockBooks(libraryId, bookId, 3, null);
 
     assertThat(result.getFirst().getStock()).isEqualTo(0L);
-    verify(analyticsValidator).validateFilters(3, null, null, null, null);
+    verify(analyticsValidator).validateThreshold(3);
+    verify(analyticsValidator).validateFormat(null);
+  }
+
+  @Test
+  @DisplayName("getLowStockBooks : should throw UnprocessableEntityException when format is invalid")
+  void getLowStockBooks_shouldThrow_whenFormatIsInvalid() {
+    doThrow(new UnprocessableEntityException("Invalid format"))
+        .when(analyticsValidator)
+        .validateFormat("INVALID");
+
+    assertThatThrownBy(
+            () -> analyticsService.getLowStockBooks(libraryId, bookId, 3, "INVALID"))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessageContaining("Invalid format");
+
+    verify(analyticsRepository, never())
+        .findLowStockBooks(any(), any(), anyInt(), any());
   }
 }

@@ -1,4 +1,4 @@
--- Seed data for GET /libraries/{libraryId}/analytics/low-stock
+-- Seed data for GET /libraries/{libraryId}/analytics/low-stock/book/{bookId}
 -- Generated with uuidgen
 --
 -- Self-contained: all required entities (library, book, author, genre,

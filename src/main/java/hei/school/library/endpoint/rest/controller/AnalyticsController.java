@@ -28,15 +28,13 @@ public class AnalyticsController {
         .body(analyticsService.getStockOverview(libraryId, bookId, format));
   }
 
-  @GetMapping("/libraries/{libraryId}/analytics/low-stock")
+  @GetMapping("/libraries/{libraryId}/analytics/low-stock/book/{bookId}")
   public ResponseEntity<List<BookLowStockResponse>> getLowStockBooks(
       @PathVariable UUID libraryId,
+      @PathVariable UUID bookId,
       @RequestParam(defaultValue = "3") int threshold,
-      @RequestParam(required = false) String genre,
-      @RequestParam(required = false) String author,
-      @RequestParam(required = false) String title,
-      @RequestParam(required = false) String isbn) {
+      @RequestParam(required = false) String format) {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(analyticsService.getLowStockBooks(libraryId, threshold, genre, author, title, isbn));
+        .body(analyticsService.getLowStockBooks(libraryId, bookId, threshold, format));
   }
 }

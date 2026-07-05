@@ -39,10 +39,11 @@ public class AnalyticsService {
   }
 
   public List<BookLowStockResponse> getLowStockBooks(
-      UUID libraryId, int threshold, String genre, String author, String title, String isbn) {
-    analyticsValidator.validateFilters(threshold, genre, author, title, isbn);
+      UUID libraryId, UUID bookId, int threshold, String format) {
+    analyticsValidator.validateThreshold(threshold);
+    analyticsValidator.validateFormat(format);
 
-    return analyticsRepository.findLowStockBooks(libraryId, threshold, genre, author, title, isbn)
+    return analyticsRepository.findLowStockBooks(libraryId, bookId, threshold, format)
         .stream()
         .map(analyticsMapper::toLowStockResponse)
         .toList();
