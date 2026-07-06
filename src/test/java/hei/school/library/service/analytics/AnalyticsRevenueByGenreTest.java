@@ -55,7 +55,7 @@ public class AnalyticsRevenueByGenreTest {
 
   @Test
   void should_throw_not_found_when_library_does_not_exist() {
-    when(repository.existsById(libraryId)).thenReturn(false);
+    when(repository.existsLibraryById(libraryId)).thenReturn(false);
 
     assertThatThrownBy(() -> service.findRevenueByGenre(libraryId, null, null, "desc", 1, 20))
         .isInstanceOf(NotFoundException.class)
@@ -64,7 +64,7 @@ public class AnalyticsRevenueByGenreTest {
 
   @Test
   void should_return_paginated_revenue_when_library_exists() {
-    when(repository.existsById(libraryId)).thenReturn(true);
+    when(repository.existsLibraryById(libraryId)).thenReturn(true);
     GenreSummary genreSummary = new GenreSummary(UUID.randomUUID(), "Fiction");
     Map<String, Object> data =
         Map.of(
@@ -90,7 +90,7 @@ public class AnalyticsRevenueByGenreTest {
 
   @Test
   void should_default_to_to_now_and_from_to_yesterday_when_dates_are_null() {
-    when(repository.existsById(libraryId)).thenReturn(true);
+    when(repository.existsLibraryById(libraryId)).thenReturn(true);
     when(repository.findRevenueByGenre(
             eq(libraryId), any(), any(), eq("desc"), any(Pageable.class)))
         .thenReturn(new PageImpl<>(List.of()));
@@ -117,7 +117,7 @@ public class AnalyticsRevenueByGenreTest {
 
   @Test
   void should_use_provided_from_and_to_when_given() {
-    when(repository.existsById(libraryId)).thenReturn(true);
+    when(repository.existsLibraryById(libraryId)).thenReturn(true);
     when(repository.findRevenueByGenre(eq(libraryId), any(), any(), eq("asc"), any(Pageable.class)))
         .thenReturn(new PageImpl<>(List.of()));
 
@@ -135,7 +135,7 @@ public class AnalyticsRevenueByGenreTest {
 
   @Test
   void should_convert_page_to_zero_based_pageable() {
-    when(repository.existsById(libraryId)).thenReturn(true);
+    when(repository.existsLibraryById(libraryId)).thenReturn(true);
     when(repository.findRevenueByGenre(
             eq(libraryId), any(), any(), eq("desc"), any(Pageable.class)))
         .thenReturn(new PageImpl<>(List.of()));
