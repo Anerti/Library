@@ -62,7 +62,7 @@ public class AnalyticsService {
   public PageResponse findRevenueByGenre(
       UUID libraryId, LocalDate from, LocalDate to, String sortOrder, int page, int size) {
 
-    if (!analyticsRepository.existsById(libraryId)) {
+    if (!analyticsRepository.existsLibraryById(libraryId)) {
       throw new NotFoundException(String.format("Library '%s' not found", libraryId));
     }
 

@@ -123,4 +123,15 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
       @Param("end") Instant end,
       @Param("sortOrder") String sortOrder,
       Pageable pageable);
+
+  @Query(
+      """
+    SELECT CASE
+        WHEN COUNT(l) > 0 THEN true
+        ELSE false
+    END
+    FROM Library l
+    WHERE l.id = :id
+""")
+  boolean existsLibraryById(@Param("id") UUID id);
 }
