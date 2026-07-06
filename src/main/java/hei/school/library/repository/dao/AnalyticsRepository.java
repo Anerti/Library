@@ -1,8 +1,12 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.BookCopy;
+import hei.school.library.projection.RevenueByGenreProjection;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -83,4 +87,40 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
       @Param("bookId") UUID bookId,
       @Param("threshold") int threshold,
       @Param("format") String format);
+
+  @Query(
+      value =
+          """
+          SELECT
+              g.id AS genreId,g.name AS genreName, SUM(si.price), CAST(COUNT(si.id) AS integer)
+          FROM Genre g
+          JOIN g.books b
+          JOIN BookCopy bc ON bc.book = b
+          JOIN SaleBookCopy si ON si.bookCopy.id = bc.id
+          JOIN Sale s ON s.id = si.sale.id
+          WHERE bc.library.id = :libraryId
+            AND s.status = hei.school.library.entity.enums.SaleStatus.SOLD
+            AND s.saleDate BETWEEN :start AND :end
+          GROUP BY g.id, g.name
+          ORDER BY CASE WHEN :sortOrder = 'asc' THEN SUM(si.price) END ASC,
+                   CASE WHEN :sortOrder != 'asc' THEN SUM(si.price) END DESC
+          """,
+      countQuery =
+          """
+          SELECT COUNT(DISTINCT g.id)
+          FROM Genre g
+          JOIN g.books b
+          JOIN BookCopy bc ON bc.book = b
+          JOIN SaleBookCopy si ON si.bookCopy.id  = bc.id
+          JOIN Sale s ON s.id = si.sale.id
+          WHERE bc.library.id = :libraryId
+            AND s.status = hei.school.library.entity.enums.SaleStatus.SOLD
+            AND s.saleDate BETWEEN :start AND :end
+          """)
+  Page<RevenueByGenreProjection> findRevenueByGenre(
+      @Param("libraryId") UUID libraryId,
+      @Param("start") Instant start,
+      @Param("end") Instant end,
+      @Param("sortOrder") String sortOrder,
+      Pageable pageable);
 }

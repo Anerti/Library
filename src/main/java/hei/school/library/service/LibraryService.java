@@ -9,9 +9,6 @@ import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.LibraryRepository;
 import hei.school.library.validator.DataValidator;
 import hei.school.library.validator.LibraryValidator;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -73,27 +70,5 @@ public class LibraryService {
     repository
         .deleteByIdAndReturn(id)
         .orElseThrow(() -> new NotFoundException(String.format("Library %s not found.", id)));
-  }
-
-  @Transactional(readOnly = true)
-  public PageResponse findRevenueByGenre(
-      UUID libraryId, LocalDate from, LocalDate to, String sortOrder, int page, int size) {
-
-    if (!repository.existsById(libraryId)) {
-      throw new NotFoundException(String.format("Library '%s' not found", libraryId));
-    }
-
-    LocalDate resolvedTo = (to != null) ? to : LocalDate.now();
-    LocalDate resolvedFrom = (from != null) ? from : resolvedTo.minusDays(1);
-
-    Instant start = resolvedFrom.atStartOfDay(ZoneOffset.UTC).toInstant();
-    Instant end = resolvedTo.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-
-    PageRequest pageable = PageRequest.of(page - 1, size);
-    Page<RevenueByGenreItem> result =
-        repository.findRevenueByGenre(libraryId, start, end, sortOrder, pageable);
-
-    return new PageResponse(
-        result.getContent(), new PaginationDto(page, size, result.getTotalElements()));
   }
 }

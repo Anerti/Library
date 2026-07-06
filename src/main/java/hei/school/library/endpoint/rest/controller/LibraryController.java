@@ -2,7 +2,6 @@ package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.dto.*;
 import hei.school.library.service.LibraryService;
-import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,17 +46,5 @@ public class LibraryController {
   public ResponseEntity<Void> delete(@PathVariable UUID libraryId) {
     libraryService.deleteLibrary(libraryId);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-  }
-
-  @GetMapping("/{libraryId}/analytics/revenue/by-genre")
-  public ResponseEntity<PageResponse> getRevenueByGenre(
-      @PathVariable UUID libraryId,
-      @RequestParam(required = false) LocalDate from,
-      @RequestParam(required = false) LocalDate to,
-      @RequestParam(defaultValue = "desc") String sortOrder,
-      @RequestParam(defaultValue = "1") int page,
-      @RequestParam(defaultValue = "20") int size) {
-    return ResponseEntity.ok(
-        libraryService.findRevenueByGenre(libraryId, from, to, sortOrder, page, size));
   }
 }
