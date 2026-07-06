@@ -1,11 +1,13 @@
 package hei.school.library.service;
 
+import hei.school.library.dto.BookLowStockResponse;
 import hei.school.library.dto.BookStockResponse;
 import hei.school.library.entity.enums.BookCopyFormat;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.AnalyticsMapper;
 import hei.school.library.repository.dao.AnalyticsRepository;
 import hei.school.library.validator.AnalyticsValidator;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,5 +35,20 @@ public class AnalyticsService {
         analyticsRepository.countAvailableStock(
             bookId, responseFormat != null ? responseFormat.name() : null, libraryId),
         responseFormat);
+  }
+
+  public List<BookLowStockResponse> getLowStockBooks(
+      UUID libraryId, UUID bookId, int threshold, String format) {
+    analyticsValidator.validateThreshold(threshold);
+    analyticsValidator.validateFormat(format);
+
+    if (analyticsRepository.checkBookCopyLink(libraryId, bookId) == null) {
+      throw new NotFoundException(
+          String.format("Library %s or Book %s not found", libraryId, bookId));
+    }
+
+    return analyticsRepository.findLowStockBooks(libraryId, bookId, threshold, format).stream()
+        .map(analyticsMapper::toLowStockResponse)
+        .toList();
   }
 }
