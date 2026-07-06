@@ -92,7 +92,7 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
       value =
           """
           SELECT
-              g.id AS genreId,g.name AS genreName, SUM(si.price), CAST(COUNT(si.id) AS integer)
+              g.id AS genreId,g.name AS genreName, SUM(si.price) AS totalRevenue, CAST(COUNT(si.id) AS integer) AS totalSold
           FROM Genre g
           JOIN g.books b
           JOIN BookCopy bc ON bc.book = b
