@@ -91,20 +91,20 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
   @Query(
       value =
           """
-          SELECT
-              g.id AS genreId,g.name AS genreName, SUM(si.price) AS totalRevenue, CAST(COUNT(si.id) AS integer) AS totalSold
-          FROM Genre g
-          JOIN g.books b
-          JOIN BookCopy bc ON bc.book = b
-          JOIN SaleBookCopy si ON si.bookCopy.id = bc.id
-          JOIN Sale s ON s.id = si.sale.id
-          WHERE bc.library.id = :libraryId
-            AND s.status = hei.school.library.entity.enums.SaleStatus.SOLD
-            AND s.saleDate BETWEEN :start AND :end
-          GROUP BY g.id, g.name
-          ORDER BY CASE WHEN :sortOrder = 'asc' THEN SUM(si.price) END ASC,
-                   CASE WHEN :sortOrder != 'asc' THEN SUM(si.price) END DESC
-          """,
+SELECT
+    g.id AS genreId,g.name AS genreName, SUM(si.price) AS totalRevenue, CAST(COUNT(si.id) AS integer) AS totalSold
+FROM Genre g
+JOIN g.books b
+JOIN BookCopy bc ON bc.book = b
+JOIN SaleBookCopy si ON si.bookCopy.id = bc.id
+JOIN Sale s ON s.id = si.sale.id
+WHERE bc.library.id = :libraryId
+  AND s.status = hei.school.library.entity.enums.SaleStatus.SOLD
+  AND s.saleDate BETWEEN :start AND :end
+GROUP BY g.id, g.name
+ORDER BY CASE WHEN :sortOrder = 'asc' THEN SUM(si.price) END ASC,
+         CASE WHEN :sortOrder != 'asc' THEN SUM(si.price) END DESC
+""",
       countQuery =
           """
           SELECT COUNT(DISTINCT g.id)
