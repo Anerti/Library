@@ -1,0 +1,21 @@
+package hei.school.library.dto;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ArrivalBookCopyResponse {
+  private UUID bookCopyId;
+  private UUID arrivalId;
+  private LocalDateTime createdAt;
+  private BigDecimal purchasePrice;
+  private LocalDateTime updatedAt;
+}

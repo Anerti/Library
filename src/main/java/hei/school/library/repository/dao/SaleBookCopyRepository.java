@@ -1,0 +1,49 @@
+package hei.school.library.repository.dao;
+
+import hei.school.library.entity.SaleBookCopy;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface SaleBookCopyRepository extends JpaRepository<SaleBookCopy, UUID> {
+
+  @Query(
+      value =
+          """
+          SELECT id, book_copy_id, sale_id, price, created_at
+          FROM sale_book_copy
+          WHERE sale_id = :saleId
+          """,
+      nativeQuery = true)
+  List<SaleBookCopy> findBySaleId(@Param("saleId") UUID saleId);
+
+  @Query(
+      value =
+          """
+          INSERT INTO sale_book_copy (book_copy_id, sale_id, price)
+          VALUES (:bookCopyId, :saleId, :price)
+          ON CONFLICT (book_copy_id, sale_id) DO NOTHING
+          RETURNING id, book_copy_id, sale_id, price, created_at
+          """,
+      nativeQuery = true)
+  Optional<SaleBookCopy> create(
+      @Param("bookCopyId") UUID bookCopyId,
+      @Param("saleId") UUID saleId,
+      @Param("price") BigDecimal price);
+
+  @Query(
+      value =
+          """
+          DELETE FROM sale_book_copy
+          WHERE sale_id = :saleId AND book_copy_id = :bookCopyId
+          RETURNING book_copy_id
+          """,
+      nativeQuery = true)
+  Optional<UUID> delete(@Param("saleId") UUID saleId, @Param("bookCopyId") UUID bookCopyId);
+}

@@ -83,8 +83,7 @@ class PostSalesServiceTest {
             Role.CUSTOMER,
             Instant.now(),
             Instant.now());
-    sale =
-        new Sale(saleId, Instant.now(), SaleStatus.BOOKED, userId, libraryId, null, Instant.now());
+    sale = new Sale(saleId, Instant.now(), SaleStatus.BOOKED, user, library, null, Instant.now());
 
     userResponse =
         new UserResponse(

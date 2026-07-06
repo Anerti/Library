@@ -45,7 +45,6 @@ class PatchSalesServiceTest {
 
   private UUID libraryId;
   private UUID saleId;
-  private UUID customerId;
   private Library library;
   private User user;
   private Sale sale;
@@ -66,12 +65,12 @@ class PatchSalesServiceTest {
 
     libraryId = UUID.randomUUID();
     saleId = UUID.randomUUID();
-    customerId = UUID.randomUUID();
 
     library = new Library(libraryId, "Lib A", "+261****4567", "lib@mail.com", "Antananarivo");
+    UUID userId = UUID.randomUUID();
     user =
         new User(
-            customerId,
+            userId,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
@@ -81,13 +80,11 @@ class PatchSalesServiceTest {
             Role.CUSTOMER,
             Instant.now(),
             Instant.now());
-    sale =
-        new Sale(
-            saleId, Instant.now(), SaleStatus.BOOKED, customerId, libraryId, null, Instant.now());
+    sale = new Sale(saleId, Instant.now(), SaleStatus.BOOKED, user, library, null, Instant.now());
 
     userResponse =
         new UserResponse(
-            customerId,
+            userId,
             "Dupont",
             "Marie",
             LocalDate.of(1995, 3, 10),
@@ -104,19 +101,11 @@ class PatchSalesServiceTest {
     SaleUpdateRequest request = new SaleUpdateRequest(SaleStatus.SOLD, null);
 
     Sale updated =
-        new Sale(
-            saleId,
-            sale.getSaleDate(),
-            SaleStatus.SOLD,
-            customerId,
-            libraryId,
-            null,
-            Instant.now());
+        new Sale(saleId, sale.getSaleDate(), SaleStatus.SOLD, user, library, null, Instant.now());
 
     when(libraryRepository.findById(libraryId)).thenReturn(Optional.of(library));
     when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
     when(saleRepository.save(any(Sale.class))).thenReturn(updated);
-    when(userRepository.findById(customerId)).thenReturn(Optional.of(user));
     when(userMapper.toResponse(user)).thenReturn(userResponse);
 
     SaleResponse result = saleService.update(libraryId, saleId, request);

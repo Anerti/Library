@@ -2,6 +2,7 @@ package hei.school.library.validator;
 
 import hei.school.library.dto.LoginRequest;
 import hei.school.library.dto.RegisterRequest;
+import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.exception.UnprocessableEntityException;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,22 @@ public class UserValidator {
     dataValidator.checkNull("email", request.getEmail());
     dataValidator.validateEmail(request.getEmail());
     dataValidator.checkNull("password", request.getPassword());
+  }
+
+  public void validateUserPatch(UserUpdateRequest request) {
+    dataValidator.validateName("lastName", request.getLastName());
+    dataValidator.validateName("firstName", request.getFirstName());
+    dataValidator.validatePhone(request.getPhone());
+
+    if (request.getBirthDate() != null) {
+      if (request.getBirthDate().isAfter(LocalDate.now())) {
+        throw new UnprocessableEntityException("BirthDate cannot be in the future.");
+      }
+
+      if (request.getBirthDate().plusYears(12).isAfter(LocalDate.now())) {
+        throw new UnprocessableEntityException(
+            "You must be at least 12 years old to create an account.");
+      }
+    }
   }
 }

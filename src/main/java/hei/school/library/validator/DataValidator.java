@@ -1,8 +1,6 @@
 package hei.school.library.validator;
 
-import hei.school.library.dto.UserUpdateRequest;
 import hei.school.library.exception.UnprocessableEntityException;
-import java.time.LocalDate;
 import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
@@ -139,43 +137,6 @@ public class DataValidator {
                     + "Only letters (a-z, A-Z, éèê), hyphen and space are allowed.",
                 fieldName));
       }
-    }
-  }
-
-  public void validateUserUpdate(UserUpdateRequest request) {
-    if (request.getLastName() == null
-        && request.getFirstName() == null
-        && request.getBirthDate() == null
-        && request.getEmail() == null
-        && request.getPhone() == null) {
-      throw new UnprocessableEntityException("At least one field is required.");
-    }
-    if (request.getLastName() != null && request.getLastName().length() > 100) {
-      throw new UnprocessableEntityException("lastName cannot be longer than 100 characters.");
-    }
-    if (request.getFirstName() != null && request.getFirstName().length() > 100) {
-      throw new UnprocessableEntityException("firstName cannot be longer than 100 characters.");
-    }
-    if (request.getEmail() != null && request.getEmail().length() > 100) {
-      throw new UnprocessableEntityException("email cannot be longer than 100 characters.");
-    }
-    if (request.getBirthDate() != null && request.getBirthDate().isAfter(LocalDate.now())) {
-      throw new UnprocessableEntityException("birthDate cannot be in the future.");
-    }
-  }
-
-  public void validateUserPatchFields(UserUpdateRequest request) {
-    if (request.getLastName() != null) {
-      validateName("lastName", request.getLastName());
-    }
-    if (request.getFirstName() != null) {
-      validateName("firstName", request.getFirstName());
-    }
-    if (request.getEmail() != null) {
-      validateEmail(request.getEmail());
-    }
-    if (request.getPhone() != null) {
-      validatePhone(request.getPhone());
     }
   }
 }

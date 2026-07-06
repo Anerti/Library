@@ -1,39 +1,36 @@
 package hei.school.library.entity;
 
-import hei.school.library.entity.enums.SaleStatus;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
-@Table(name = "sale")
+@Table(
+    name = "sale_book_copy",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"book_copy_id", "sale_id"}))
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Sale {
+@Builder
+public class SaleBookCopy {
 
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
-  @Column(nullable = false)
-  private Instant saleDate;
-
-  @Column(nullable = false)
-  @Enumerated(EnumType.STRING)
-  private SaleStatus status;
+  @ManyToOne
+  @JoinColumn(name = "book_copy_id", nullable = false)
+  private BookCopy bookCopy;
 
   @ManyToOne
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+  @JoinColumn(name = "sale_id", nullable = false)
+  private Sale sale;
 
-  @ManyToOne
-  @JoinColumn(name = "library_id", nullable = false)
-  private Library library;
-
-  @Column private Instant expirationDate;
+  @Column(nullable = false, precision = 10, scale = 2)
+  private BigDecimal price;
 
   @CreationTimestamp
   @Column(updatable = false, nullable = false)

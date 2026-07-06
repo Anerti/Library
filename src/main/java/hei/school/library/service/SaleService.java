@@ -55,24 +55,12 @@ public class SaleService {
 
     Page<Sale> salePage =
         saleRepository.findByLibraryId(libraryId, statusStr, customerId, from, to, pageable);
-
     List<SaleResponse> responses =
         salePage.getContent().stream()
             .map(
                 sale -> {
-                  User user =
-                      userRepository
-                          .findById(sale.getUserId())
-                          .orElseThrow(
-                              () ->
-                                  new NotFoundException("User " + sale.getUserId() + " not found"));
-                  Library library =
-                      libraryRepository
-                          .findById(sale.getLibraryId())
-                          .orElseThrow(
-                              () ->
-                                  new NotFoundException(
-                                      "Library " + sale.getLibraryId() + " not found"));
+                  User user = sale.getUser();
+                  Library library = sale.getLibrary();
 
                   UserResponse userResponse = userMapper.toResponse(user);
                   LibraryResponse libraryResponse =
@@ -104,16 +92,8 @@ public class SaleService {
             .findById(saleId)
             .orElseThrow(() -> new NotFoundException("Sale " + saleId + " not found"));
 
-    User user =
-        userRepository
-            .findById(sale.getUserId())
-            .orElseThrow(() -> new NotFoundException("User " + sale.getUserId() + " not found"));
-
-    Library library =
-        libraryRepository
-            .findById(sale.getLibraryId())
-            .orElseThrow(
-                () -> new NotFoundException("Library " + sale.getLibraryId() + " not found"));
+    User user = sale.getUser();
+    Library library = sale.getLibrary();
 
     UserResponse userResponse = userMapper.toResponse(user);
     LibraryResponse libraryResponse =
@@ -179,15 +159,8 @@ public class SaleService {
   }
 
   private SaleResponse buildSaleResponse(Sale sale) {
-    User user =
-        userRepository
-            .findById(sale.getUserId())
-            .orElseThrow(() -> new NotFoundException("User " + sale.getUserId() + " not found"));
-    Library library =
-        libraryRepository
-            .findById(sale.getLibraryId())
-            .orElseThrow(
-                () -> new NotFoundException("Library " + sale.getLibraryId() + " not found"));
+    User user = sale.getUser();
+    Library library = sale.getLibrary();
 
     UserResponse userResponse = userMapper.toResponse(user);
     LibraryResponse libraryResponse =

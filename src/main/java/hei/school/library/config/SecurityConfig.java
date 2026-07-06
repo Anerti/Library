@@ -116,6 +116,11 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/sales/{saleId}/items/{bookCopyId}")
                     .hasRole("ADMIN")
+                    .requestMatchers(
+                        HttpMethod.GET,
+                        "/libraries/{libraryId}/analytics/stock/{bookId}",
+                        "/libraries/{libraryId}/analytics/low-stock/book/{bookId}")
+                    .hasRole("ADMIN")
                     .anyRequest()
                     .authenticated())
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)

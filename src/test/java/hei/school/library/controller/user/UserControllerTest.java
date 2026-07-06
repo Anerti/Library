@@ -124,7 +124,7 @@ public class UserControllerTest {
 
   @Test
   void should_update_user() throws Exception {
-    UserUpdateRequest request = new UserUpdateRequest(null, "Faly Updated", null, null, null);
+    UserUpdateRequest request = new UserUpdateRequest(null, "Faly Updated", null, null);
 
     UserResponse updatedResponse =
         UserResponse.builder()
@@ -151,7 +151,7 @@ public class UserControllerTest {
 
   @Test
   void should_return_not_found_when_user_does_not_exist_on_update() throws Exception {
-    UserUpdateRequest request = new UserUpdateRequest(null, "Faly Updated", null, null, null);
+    UserUpdateRequest request = new UserUpdateRequest(null, "Faly Updated", null, null);
 
     when(userService.update(eq(userId), any(UserUpdateRequest.class)))
         .thenThrow(new NotFoundException("User " + userId + " not found"));
