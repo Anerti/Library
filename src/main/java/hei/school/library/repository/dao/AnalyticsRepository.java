@@ -91,34 +91,38 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
   @Query(
       value =
           """
-SELECT
-    g.id AS genreId,g.name AS genreName, SUM(si.price) AS totalRevenue, CAST(COUNT(si.id) AS integer) AS totalSold
-FROM Genre g
-JOIN g.books b
-JOIN BookCopy bc ON bc.book = b
-JOIN SaleBookCopy si ON si.bookCopy.id = bc.id
-JOIN Sale s ON s.id = si.sale.id
-WHERE bc.library.id = :libraryId
-  AND s.status = hei.school.library.entity.enums.SaleStatus.SOLD
-  AND (:start IS NULL OR s.saleDate >= :start)
-  AND (:end IS NULL OR s.saleDate <= :end)
-GROUP BY g.id, g.name
-ORDER BY CASE WHEN :sortOrder = 'asc' THEN SUM(si.price) END ASC,
-         CASE WHEN :sortOrder != 'asc' THEN SUM(si.price) END DESC
-""",
+          SELECT g.id AS "genreId", g.name AS "genreName",
+                 SUM(sbc.price) AS "totalRevenue",
+                 CAST(COUNT(sbc.id) AS integer) AS "totalSold"
+          FROM genre g
+          JOIN book_genre bg ON g.id = bg.genre_id
+          JOIN book b ON b.id = bg.book_id
+          JOIN book_copy bc ON bc.book_id = b.id
+          JOIN sale_book_copy sbc ON sbc.book_copy_id = bc.id
+          JOIN sale s ON s.id = sbc.sale_id
+          WHERE bc.library_id = CAST(:libraryId AS uuid)
+            AND s.status = 'SOLD'
+            AND (CAST(:start AS timestamptz) IS NULL OR s.sale_date >= CAST(:start AS timestamptz))
+            AND (CAST(:end AS timestamptz) IS NULL OR s.sale_date <= CAST(:end AS timestamptz))
+          GROUP BY g.id, g.name
+          ORDER BY CASE WHEN :sortOrder = 'asc' THEN SUM(sbc.price) END ASC,
+                   CASE WHEN :sortOrder != 'asc' THEN SUM(sbc.price) END DESC
+          """,
       countQuery =
           """
           SELECT COUNT(DISTINCT g.id)
-          FROM Genre g
-          JOIN g.books b
-          JOIN BookCopy bc ON bc.book = b
-          JOIN SaleBookCopy si ON si.bookCopy.id  = bc.id
-          JOIN Sale s ON s.id = si.sale.id
-          WHERE bc.library.id = :libraryId
-            AND s.status = hei.school.library.entity.enums.SaleStatus.SOLD
-            AND (:start IS NULL OR s.saleDate >= :start)
-            AND (:end IS NULL OR s.saleDate <= :end)
-          """)
+          FROM genre g
+          JOIN book_genre bg ON g.id = bg.genre_id
+          JOIN book b ON b.id = bg.book_id
+          JOIN book_copy bc ON bc.book_id = b.id
+          JOIN sale_book_copy sbc ON sbc.book_copy_id = bc.id
+          JOIN sale s ON s.id = sbc.sale_id
+          WHERE bc.library_id = CAST(:libraryId AS uuid)
+            AND s.status = 'SOLD'
+            AND (CAST(:start AS timestamptz) IS NULL OR s.sale_date >= CAST(:start AS timestamptz))
+            AND (CAST(:end AS timestamptz) IS NULL OR s.sale_date <= CAST(:end AS timestamptz))
+          """,
+      nativeQuery = true)
   Page<RevenueByGenreProjection> findRevenueByGenre(
       @Param("libraryId") UUID libraryId,
       @Param("start") Instant start,
