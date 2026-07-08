@@ -1,8 +1,6 @@
 package hei.school.library.endpoint.rest.controller;
 
-import hei.school.library.dto.LibraryListResponse;
-import hei.school.library.dto.LibraryRequest;
-import hei.school.library.dto.LibraryResponse;
+import hei.school.library.dto.*;
 import hei.school.library.service.LibraryService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

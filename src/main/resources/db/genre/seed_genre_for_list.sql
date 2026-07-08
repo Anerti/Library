@@ -8,5 +8,4 @@ VALUES ('258d3b83-4a83-4138-8070-73c94b92cf86', 'Fantasy'),
        ('9f9cb019-29ab-4742-a85d-6074a15f1cb0', 'Historical Fiction'),
        ('fcfba7ab-9276-47d9-ad8e-208785a70aaa', 'Biography'),
        ('c5254d87-a617-4f19-9ad4-204dfbee7ef4', 'Non-Fiction'),
-       ('5686a96d-ac46-4d4b-9674-724223371ffa', 'Poetry')
-ON CONFLICT DO NOTHING;
+       ('5686a96d-ac46-4d4b-9674-724223371ffa', 'Poetry') ON CONFLICT DO NOTHING;

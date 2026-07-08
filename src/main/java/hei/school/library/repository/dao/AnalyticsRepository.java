@@ -1,8 +1,12 @@
 package hei.school.library.repository.dao;
 
 import hei.school.library.entity.BookCopy;
+import hei.school.library.projection.RevenueByGenreProjection;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -83,4 +87,57 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
       @Param("bookId") UUID bookId,
       @Param("threshold") int threshold,
       @Param("format") String format);
+
+  @Query(
+      value =
+          """
+          SELECT g.id AS "genreId", g.name AS "genreName",
+                 SUM(sbc.price) AS "totalRevenue",
+                 CAST(COUNT(sbc.id) AS integer) AS "totalSold"
+          FROM genre g
+          JOIN book_genre bg ON g.id = bg.genre_id
+          JOIN book b ON b.id = bg.book_id
+          JOIN book_copy bc ON bc.book_id = b.id
+          JOIN sale_book_copy sbc ON sbc.book_copy_id = bc.id
+          JOIN sale s ON s.id = sbc.sale_id
+          WHERE bc.library_id = CAST(:libraryId AS uuid)
+            AND s.status = 'SOLD'
+            AND (CAST(:start AS timestamptz) IS NULL OR s.sale_date >= CAST(:start AS timestamptz))
+            AND (CAST(:end AS timestamptz) IS NULL OR s.sale_date <= CAST(:end AS timestamptz))
+          GROUP BY g.id, g.name
+          ORDER BY CASE WHEN :sortOrder = 'asc' THEN SUM(sbc.price) END ASC,
+                   CASE WHEN :sortOrder != 'asc' THEN SUM(sbc.price) END DESC
+          """,
+      countQuery =
+          """
+          SELECT COUNT(DISTINCT g.id)
+          FROM genre g
+          JOIN book_genre bg ON g.id = bg.genre_id
+          JOIN book b ON b.id = bg.book_id
+          JOIN book_copy bc ON bc.book_id = b.id
+          JOIN sale_book_copy sbc ON sbc.book_copy_id = bc.id
+          JOIN sale s ON s.id = sbc.sale_id
+          WHERE bc.library_id = CAST(:libraryId AS uuid)
+            AND s.status = 'SOLD'
+            AND (CAST(:start AS timestamptz) IS NULL OR s.sale_date >= CAST(:start AS timestamptz))
+            AND (CAST(:end AS timestamptz) IS NULL OR s.sale_date <= CAST(:end AS timestamptz))
+          """,
+      nativeQuery = true)
+  Page<RevenueByGenreProjection> findRevenueByGenre(
+      @Param("libraryId") UUID libraryId,
+      @Param("start") Instant start,
+      @Param("end") Instant end,
+      @Param("sortOrder") String sortOrder,
+      Pageable pageable);
+
+  @Query(
+      """
+    SELECT CASE
+        WHEN COUNT(l) > 0 THEN true
+        ELSE false
+    END
+    FROM Library l
+    WHERE l.id = :id
+""")
+  boolean existsLibraryById(@Param("id") UUID id);
 }

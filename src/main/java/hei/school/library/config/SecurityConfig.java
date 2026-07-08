@@ -120,7 +120,9 @@ public class SecurityConfig {
                         HttpMethod.GET, "/libraries/{libraryId}/analytics/stock/{bookId}")
                     .permitAll()
                     .requestMatchers(
-                        HttpMethod.GET, "/libraries/{libraryId}/analytics/low-stock/book/{bookId}")
+                        HttpMethod.GET,
+                        "/libraries/{libraryId}/analytics/low-stock/book/{bookId}",
+                        "/libraries/{libraryId}/analytics/revenue/by-genre")
                     .hasRole("ADMIN")
                     .anyRequest()
                     .authenticated())

@@ -20,5 +20,4 @@ VALUES ('fc318e59-82a6-40b9-b061-3fe7051e86c0', 'Antoine', 'de Saint-Exupéry'),
        ('fd55254f-612d-4a02-a8e1-eeb0ae4a7468', 'Jean', 'Racine'),
        ('04c6d16b-21aa-4816-8739-8e8efe6fec05', 'Charles', 'Baudelaire'),
        ('56b67a93-7bcb-448b-b740-610dee77f361', 'Blaise', 'Pascal'),
-       ('360a9ca3-3f8b-442e-a097-c0986d95ef49', 'René', 'Descartes')
-ON CONFLICT DO NOTHING;
+       ('360a9ca3-3f8b-442e-a097-c0986d95ef49', 'René', 'Descartes') ON CONFLICT DO NOTHING;

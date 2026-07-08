@@ -4,9 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import hei.school.library.dto.LibraryListResponse;
-import hei.school.library.dto.LibraryRequest;
-import hei.school.library.dto.LibraryResponse;
+import hei.school.library.dto.*;
 import hei.school.library.entity.Library;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
@@ -39,9 +37,11 @@ class LibraryServiceTest {
   private DataValidator dataValidator;
   private LibraryValidator libraryValidator;
   private LibraryService service;
+  UUID libraryId;
 
   @BeforeEach
   void setUp() {
+    libraryId = UUID.randomUUID();
     paginationMapper = new PaginationMapper();
     dataValidator = new DataValidator();
     libraryValidator = new LibraryValidator(dataValidator);
