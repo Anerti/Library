@@ -5,17 +5,17 @@
 -- book_copy, users, sale) are created in this script.
 --
 -- Revenue scenario (SOLD sales per genre):
---   Fantasy (The Dragon's Lair)
+--   Revenue Fantasy (The Dragon's Lair)
 --     Sale 1 (Jan 2026): 1 copy × $12.99
 --     Sale 3 (Jun 2026): 1 copy × $12.99  → total = $25.98, 2 sold
---   Science Fiction (Starship Odyssey)
+--   Revenue Science Fiction (Starship Odyssey)
 --     Sale 1 (Jan 2026): 1 copy × $14.99   → total = $14.99, 1 sold
---   Mystery (The Hidden Clue)
+--   Revenue Mystery (The Hidden Clue)
 --     Sale 2 (Mar 2026): 1 copy × $11.99   → total = $11.99, 1 sold
 --   Romance (existing genre, no sales)      → not returned
 --
--- Expected revenue by genre (DESC): Fantasy > Science Fiction > Mystery
--- Expected with date filter [2026-01-01, 2026-01-31]: Fantasy ($12.99) + Science Fiction ($14.99)
+-- Expected revenue by genre (DESC): Revenue Fantasy > Revenue Science Fiction > Revenue Mystery
+-- Expected with date filter [2026-01-01, 2026-01-31]: Revenue Fantasy ($12.99) + Revenue Science Fiction ($14.99)
 
 -- Library
 INSERT INTO library (id, name, phone, email, address)
@@ -26,9 +26,9 @@ ON CONFLICT DO NOTHING;
 -- Genres
 INSERT INTO genre (id, name)
 VALUES
-    ('1cdf79ba-90ea-494b-b475-ef5b5db14633', 'Fantasy'),
-    ('d93f52b0-982b-4fa3-93f8-eac096d8e717', 'Science Fiction'),
-    ('eb602742-e7ff-4f26-ad25-26e9b97ed4ba', 'Mystery')
+    ('1cdf79ba-90ea-494b-b475-ef5b5db14633', 'Revenue Fantasy'),
+    ('d93f52b0-982b-4fa3-93f8-eac096d8e717', 'Revenue Science Fiction'),
+    ('eb602742-e7ff-4f26-ad25-26e9b97ed4ba', 'Revenue Mystery')
 ON CONFLICT (name) DO NOTHING;
 
 -- Authors
