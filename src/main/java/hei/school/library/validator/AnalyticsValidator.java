@@ -1,10 +1,9 @@
 package hei.school.library.validator;
 
 import hei.school.library.exception.UnprocessableEntityException;
-import org.springframework.stereotype.Component;
-
-import javax.swing.*;
 import java.time.Instant;
+import javax.swing.*;
+import org.springframework.stereotype.Component;
 
 @Component
 public class AnalyticsValidator {
@@ -32,7 +31,9 @@ public class AnalyticsValidator {
   }
 
   public void validateSortOrder(String sortOrder) {
-    if (sortOrder != null && !sortOrder.equalsIgnoreCase("DESC") && !sortOrder.equalsIgnoreCase("ASC")) {
+    if (sortOrder != null
+        && !sortOrder.equalsIgnoreCase("DESC")
+        && !sortOrder.equalsIgnoreCase("ASC")) {
       throw new UnprocessableEntityException("Invalid sort order");
     }
   }

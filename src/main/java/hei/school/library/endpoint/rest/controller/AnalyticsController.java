@@ -48,7 +48,7 @@ public class AnalyticsController {
       @RequestParam(defaultValue = "desc") String sortOrder,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
-    return ResponseEntity.status(HttpStatus.OK).body(
-        analyticsService.findRevenueByGenre(libraryId, from, to, sortOrder, page, size));
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(analyticsService.findRevenueByGenre(libraryId, from, to, sortOrder, page, size));
   }
 }

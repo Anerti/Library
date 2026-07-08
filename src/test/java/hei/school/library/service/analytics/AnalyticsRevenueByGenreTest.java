@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import hei.school.library.dto.GenreSummary;
-import hei.school.library.dto.RevenueByGenreItem;
 import hei.school.library.dto.RevenueByGenreResponse;
 import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.AnalyticsMapper;
@@ -63,8 +62,7 @@ public class AnalyticsRevenueByGenreTest {
     Instant from = Instant.parse("2026-02-01T00:00:00Z");
     Instant to = Instant.parse("2026-01-01T00:00:00Z");
 
-    assertThatThrownBy(
-            () -> service.findRevenueByGenre(libraryId, from, to, "DESC", 1, 20))
+    assertThatThrownBy(() -> service.findRevenueByGenre(libraryId, from, to, "DESC", 1, 20))
         .isInstanceOf(UnprocessableEntityException.class)
         .hasMessageContaining("Start date must be before end date");
   }
@@ -143,8 +141,7 @@ public class AnalyticsRevenueByGenreTest {
 
     service.findRevenueByGenre(libraryId, from, to, "ASC", 1, 20);
 
-    verify(repository)
-        .findRevenueByGenre(libraryId, from, to, "ASC", PageRequest.of(0, 20));
+    verify(repository).findRevenueByGenre(libraryId, from, to, "ASC", PageRequest.of(0, 20));
   }
 
   @Test
