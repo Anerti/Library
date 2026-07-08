@@ -116,9 +116,8 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/sales/{saleId}/items/{bookCopyId}")
                     .hasRole("ADMIN")
-                    .requestMatchers(
-                        HttpMethod.GET,
-                        "/libraries/{libraryId}/analytics/stock/{bookId}",
+                    .requestMatchers(HttpMethod.GET, "/libraries/{libraryId}/analytics/stock/{bookId}").permitAll()
+                    .requestMatchers(HttpMethod.GET,
                         "/libraries/{libraryId}/analytics/low-stock/book/{bookId}")
                     .hasRole("ADMIN")
                     .anyRequest()
