@@ -13,6 +13,5 @@ public class SaleBookCopyResponse {
   private UUID bookCopyId;
   private UUID saleId;
   private Instant createdAt;
-  private Integer quantity;
   private BigDecimal price;
 }

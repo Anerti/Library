@@ -62,7 +62,8 @@ WHERE id = :id
 SELECT
     id, last_name, first_name, birth_date, email, password, phone, role, created_at, updated_at
 FROM users
-WHERE email = :email""",
+WHERE email = :email\
+""",
       nativeQuery = true)
   Optional<User> findByEmail(@Param("email") String email);
 }

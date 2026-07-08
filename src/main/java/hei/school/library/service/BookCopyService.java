@@ -116,14 +116,4 @@ public class BookCopyService {
     }
     bookCopyRepository.deleteById(copyId);
   }
-
-  public long getStock(UUID bookId, BookCopyFormat format, UUID libraryId) {
-    if (!bookRepository.existsById(bookId)) {
-      throw new NotFoundException("Book with id " + bookId + " not found");
-    }
-    if (libraryId != null && !libraryRepository.existsById(libraryId)) {
-      throw new NotFoundException("Library with id " + libraryId + " not found");
-    }
-    return bookCopyRepository.countAvailableStock(bookId, format, libraryId);
-  }
 }

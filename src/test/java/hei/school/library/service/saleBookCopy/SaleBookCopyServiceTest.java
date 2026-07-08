@@ -73,9 +73,9 @@ class SaleBookCopyServiceTest {
 
     saleBookCopy =
         new SaleBookCopy(
-            UUID.randomUUID(), bookCopy, itemSale, 1, BigDecimal.valueOf(25.00), Instant.now());
+            UUID.randomUUID(), bookCopy, itemSale, BigDecimal.valueOf(25.00), Instant.now());
 
-    validRequest = new SaleBookCopyRequest(bookCopyId, 1, BigDecimal.valueOf(25.00));
+    validRequest = new SaleBookCopyRequest(bookCopyId, BigDecimal.valueOf(25.00));
   }
 
   @Test
@@ -105,8 +105,7 @@ class SaleBookCopyServiceTest {
   @DisplayName("create: should save and return DTO")
   void create_shouldSaveAndReturnDto() {
     when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
-    when(saleBookCopyRepository.create(any(), any(), any(), any()))
-        .thenReturn(Optional.of(saleBookCopy));
+    when(saleBookCopyRepository.create(any(), any(), any())).thenReturn(Optional.of(saleBookCopy));
 
     SaleBookCopyResponse result = saleBookCopyService.create(saleId, validRequest);
 
@@ -119,7 +118,7 @@ class SaleBookCopyServiceTest {
   @DisplayName("create: should throw ConflictException when already exists")
   void create_shouldThrow_whenDuplicate() {
     when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
-    when(saleBookCopyRepository.create(any(), any(), any(), any())).thenReturn(Optional.empty());
+    when(saleBookCopyRepository.create(any(), any(), any())).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> saleBookCopyService.create(saleId, validRequest))
         .isInstanceOf(ConflictException.class);
@@ -138,7 +137,7 @@ class SaleBookCopyServiceTest {
   @Test
   @DisplayName("create: should throw UnprocessableEntityException when price is null")
   void create_shouldThrow_whenPriceNull() {
-    SaleBookCopyRequest invalidRequest = new SaleBookCopyRequest(bookCopyId, 1, null);
+    SaleBookCopyRequest invalidRequest = new SaleBookCopyRequest(bookCopyId, null);
 
     doThrow(new UnprocessableEntityException("price is required."))
         .when(saleBookCopyValidator)
