@@ -16,8 +16,8 @@ import org.springframework.stereotype.Repository;
 public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
 
   @Query(
-      value =
-          """
+          value =
+                  """
             SELECT COALESCE(
             (SELECT COUNT(abc.book_copy_id)
              FROM arrival_book_copy abc
@@ -36,27 +36,28 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
                AND s.status = 'SOLD'),
                0)
           """,
-      nativeQuery = true)
+          nativeQuery = true)
   long countAvailableStock(
-      @Param("bookId") UUID bookId,
-      @Param("format") String format,
-      @Param("libraryId") UUID libraryId);
+          @Param("bookId") UUID bookId,
+          @Param("format") String format,
+          @Param("libraryId") UUID libraryId);
 
   @Query(
-      value =
-          """
+          value =
+                  """
             SELECT DISTINCT(book_copy.library_id, book_copy.book_id)
             FROM book_copy
             WHERE library_id = CAST(:libraryId AS uuid)
             AND book_id = CAST(:bookId AS uuid)
           """,
-      nativeQuery = true)
+          nativeQuery = true)
   Object checkBookCopyLink(@Param("libraryId") UUID libraryId, @Param("bookId") UUID bookId);
 
   @Query(
-      value =
-          """
-          WITH arrival_count AS (
+          value =
+                  """
+
+                          WITH arrival_count AS (
               SELECT book_copy_id, COUNT(book_copy_id) AS cnt
               FROM arrival_book_copy
               GROUP BY book_copy_id
@@ -129,15 +130,4 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
       @Param("end") Instant end,
       @Param("sortOrder") String sortOrder,
       Pageable pageable);
-
-  @Query(
-      """
-    SELECT CASE
-        WHEN COUNT(l) > 0 THEN true
-        ELSE false
-    END
-    FROM Library l
-    WHERE l.id = :id
-""")
-  boolean existsLibraryById(@Param("id") UUID id);
-}
+  }
