@@ -16,8 +16,8 @@ import org.springframework.stereotype.Repository;
 public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
 
   @Query(
-          value =
-                  """
+      value =
+          """
             SELECT COALESCE(
             (SELECT COUNT(abc.book_copy_id)
              FROM arrival_book_copy abc
@@ -36,52 +36,52 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
                AND s.status = 'SOLD'),
                0)
           """,
-          nativeQuery = true)
+      nativeQuery = true)
   long countAvailableStock(
-          @Param("bookId") UUID bookId,
-          @Param("format") String format,
-          @Param("libraryId") UUID libraryId);
+      @Param("bookId") UUID bookId,
+      @Param("format") String format,
+      @Param("libraryId") UUID libraryId);
 
   @Query(
-          value =
-                  """
+      value =
+          """
             SELECT DISTINCT(book_copy.library_id, book_copy.book_id)
             FROM book_copy
             WHERE library_id = CAST(:libraryId AS uuid)
             AND book_id = CAST(:bookId AS uuid)
           """,
-          nativeQuery = true)
+      nativeQuery = true)
   Object checkBookCopyLink(@Param("libraryId") UUID libraryId, @Param("bookId") UUID bookId);
 
   @Query(
-          value =
-                  """
+      value =
+          """
 
-                          WITH arrival_count AS (
-              SELECT book_copy_id, COUNT(book_copy_id) AS cnt
-              FROM arrival_book_copy
-              GROUP BY book_copy_id
-          ),
-          sold_count AS (
-              SELECT sbc.book_copy_id, COUNT(sbc.book_copy_id) AS cnt
-              FROM sale_book_copy sbc
-              JOIN sale s ON s.id = sbc.sale_id AND s.status = 'SOLD'
-              GROUP BY sbc.book_copy_id
-          )
-          SELECT
-              bc.book_id,
-              bc.library_id,
-              bc.format,
-              COALESCE(ac.cnt, 0) - COALESCE(sc.cnt, 0) AS stock
-          FROM book_copy bc
-          LEFT JOIN arrival_count ac ON ac.book_copy_id = bc.id
-          LEFT JOIN sold_count sc ON sc.book_copy_id = bc.id
-          WHERE bc.library_id = CAST(:libraryId AS uuid)
-            AND bc.book_id = CAST(:bookId AS uuid)
-            AND (:format IS NULL OR bc.format = CAST(:format AS book_copy_format))
-          GROUP BY bc.book_id, bc.library_id, bc.format, ac.cnt, sc.cnt
-          HAVING COALESCE(ac.cnt, 0) - COALESCE(sc.cnt, 0) <= :threshold
-          """,
+                WITH arrival_count AS (
+    SELECT book_copy_id, COUNT(book_copy_id) AS cnt
+    FROM arrival_book_copy
+    GROUP BY book_copy_id
+),
+sold_count AS (
+    SELECT sbc.book_copy_id, COUNT(sbc.book_copy_id) AS cnt
+    FROM sale_book_copy sbc
+    JOIN sale s ON s.id = sbc.sale_id AND s.status = 'SOLD'
+    GROUP BY sbc.book_copy_id
+)
+SELECT
+    bc.book_id,
+    bc.library_id,
+    bc.format,
+    COALESCE(ac.cnt, 0) - COALESCE(sc.cnt, 0) AS stock
+FROM book_copy bc
+LEFT JOIN arrival_count ac ON ac.book_copy_id = bc.id
+LEFT JOIN sold_count sc ON sc.book_copy_id = bc.id
+WHERE bc.library_id = CAST(:libraryId AS uuid)
+  AND bc.book_id = CAST(:bookId AS uuid)
+  AND (:format IS NULL OR bc.format = CAST(:format AS book_copy_format))
+GROUP BY bc.book_id, bc.library_id, bc.format, ac.cnt, sc.cnt
+HAVING COALESCE(ac.cnt, 0) - COALESCE(sc.cnt, 0) <= :threshold
+""",
       nativeQuery = true)
   List<Object[]> findLowStockBooks(
       @Param("libraryId") UUID libraryId,
@@ -130,4 +130,4 @@ public interface AnalyticsRepository extends JpaRepository<BookCopy, UUID> {
       @Param("end") Instant end,
       @Param("sortOrder") String sortOrder,
       Pageable pageable);
-  }
+}
