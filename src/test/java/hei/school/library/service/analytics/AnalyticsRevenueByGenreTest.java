@@ -8,9 +8,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import hei.school.library.dto.GenreSummary;
-import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.RevenueByGenreItem;
-import hei.school.library.exception.NotFoundException;
+import hei.school.library.dto.RevenueByGenreResponse;
+import hei.school.library.exception.UnprocessableEntityException;
 import hei.school.library.mapper.AnalyticsMapper;
 import hei.school.library.projection.RevenueByGenreProjection;
 import hei.school.library.repository.dao.AnalyticsRepository;
@@ -18,8 +18,6 @@ import hei.school.library.service.AnalyticsService;
 import hei.school.library.validator.AnalyticsValidator;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -54,17 +52,25 @@ public class AnalyticsRevenueByGenreTest {
   }
 
   @Test
-  void should_throw_not_found_when_library_does_not_exist() {
-    when(repository.existsLibraryById(libraryId)).thenReturn(false);
-
-    assertThatThrownBy(() -> service.findRevenueByGenre(libraryId, null, null, "desc", 1, 20))
-        .isInstanceOf(NotFoundException.class)
-        .hasMessageContaining(libraryId.toString());
+  void should_throw_when_sort_order_is_invalid() {
+    assertThatThrownBy(() -> service.findRevenueByGenre(libraryId, null, null, "invalid", 1, 20))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessageContaining("Invalid sort order");
   }
 
   @Test
-  void should_return_paginated_revenue_when_library_exists() {
-    when(repository.existsLibraryById(libraryId)).thenReturn(true);
+  void should_throw_when_end_date_before_start_date() {
+    Instant from = Instant.parse("2026-02-01T00:00:00Z");
+    Instant to = Instant.parse("2026-01-01T00:00:00Z");
+
+    assertThatThrownBy(
+            () -> service.findRevenueByGenre(libraryId, from, to, "DESC", 1, 20))
+        .isInstanceOf(UnprocessableEntityException.class)
+        .hasMessageContaining("Start date must be before end date");
+  }
+
+  @Test
+  void should_return_paginated_revenue() {
     GenreSummary genreSummary = new GenreSummary(UUID.randomUUID(), "Fiction");
     Map<String, Object> data =
         Map.of(
@@ -77,74 +83,81 @@ public class AnalyticsRevenueByGenreTest {
     Page<RevenueByGenreProjection> page = new PageImpl<>(List.of(item), PageRequest.of(0, 20), 1);
 
     when(repository.findRevenueByGenre(
-            eq(libraryId), any(), any(), eq("desc"), any(Pageable.class)))
+            eq(libraryId), any(), any(), eq("DESC"), any(Pageable.class)))
         .thenReturn(page);
 
-    PageResponse<RevenueByGenreItem> result =
-        service.findRevenueByGenre(libraryId, null, null, "desc", 1, 20);
+    RevenueByGenreResponse result =
+        service.findRevenueByGenre(libraryId, null, null, "DESC", 1, 20);
 
-    assertThat(result.getPagination().getPage()).isEqualTo(1);
-    assertThat(result.getPagination().getSize()).isEqualTo(20);
-    assertThat(result.getPagination().getTotal()).isEqualTo(1);
+    assertThat(result.getMeta().getPage()).isEqualTo(1);
+    assertThat(result.getMeta().getSize()).isEqualTo(20);
+    assertThat(result.getMeta().getTotal()).isEqualTo(1);
+    assertThat(result.getData()).hasSize(1);
+    assertThat(result.getData().get(0).getGenre().getName()).isEqualTo("Fiction");
+    assertThat(result.getData().get(0).getTotalRevenue())
+        .isEqualByComparingTo(BigDecimal.valueOf(2300.00));
+    assertThat(result.getData().get(0).getTotalSold()).isEqualTo(45);
   }
 
   @Test
-  void should_default_to_to_now_and_from_to_yesterday_when_dates_are_null() {
-    when(repository.existsLibraryById(libraryId)).thenReturn(true);
+  void should_return_null_data_when_no_revenue() {
     when(repository.findRevenueByGenre(
-            eq(libraryId), any(), any(), eq("desc"), any(Pageable.class)))
+            eq(libraryId), any(), any(), eq("DESC"), any(Pageable.class)))
         .thenReturn(new PageImpl<>(List.of()));
 
-    service.findRevenueByGenre(libraryId, null, null, "desc", 1, 20);
+    RevenueByGenreResponse result =
+        service.findRevenueByGenre(libraryId, null, null, "DESC", 1, 20);
+
+    assertThat(result.getData()).isNull();
+    assertThat(result.getMeta().getPage()).isEqualTo(1);
+    assertThat(result.getMeta().getSize()).isEqualTo(20);
+    assertThat(result.getMeta().getTotal()).isZero();
+  }
+
+  @Test
+  void should_pass_null_dates_when_not_provided() {
+    when(repository.findRevenueByGenre(
+            eq(libraryId), any(), any(), eq("DESC"), any(Pageable.class)))
+        .thenReturn(new PageImpl<>(List.of()));
+
+    service.findRevenueByGenre(libraryId, null, null, "DESC", 1, 20);
 
     ArgumentCaptor<Instant> startCaptor = ArgumentCaptor.forClass(Instant.class);
     ArgumentCaptor<Instant> endCaptor = ArgumentCaptor.forClass(Instant.class);
 
     verify(repository)
         .findRevenueByGenre(
-            eq(libraryId), startCaptor.capture(), endCaptor.capture(), eq("desc"), any());
+            eq(libraryId), startCaptor.capture(), endCaptor.capture(), eq("DESC"), any());
 
-    Instant capturedStart = startCaptor.getValue();
-    Instant capturedEnd = endCaptor.getValue();
-
-    LocalDate today = LocalDate.now();
-    Instant expectedEnd = today.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-    Instant expectedStart = today.minusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-
-    assertThat(capturedEnd).isEqualTo(expectedEnd);
-    assertThat(capturedStart).isEqualTo(expectedStart);
+    assertThat(startCaptor.getValue()).isNull();
+    assertThat(endCaptor.getValue()).isNull();
   }
 
   @Test
   void should_use_provided_from_and_to_when_given() {
-    when(repository.existsLibraryById(libraryId)).thenReturn(true);
-    when(repository.findRevenueByGenre(eq(libraryId), any(), any(), eq("asc"), any(Pageable.class)))
+    when(repository.findRevenueByGenre(eq(libraryId), any(), any(), eq("ASC"), any(Pageable.class)))
         .thenReturn(new PageImpl<>(List.of()));
 
-    LocalDate from = LocalDate.of(2026, 1, 1);
-    LocalDate to = LocalDate.of(2026, 1, 31);
+    Instant from = Instant.parse("2026-01-01T00:00:00Z");
+    Instant to = Instant.parse("2026-01-31T23:59:59Z");
 
-    service.findRevenueByGenre(libraryId, from, to, "asc", 1, 20);
-
-    Instant expectedStart = from.atStartOfDay(ZoneOffset.UTC).toInstant();
-    Instant expectedEnd = to.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+    service.findRevenueByGenre(libraryId, from, to, "ASC", 1, 20);
 
     verify(repository)
-        .findRevenueByGenre(libraryId, expectedStart, expectedEnd, "asc", PageRequest.of(0, 20));
+        .findRevenueByGenre(libraryId, from, to, "ASC", PageRequest.of(0, 20));
   }
 
   @Test
   void should_convert_page_to_zero_based_pageable() {
-    when(repository.existsLibraryById(libraryId)).thenReturn(true);
     when(repository.findRevenueByGenre(
-            eq(libraryId), any(), any(), eq("desc"), any(Pageable.class)))
+            eq(libraryId), any(), any(), eq("DESC"), any(Pageable.class)))
         .thenReturn(new PageImpl<>(List.of()));
 
-    service.findRevenueByGenre(libraryId, null, null, "desc", 3, 10);
+    service.findRevenueByGenre(libraryId, null, null, "DESC", 3, 10);
 
     ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
     verify(repository)
-        .findRevenueByGenre(eq(libraryId), any(), any(), eq("desc"), pageableCaptor.capture());
+        .findRevenueByGenre(eq(libraryId), any(), any(), eq("DESC"), pageableCaptor.capture());
 
     assertThat(pageableCaptor.getValue().getPageNumber()).isEqualTo(2);
     assertThat(pageableCaptor.getValue().getPageSize()).isEqualTo(10);

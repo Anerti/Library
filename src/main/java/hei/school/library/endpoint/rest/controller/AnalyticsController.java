@@ -2,9 +2,9 @@ package hei.school.library.endpoint.rest.controller;
 
 import hei.school.library.dto.BookLowStockResponse;
 import hei.school.library.dto.BookStockResponse;
-import hei.school.library.dto.PageResponse;
+import hei.school.library.dto.RevenueByGenreResponse;
 import hei.school.library.service.AnalyticsService;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -41,14 +41,14 @@ public class AnalyticsController {
   }
 
   @GetMapping("/libraries/{libraryId}/analytics/revenue/by-genre")
-  public ResponseEntity<PageResponse> getRevenueByGenre(
+  public ResponseEntity<RevenueByGenreResponse> getRevenueByGenre(
       @PathVariable UUID libraryId,
-      @RequestParam(required = false) LocalDate from,
-      @RequestParam(required = false) LocalDate to,
+      @RequestParam(required = false) Instant from,
+      @RequestParam(required = false) Instant to,
       @RequestParam(defaultValue = "desc") String sortOrder,
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "20") int size) {
-    return ResponseEntity.ok(
+    return ResponseEntity.status(HttpStatus.OK).body(
         analyticsService.findRevenueByGenre(libraryId, from, to, sortOrder, page, size));
   }
 }

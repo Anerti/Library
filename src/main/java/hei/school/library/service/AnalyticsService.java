@@ -8,8 +8,6 @@ import hei.school.library.projection.RevenueByGenreProjection;
 import hei.school.library.repository.dao.AnalyticsRepository;
 import hei.school.library.validator.AnalyticsValidator;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +24,7 @@ public class AnalyticsService {
   private final AnalyticsValidator analyticsValidator;
   private final AnalyticsMapper analyticsMapper;
 
+  @Transactional(readOnly = true)
   public BookStockResponse getStockOverview(UUID libraryId, UUID bookId, String format) {
     analyticsValidator.validateFormat(format);
 
@@ -43,6 +42,7 @@ public class AnalyticsService {
         responseFormat);
   }
 
+  @Transactional(readOnly = true)
   public List<BookLowStockResponse> getLowStockBooks(
       UUID libraryId, UUID bookId, int threshold, String format) {
     analyticsValidator.validateThreshold(threshold);
@@ -59,31 +59,15 @@ public class AnalyticsService {
   }
 
   @Transactional(readOnly = true)
-  public PageResponse findRevenueByGenre(
-      UUID libraryId, LocalDate from, LocalDate to, String sortOrder, int page, int size) {
+  public RevenueByGenreResponse findRevenueByGenre(
+      UUID libraryId, Instant from, Instant to, String sortOrder, int page, int size) {
 
-    if (!analyticsRepository.existsLibraryById(libraryId)) {
-      throw new NotFoundException(String.format("Library '%s' not found", libraryId));
-    }
-
-    LocalDate resolvedTo = (to != null) ? to : LocalDate.now();
-    LocalDate resolvedFrom = (from != null) ? from : resolvedTo.minusDays(1);
-
-    Instant start = resolvedFrom.atStartOfDay(ZoneOffset.UTC).toInstant();
-    Instant end = resolvedTo.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-
+    analyticsValidator.validateDate(from, to);
+    analyticsValidator.validateSortOrder(sortOrder);
     PageRequest pageable = PageRequest.of(page - 1, size);
     Page<RevenueByGenreProjection> found =
-        analyticsRepository.findRevenueByGenre(libraryId, start, end, sortOrder, pageable);
-    Page<RevenueByGenreItem> result =
-        found.map(
-            p ->
-                new RevenueByGenreItem(
-                    new GenreSummary(p.getGenreId(), p.getGenreName()),
-                    p.getTotalRevenue(),
-                    p.getTotalSold()));
+        analyticsRepository.findRevenueByGenre(libraryId, from, to, sortOrder, pageable);
 
-    return new PageResponse(
-        result.getContent(), new PaginationDto(page, size, result.getTotalElements()));
+    return analyticsMapper.toRevenueByGenreResponse(found, page, size);
   }
 }

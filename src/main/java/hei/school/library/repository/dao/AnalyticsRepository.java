@@ -100,7 +100,8 @@ JOIN SaleBookCopy si ON si.bookCopy.id = bc.id
 JOIN Sale s ON s.id = si.sale.id
 WHERE bc.library.id = :libraryId
   AND s.status = hei.school.library.entity.enums.SaleStatus.SOLD
-  AND s.saleDate BETWEEN :start AND :end
+  AND (:start IS NULL OR s.saleDate >= :start)
+  AND (:end IS NULL OR s.saleDate <= :end)
 GROUP BY g.id, g.name
 ORDER BY CASE WHEN :sortOrder = 'asc' THEN SUM(si.price) END ASC,
          CASE WHEN :sortOrder != 'asc' THEN SUM(si.price) END DESC
@@ -115,7 +116,8 @@ ORDER BY CASE WHEN :sortOrder = 'asc' THEN SUM(si.price) END ASC,
           JOIN Sale s ON s.id = si.sale.id
           WHERE bc.library.id = :libraryId
             AND s.status = hei.school.library.entity.enums.SaleStatus.SOLD
-            AND s.saleDate BETWEEN :start AND :end
+            AND (:start IS NULL OR s.saleDate >= :start)
+            AND (:end IS NULL OR s.saleDate <= :end)
           """)
   Page<RevenueByGenreProjection> findRevenueByGenre(
       @Param("libraryId") UUID libraryId,

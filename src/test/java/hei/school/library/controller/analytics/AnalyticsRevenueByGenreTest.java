@@ -11,9 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import hei.school.library.config.JwtTokenProvider;
 import hei.school.library.dto.GenreSummary;
-import hei.school.library.dto.PageResponse;
 import hei.school.library.dto.PaginationDto;
 import hei.school.library.dto.RevenueByGenreItem;
+import hei.school.library.dto.RevenueByGenreResponse;
 import hei.school.library.endpoint.rest.controller.AnalyticsController;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.exception.NotFoundException;
@@ -41,8 +41,8 @@ public class AnalyticsRevenueByGenreTest {
     GenreSummary genreSummary = new GenreSummary(UUID.randomUUID(), "Fiction");
 
     RevenueByGenreItem item = new RevenueByGenreItem(genreSummary, BigDecimal.valueOf(2300.00), 45);
-    PageResponse<RevenueByGenreItem> response =
-        new PageResponse<>(List.of(item), new PaginationDto(1, 20, 1));
+    RevenueByGenreResponse response =
+        new RevenueByGenreResponse(List.of(item), new PaginationDto(1, 20, 1));
 
     when(service.findRevenueByGenre(eq(libraryId), any(), any(), eq("desc"), eq(1), eq(20)))
         .thenReturn(response);
@@ -55,9 +55,9 @@ public class AnalyticsRevenueByGenreTest {
         .andExpect(jsonPath("$.data[0].genre.id").exists())
         .andExpect(jsonPath("$.data[0].totalRevenue").value(2300.00))
         .andExpect(jsonPath("$.data[0].totalSold").value(45))
-        .andExpect(jsonPath("$.pagination.page").value(1))
-        .andExpect(jsonPath("$.pagination.size").value(20))
-        .andExpect(jsonPath("$.pagination.total").value(1));
+        .andExpect(jsonPath("$.meta.page").value(1))
+        .andExpect(jsonPath("$.meta.size").value(20))
+        .andExpect(jsonPath("$.meta.total").value(1));
 
     verify(service).findRevenueByGenre(libraryId, null, null, "desc", 1, 20);
   }
@@ -66,8 +66,8 @@ public class AnalyticsRevenueByGenreTest {
   void should_pass_query_params_to_service() throws Exception {
     UUID libraryId = UUID.randomUUID();
 
-    PageResponse<RevenueByGenreItem> response =
-        new PageResponse<>(List.of(), new PaginationDto(2, 10, 0));
+    RevenueByGenreResponse response =
+        new RevenueByGenreResponse(List.of(), new PaginationDto(2, 10, 0));
 
     when(service.findRevenueByGenre(eq(libraryId), any(), any(), eq("asc"), eq(2), eq(10)))
         .thenReturn(response);
@@ -75,20 +75,20 @@ public class AnalyticsRevenueByGenreTest {
     mockMvc
         .perform(
             get("/libraries/{libraryId}/analytics/revenue/by-genre", libraryId)
-                .param("from", "2026-01-01")
-                .param("to", "2026-01-31")
+                .param("from", "2026-01-01T00:00:00Z")
+                .param("to", "2026-01-31T23:59:59Z")
                 .param("sortOrder", "asc")
                 .param("page", "2")
                 .param("size", "10"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data", hasSize(0)))
-        .andExpect(jsonPath("$.pagination.page").value(2));
+        .andExpect(jsonPath("$.meta.page").value(2));
 
     verify(service)
         .findRevenueByGenre(
             libraryId,
-            java.time.LocalDate.of(2026, 1, 1),
-            java.time.LocalDate.of(2026, 1, 31),
+            java.time.Instant.parse("2026-01-01T00:00:00Z"),
+            java.time.Instant.parse("2026-01-31T23:59:59Z"),
             "asc",
             2,
             10);
