@@ -32,7 +32,7 @@ public class AnalyticsValidator {
   }
 
   public void validateSortOrder(String sortOrder) {
-    if (sortOrder != null && !sortOrder.equals("DESC") && !sortOrder.equals("ASC")) {
+    if (sortOrder != null && !sortOrder.equalsIgnoreCase("DESC") && !sortOrder.equalsIgnoreCase("ASC")) {
       throw new UnprocessableEntityException("Invalid sort order");
     }
   }
