@@ -12,6 +12,7 @@ import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
+import hei.school.library.service.client.OpenLibraryClient;
 import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.time.LocalDate;
@@ -29,6 +30,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class GetBookByIdServiceTest {
 
   @Mock private BookRepository bookRepository;
+    @Mock
+    private OpenLibraryClient openLibraryClient;
 
   private BookService bookService;
 
@@ -44,7 +47,8 @@ class GetBookByIdServiceTest {
             new BookMapper(),
             new DataValidator(),
             new BookValidator(new DataValidator()),
-            new PaginationMapper());
+            new PaginationMapper(),
+                openLibraryClient);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();

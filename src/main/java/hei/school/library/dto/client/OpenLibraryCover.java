@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class OpenLibraryCover {
 
-    private String small;
-    private String medium;
-    private String large;
+  private String small;
+  private String medium;
+  private String large;
 }

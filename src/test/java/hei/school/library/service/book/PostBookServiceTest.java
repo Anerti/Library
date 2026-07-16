@@ -43,7 +43,8 @@ class PostBookServiceTest {
             new BookMapper(),
             new DataValidator(),
             new BookValidator(new DataValidator()),
-            new PaginationMapper());
+            new PaginationMapper(),
+                openLibraryClient);
 
     validRequest =
         BookRequest.builder()

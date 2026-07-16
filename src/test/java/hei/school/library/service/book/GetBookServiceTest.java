@@ -51,7 +51,8 @@ class GetBookServiceTest {
             new BookMapper(),
             dataValidator,
             new BookValidator(new DataValidator()),
-            new PaginationMapper());
+            new PaginationMapper(),
+                openLibraryClient);
 
     Author author =
         Author.builder()

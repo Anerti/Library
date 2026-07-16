@@ -45,6 +45,8 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.GET, "/books", "/books/{id}")
                     .permitAll()
+                    .requestMatchers(HttpMethod.POST, "/books", "/books/{bookId}/verify")
+                    .permitAll()
                     .requestMatchers(HttpMethod.POST, "/books")
                     .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.PATCH, "/books/{id}")
