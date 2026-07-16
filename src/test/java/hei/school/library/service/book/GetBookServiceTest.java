@@ -15,6 +15,7 @@ import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
+import hei.school.library.service.client.OpenLibraryClient;
 import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.time.LocalDate;
@@ -38,7 +39,7 @@ class GetBookServiceTest {
   @Mock private BookRepository bookRepository;
 
   private BookService bookService;
-
+  @Mock private OpenLibraryClient openLibraryClient;
   private Book bookWithAuthorsAndGenres;
   private Book bookWithoutRelations;
   @Mock private DataValidator dataValidator;
@@ -52,7 +53,7 @@ class GetBookServiceTest {
             dataValidator,
             new BookValidator(new DataValidator()),
             new PaginationMapper(),
-                openLibraryClient);
+            openLibraryClient);
 
     Author author =
         Author.builder()

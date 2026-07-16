@@ -30,8 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class GetBookByIdServiceTest {
 
   @Mock private BookRepository bookRepository;
-    @Mock
-    private OpenLibraryClient openLibraryClient;
+  @Mock private OpenLibraryClient openLibraryClient;
 
   private BookService bookService;
 
@@ -48,7 +47,7 @@ class GetBookByIdServiceTest {
             new DataValidator(),
             new BookValidator(new DataValidator()),
             new PaginationMapper(),
-                openLibraryClient);
+            openLibraryClient);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();

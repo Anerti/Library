@@ -26,8 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DeleteBookByIdServiceTest {
 
   @Mock private BookRepository bookRepository;
-    @Mock
-    private OpenLibraryClient openLibraryClient;
+  @Mock private OpenLibraryClient openLibraryClient;
   private BookService bookService;
 
   private UUID existingId;
@@ -42,7 +41,7 @@ class DeleteBookByIdServiceTest {
             new DataValidator(),
             new BookValidator(new DataValidator()),
             new PaginationMapper(),
-                openLibraryClient);
+            openLibraryClient);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();
