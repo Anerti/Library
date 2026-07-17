@@ -16,6 +16,7 @@ import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
+import hei.school.library.service.client.OpenLibraryClient;
 import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.sql.SQLException;
@@ -34,7 +35,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 class PatchBookByIdTest {
 
   @Mock private BookRepository bookRepository;
-
+  @Mock private OpenLibraryClient openLibraryClient;
   private BookService bookService;
 
   private UUID bookId;
@@ -47,7 +48,8 @@ class PatchBookByIdTest {
             new BookMapper(),
             new DataValidator(),
             new BookValidator(new DataValidator()),
-            new PaginationMapper());
+            new PaginationMapper(),
+            openLibraryClient);
 
     bookId = UUID.randomUUID();
   }

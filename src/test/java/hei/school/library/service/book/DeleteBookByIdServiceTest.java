@@ -10,6 +10,7 @@ import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
 import hei.school.library.service.BookService;
+import hei.school.library.service.client.OpenLibraryClient;
 import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.util.Optional;
@@ -25,7 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DeleteBookByIdServiceTest {
 
   @Mock private BookRepository bookRepository;
-
+  @Mock private OpenLibraryClient openLibraryClient;
   private BookService bookService;
 
   private UUID existingId;
@@ -39,7 +40,8 @@ class DeleteBookByIdServiceTest {
             new BookMapper(),
             new DataValidator(),
             new BookValidator(new DataValidator()),
-            new PaginationMapper());
+            new PaginationMapper(),
+            openLibraryClient);
 
     existingId = UUID.randomUUID();
     unknownId = UUID.randomUUID();

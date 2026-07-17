@@ -1,16 +1,13 @@
 package hei.school.library.service;
 
-import hei.school.library.dto.BookRequest;
-import hei.school.library.dto.BookResponse;
-import hei.school.library.dto.BookUpdateRequest;
-import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.PaginationDto;
+import hei.school.library.dto.*;
 import hei.school.library.entity.Book;
 import hei.school.library.exception.ConflictException;
 import hei.school.library.exception.NotFoundException;
 import hei.school.library.mapper.BookMapper;
 import hei.school.library.mapper.PaginationMapper;
 import hei.school.library.repository.dao.BookRepository;
+import hei.school.library.service.client.OpenLibraryClient;
 import hei.school.library.validator.BookValidator;
 import hei.school.library.validator.DataValidator;
 import java.sql.SQLException;
@@ -34,6 +31,7 @@ public class BookService {
   private final BookValidator bookValidator;
   private final PaginationMapper paginationMapper;
   private static final String UNIQUE_CONSTRAINT_VIOLATION = "23505";
+  private final OpenLibraryClient openLibraryClient;
 
   @Transactional
   public BookResponse createBook(BookRequest request) {
@@ -119,5 +117,12 @@ public class BookService {
         .data(books.isEmpty() ? null : books)
         .pagination(pagination)
         .build();
+  }
+
+  public VerifyBookResponse verifyBook(UUID bookId) {
+    Book book =
+        bookRepository.findById(bookId).orElseThrow(() -> new NotFoundException("Book not found"));
+
+    return openLibraryClient.verify(book.getIsbn());
   }
 }

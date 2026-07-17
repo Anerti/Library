@@ -328,6 +328,68 @@ components:
           type: string
           format: date
           example: "1943-04-06"
+    VerifyBookResponse:
+      type: object
+      required:
+        - exists
+        - isbn
+
+      properties:
+        exists:
+          type: boolean
+          example: true
+
+        isbn:
+          type: string
+          example: "9780140328721"
+
+        title:
+          type: string
+          nullable: true
+          example: Fantastic Mr. Fox
+
+        authors:
+          type: array
+          items:
+            type: string
+
+        publisher:
+          type: string
+          nullable: true
+
+        publishDate:
+          type: string
+          nullable: true
+          example: October 1, 1988
+
+        numberOfPages:
+          type: integer
+          nullable: true
+          example: 96
+
+        subjects:
+          type: array
+          items:
+            type: string
+
+        cover:
+          $ref: "#/components/schemas/OpenLibraryCover"
+
+    OpenLibraryCover:
+      type: object
+
+      properties:
+        small:
+          type: string
+          format: uri
+
+        medium:
+          type: string
+          format: uri
+
+        large:
+          type: string
+          format: uri
 
     # ────────────────── Author ──────────────────
     AuthorRequest:
@@ -1674,6 +1736,40 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+
+  /books/{bookId}/verify:
+    post:
+      summary: Verify a book on Open Library
+      tags:
+        - Books
+      description: |
+        Retrieves the ISBN of the specified book and checks whether it exists
+        on Open Library. When found, selected metadata is returned.
+      operationId: verifyBook
+
+      parameters:
+        - name: bookId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Verification completed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyBookResponse"
+
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+        "502":
+          description: Open Library service unavailable.
 
 
 

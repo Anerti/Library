@@ -1,9 +1,6 @@
 package hei.school.library.endpoint.rest.controller;
 
-import hei.school.library.dto.BookRequest;
-import hei.school.library.dto.BookResponse;
-import hei.school.library.dto.BookUpdateRequest;
-import hei.school.library.dto.PageResponse;
+import hei.school.library.dto.*;
 import hei.school.library.service.BookService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +49,11 @@ public class BookController {
   public ResponseEntity<Void> deleteBook(@PathVariable UUID id) {
     bookService.deleteBook(id);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+  }
+
+  @PostMapping("/{bookId}/verify")
+  public ResponseEntity<VerifyBookResponse> verifyBook(@PathVariable UUID bookId) {
+
+    return ResponseEntity.ok(bookService.verifyBook(bookId));
   }
 }

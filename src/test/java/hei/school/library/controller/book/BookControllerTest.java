@@ -2,17 +2,15 @@ package hei.school.library.controller.book;
 
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import hei.school.library.config.JwtTokenProvider;
-import hei.school.library.dto.AuthorResponse;
-import hei.school.library.dto.BookResponse;
-import hei.school.library.dto.GenreSummary;
-import hei.school.library.dto.PageResponse;
-import hei.school.library.dto.PaginationDto;
+import hei.school.library.dto.*;
 import hei.school.library.endpoint.rest.controller.BookController;
 import hei.school.library.exception.GlobalExceptionHandler;
 import hei.school.library.service.BookService;
@@ -224,5 +222,36 @@ public class BookControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data").value(nullValue()))
         .andExpect(jsonPath("$.pagination.total").value(0));
+  }
+
+  @Test
+  void should_verify_book() throws Exception {
+
+    UUID id = UUID.randomUUID();
+
+    VerifyBookResponse response =
+        VerifyBookResponse.builder()
+            .exists(true)
+            .isbn("9780140328721")
+            .title("Fantastic Mr. Fox")
+            .publisher("Puffin")
+            .authors(List.of("Roald Dahl"))
+            .subjects(List.of("Children"))
+            .numberOfPages(96)
+            .publishDate("October 1, 1988")
+            .build();
+
+    when(bookService.verifyBook(id)).thenReturn(response);
+
+    mockMvc
+        .perform(post("/books/{id}/verify", id))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.exists").value(true))
+        .andExpect(jsonPath("$.isbn").value("9780140328721"))
+        .andExpect(jsonPath("$.title").value("Fantastic Mr. Fox"))
+        .andExpect(jsonPath("$.publisher").value("Puffin"))
+        .andExpect(jsonPath("$.numberOfPages").value(96));
+
+    verify(bookService).verifyBook(id);
   }
 }
